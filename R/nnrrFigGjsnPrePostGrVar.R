@@ -40,9 +40,9 @@ nnrrFigGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra='2000-01-01', dat
 
   # Definerer pre -og postvariabler, fjerner registreringer som mangler én eller begge
   PrePostVar <- switch(valgtVar,
-                       ODI_PrePost = c('ODI.Score', 'ODI.Score_post'),
-                       NDI_PrePost = c('NDI.Score', 'NDI.Score_post'),
-                       EQ5D_PrePost = c('EQ5D.Score', 'EQ5D.Score_post'))
+                       ODI_PrePost = c('OdiScore', 'OdiScore_post'),
+                       NDI_PrePost = c('NdiScore', 'NdiScore_post'),
+                       EQ5D_PrePost = c('Eq5dScore', 'Eq5dScore_post'))
 
   RegData$VarPre <- RegData[ ,PrePostVar[1]]
   RegData$VarPost <- RegData[ ,PrePostVar[2]]

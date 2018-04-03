@@ -15,4 +15,3 @@ Et preprosessert datasett
 \description{
 Denne funksjonen gjor nodvendig preprosessering av NNRR sin data for bruk i rapporter
 }
-

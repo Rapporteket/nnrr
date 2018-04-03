@@ -36,4 +36,3 @@ Funksjon som genererer en figur med som viser endring i en variabels fordeling f
 \details{
 Detajer: Her bør man liste opp hvilke variable funksjonen benytter...
 }
-

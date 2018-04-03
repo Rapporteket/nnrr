@@ -17,4 +17,3 @@ RegData data frame
 \description{
 Provides NNRR data from staging
 }
-

@@ -10,7 +10,7 @@
 #'
 
 nnrrPreprosess <- function(RegData)
-  {
+{
 
   RegData$Besoksdato <- as.POSIXlt(RegData$Besoksdato, format="%d.%m.%Y")
   RegData$Besoksdato_pre <- as.POSIXlt(RegData$Besoksdato_pre, format="%d.%m.%Y")
@@ -44,36 +44,27 @@ nnrrPreprosess <- function(RegData)
 
   RegData$Aar <- RegData$Besoksdato$year+1900
 
-  RegData[, c('Arbeidsbelastning', 'Hjemmebelastning', 'Folelsesmessig.belastning',
-              'Fritidsaktivitet', 'Skade.i.skjelett', 'Skade.i.muskulatur',
-              'Skade.i.nerve', 'Vet.ikke', 'Hode', 'Nakke', 'Ovre.del.mage', "Venstre.skulder", "Hoyre.albue", "Venstre.albue", "Mage",
-              "Hoyre.haandledd", "Venstre.haandledd", "Hoyre.hofte.laar", "Venstre.hofte.laar", "Hoyre.kne", "Venstre.kne",
-              "Hoyre.ankel.fot", "Venstre.ankel.fot")] <-
-    apply(RegData[, c('Arbeidsbelastning', 'Hjemmebelastning', 'Folelsesmessig.belastning',
-                      'Fritidsaktivitet', 'Skade.i.skjelett', 'Skade.i.muskulatur',
-                      'Skade.i.nerve', 'Vet.ikke', 'Hode', 'Nakke', 'Ovre.del.mage', "Venstre.skulder", "Hoyre.albue", "Venstre.albue", "Mage",
-                      "Hoyre.haandledd", "Venstre.haandledd", "Hoyre.hofte.laar", "Venstre.hofte.laar", "Hoyre.kne", "Venstre.kne",
-                      "Hoyre.ankel.fot", "Venstre.ankel.fot")],
-          2, function(x){as.logical(x)})
-
   RegData$ErMann <- NA
   RegData$ErMann[which(RegData$PatientGender == 'Female')] <- 0
   RegData$ErMann[which(RegData$PatientGender == 'Male')] <- 1
 
-  RegData$SoktUforetrygd <- factor(RegData$Har.du.sokt.uforetrygd.,
+  RegData$SoktUforetrygd <- factor(RegData$PainDisable,
                                    levels = c(1,2,0), labels = c('Ja', 'Nei', 'Ikke Reg.'))
-  RegData$SoktErstatning <- factor(RegData$Har.du.sokt.erstatning.,
+  RegData$SoktErstatning <- factor(RegData$PainCompensation,
                                    levels = c(1,2,0), labels = c('Ja', 'Nei', 'Ikke Reg.'))
-  RegData$OnsketTilbake <- factor(RegData$Foler.du.at.din.arbeidsgiver.onsker.deg.tilbake.i.jobb.,
+  RegData$OnsketTilbake <- factor(RegData$ProfessionWantedBack,
                                   levels = c(1,2,0), labels = c('Ja', 'Nei', 'Ikke Reg.'))
-  RegData$DagligRoyk <- factor(RegData$Royker.du.daglig.,
-                                  levels = c(1,2,0), labels = c('Ja', 'Nei', 'Ikke Reg.'))
+  RegData$DagligRoyk <- factor(RegData$Smoking,
+                               levels = c(1,2,0), labels = c('Ja', 'Nei', 'Ikke Reg.'))
 
   RegData$HSCL10.Score <- as.numeric(sapply(as.character(RegData$HSCL10.Score), gsub, pattern = ",", replacement= "."))
-  RegData$ODI.Score <- as.numeric(sapply(as.character(RegData$ODI.Score), gsub, pattern = ",", replacement= "."))
-  RegData$ODI.Score_post <- as.numeric(sapply(as.character(RegData$ODI.Score_post), gsub, pattern = ",", replacement= "."))
-  RegData$NDI.Score <- as.numeric(sapply(as.character(RegData$NDI.Score), gsub, pattern = ",", replacement= "."))
-  RegData$NDI.Score_post <- as.numeric(sapply(as.character(RegData$NDI.Score_post), gsub, pattern = ",", replacement= "."))
+  RegData$OdiScore <- as.numeric(sapply(as.character(RegData$OdiScore), gsub, pattern = ",", replacement= "."))
+  RegData$OdiScore_post <- as.numeric(sapply(as.character(RegData$OdiScore_post), gsub, pattern = ",", replacement= "."))
+  RegData$NdiScore <- as.numeric(sapply(as.character(RegData$NdiScore), gsub, pattern = ",", replacement= "."))
+  RegData$NdiScore_post <- as.numeric(sapply(as.character(RegData$NdiScore_post), gsub, pattern = ",", replacement= "."))
+  RegData$Eq5dScore <- as.numeric(sapply(as.character(RegData$Eq5dScore), gsub, pattern = ",", replacement= "."))
+  RegData$Eq5dScore_post <- as.numeric(sapply(as.character(RegData$Eq5dScore_post), gsub, pattern = ",", replacement= "."))
+
 
   RegData$SykehusNavn <- NA
   RegData$SykehusNavn[RegData$ReshId == 102959] <- 'Haukeland'
@@ -82,10 +73,55 @@ nnrrPreprosess <- function(RegData)
   RegData$SykehusNavn[RegData$ReshId == 601032] <- 'UNN'
 
 
-  names(RegData)[which(names(RegData) == 'Paa.en.skala.fra.0..verst.tenkelig.tilstand..til.100..best.tenkelige.tilstand...angi.din.naavaerende.helsetilstand..')] <- 'EQ5D.VAS'
+  # names(RegData)[which(names(RegData) == 'Paa.en.skala.fra.0..verst.tenkelig.tilstand..til.100..best.tenkelige.tilstand...angi.din.naavaerende.helsetilstand..')] <- 'EQ5D.VAS'
+
+  names(RegData)[which(names(RegData) == 'Eq5dHealthLevel')] <- 'EQ5D.VAS'
+  names(RegData)[which(names(RegData) == 'Eq5dHealthLevel_post')] <- 'EQ5D.VAS_post'
+
+  RegData$FamilyStatus[RegData$FamilyStatus==0] <- 99
+  RegData$FamilyStatus <- factor(RegData$FamilyStatus, levels = c(1:3,99),
+                                 labels = c('Gift/Reg. partner','Samboende', 'Enslig', 'Ikke svart'))
+  RegData$EducationLevel[RegData$EducationLevel==0] <- 99
+  RegData$EducationLevel <- factor(RegData$EducationLevel, levels = c(1:5,99),
+                                   labels = c('Grunnskole 7-10 år, framhaldskole eller folkehøyskole'
+                                              , 'Yrkesfaglig videregående skole, yrkesskole eller realskole'
+                                              , 'Allmennfaglig videregående skole eller gymnas'
+                                              , 'Høyskole eller universitet (mindre en 4 år)'
+                                              , 'Høyskole eller universitet (4 år eller mer)', 'Ikke svart'))
+
+  RegData$PainDurationNow[RegData$PainDurationNow==0] <- 99
+  RegData$PainDurationNow <- factor(RegData$PainDurationNow, levels = c(1:5,99),
+                                 labels = c('Ingen smerter', 'Mindre enn 3 måneder', '3 til 12 måneder',
+                                            '1-2 år', 'Mer enn 2', 'Ikke svart'))
+
+
+  RegData$NeckSurgery[RegData$NeckSurgery==0] <- 99
+  RegData$NeckSurgery <- factor(RegData$NeckSurgery, levels = c(1:2,99),
+                                labels = c('Ja', 'Nei', 'Ikke svart'))
+
+  mapping_ny_gml <- data.frame(gammel=c('Yes', 'No', 'Unknown','None'), ny=c(1:3,99))
+  RegData$BackSurgery <- mapping_ny_gml$ny[match(RegData$BackSurgery, mapping_ny_gml$gammel)]
+  RegData$BackSurgery[RegData$BackSurgery==0] <- 99
+  RegData$BackSurgery <- factor(RegData$BackSurgery, levels = c(1:3,99),
+                                labels = c('Ja', 'Nei', 'Ukjent', 'Ikke svart'))
+
 
   return(RegData)
 }
 
+
+#
+#
+#   RegData[, c('PainCausesWork', 'PainCausesHome', 'PainCausesMental',
+#               'PainCausesLeisure', 'PainCausesSkeleton', 'PainCausesMuscle',
+#               'PainCausesNerve', 'PainCausesUknown', 'Hode', 'Nakke', 'Ovre.del.mage', "Venstre.skulder", "Hoyre.albue", "Venstre.albue", "Mage",
+#               "Hoyre.haandledd", "Venstre.haandledd", "Hoyre.hofte.laar", "Venstre.hofte.laar", "Hoyre.kne", "Venstre.kne",
+#               "Hoyre.ankel.fot", "Venstre.ankel.fot")] <-
+#     apply(RegData[, c('Arbeidsbelastning', 'Hjemmebelastning', 'Folelsesmessig.belastning',
+#                       'Fritidsaktivitet', 'Skade.i.skjelett', 'Skade.i.muskulatur',
+#                       'Skade.i.nerve', 'Vet.ikke', 'Hode', 'Nakke', 'Ovre.del.mage', "Venstre.skulder", "Hoyre.albue", "Venstre.albue", "Mage",
+#                       "Hoyre.haandledd", "Venstre.haandledd", "Hoyre.hofte.laar", "Venstre.hofte.laar", "Hoyre.kne", "Venstre.kne",
+#                       "Hoyre.ankel.fot", "Venstre.ankel.fot")],
+#           2, function(x){as.logical(x)})
 
 

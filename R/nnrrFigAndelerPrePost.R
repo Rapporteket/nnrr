@@ -38,8 +38,8 @@ nnrrFigAndelerPrePost <- function(RegData=0, valgtVar, datoFra='2000-01-01', dat
 
   # Definerer pre -og postvariabler, fjerner registreringer som mangler én eller begge
   PrePostVar <- switch(valgtVar,
-                       SmertestillendeResept = c('Smertestillende.paa.resept', 'Smertestillende.paa.resept_post'),
-                       SmertestillendeUtenResept = c('Smertestillende.uten.resept', 'Smertestillende.uten.resept_post'))
+                       SmertestillendeResept = c('PainMedicinePrescription', 'PainMedicinePrescription_post'),
+                       SmertestillendeUtenResept = c('PainMedicineNoPrescription', 'PainMedicineNoPrescription_post'))
 
   RegData$VarPre <- RegData[ ,PrePostVar[1]]
   RegData$VarPost <- RegData[ ,PrePostVar[2]]

@@ -37,4 +37,3 @@ En figur med beskrevet innhold
 \description{
 Denne funksjonen lager søylediagram som viser fordelingen til valgt variabel
 }
-

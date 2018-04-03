@@ -26,4 +26,3 @@ Et filtrert datasett, samt en tekst som angir utvalget som er gjort
 \description{
 Denne funksjonen gjør utvalg av dataen basert på brukervalg
 }
-
