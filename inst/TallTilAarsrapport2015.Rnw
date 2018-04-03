@@ -1,0 +1,330 @@
+\documentclass[norsk,a4paper]{article} % ,twoside
+\usepackage[norsk]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{subfig}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{amssymb}
+\usepackage[a4paper]{geometry}
+\usepackage[pdftex, colorlinks, linkcolor=lysblaa, urlcolor=lysblaa]{hyperref}
+
+\title{Figurer og tabeller til årsrapport for NNRR}
+\author{NNRR}
+
+%setter grå skrift fremfort sort
+\usepackage{xcolor}
+\usepackage{graphicx}
+\pagestyle{myheadings}
+\definecolor{lysblaa}{rgb}{0.27,0.51,0.71}
+\definecolor{moerkgraa}{rgb}{0.25,0.25,0.25}
+\color{moerkgraa}
+
+<<'initOpts',include=FALSE>>=
+knitr::opts_chunk$set(warnings=FALSE,echo=FALSE)
+knitr::opts_knit$set(root.dir = './')
+@
+
+\begin{document}
+
+<<LastData, include=FALSE, cache=FALSE>>=
+rm(list=ls())
+library(nnrr)
+
+legeskjema <- read.table('c:/SVN/jasper/nnrr/data/DataDump_1b%3aRegistreringsskjema+poliklinikk_2016-09-27.csv', sep=';', header=T, encoding = 'UTF-8')
+pasientsvar_pre <- read.table('c:/SVN/jasper/nnrr/data/DataDump_1a%3aSpørreskjema+før+behandling_2016-09-27.csv', sep=';', header=T, encoding = 'UTF-8')
+pasientsvar_post <- read.table('c:/SVN/jasper/nnrr/data/DataDump_2%3aSpørreskjema+etter+behandling_2016-09-27.csv', sep=';', header=T, encoding = 'UTF-8')
+
+legeskjema$regstatus <- 1
+pasientsvar_pre$regstatus <- 1
+pasientsvar_post$regstatus <- 1
+
+names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
+names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
+
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all = TRUE)
+RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all = TRUE)
+
+RegData <- nnrrPreprosess(RegData = RegData)
+RegData <- RegData[which(RegData$Aar == 2015), ]
+
+figstr <- 0.61
+tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+@
+
+%%%%% Forside
+
+\color{moerkgraa}
+\thispagestyle{empty}
+
+\maketitle
+%
+% \tableofcontents
+% \newpage
+\thispagestyle{empty}
+\listoffigures
+% \newpage
+% \thispagestyle{empty}
+\listoftables
+
+\clearpage
+
+\newpage
+
+<<'Tab', results='asis', echo=FALSE>>=
+Gj.snitt <- apply(RegData[,c("Paa.en.skala.fra.0.til.10..hvor.fysisk.tungt.arbeid.har.du.", "Paa.en.skala.fra.0.til.10..hvor.ensformig.arbeid.har.du.",
+                 "Paa.en.skala.fra.0.til.10..hvor.fornoyd.er.du.med.jobben.")], 2, mean, na.rm=T)
+Median <- apply(RegData[,c("Paa.en.skala.fra.0.til.10..hvor.fysisk.tungt.arbeid.har.du.", "Paa.en.skala.fra.0.til.10..hvor.ensformig.arbeid.har.du.",
+                               "Paa.en.skala.fra.0.til.10..hvor.fornoyd.er.du.med.jobben.")], 2, median, na.rm=T)
+Std.avvik <- apply(RegData[,c("Paa.en.skala.fra.0.til.10..hvor.fysisk.tungt.arbeid.har.du.", "Paa.en.skala.fra.0.til.10..hvor.ensformig.arbeid.har.du.",
+                                  "Paa.en.skala.fra.0.til.10..hvor.fornoyd.er.du.med.jobben.")], 2, sd, na.rm=T)
+N <- apply(RegData[,c("Paa.en.skala.fra.0.til.10..hvor.fysisk.tungt.arbeid.har.du.", "Paa.en.skala.fra.0.til.10..hvor.ensformig.arbeid.har.du.",
+                      "Paa.en.skala.fra.0.til.10..hvor.fornoyd.er.du.med.jobben.")], 2, function(x){length(which(!is.na(x)))})
+
+tabell1 <- cbind(Gj.snitt, Median, Std.avvik, N)
+tabell1 <- cbind(round(tabell1, 1), Paa.en.skala = c('hvor fysisk tungt arbeid har du?',
+                                           'hvor ensformig arbeid har du?', 'hvor fornøyd er du med jobben?'))
+tabell1 <- tabell1[, c(5, 1:4)]
+colnames(tabell1) <- c('På en skala fra 0 til 10,', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+
+print(xtable::xtable(tabell1, digits=0, align=c('l','l', rep('r', ncol(tabell1)-1)),
+                     caption = 'Pasientens arbeidsforhold'), include.rownames=FALSE)
+@
+
+<<'Fig:andeler', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
+valgtVar <- 'AarsakSmerte_PasRap'
+datoFra='2015-01-01'
+datoTil='2015-12-31'
+minald=0
+maxald=130
+erMann=99
+# outfile=''
+reshID <- 0
+enhetsUtvalg=0
+preprosess=F
+hentData=F
+
+valgtVar <- 'Sammenhengende.varighet.av.naavaerende.smerter'
+outfile=paste0(valgtVar, '.pdf')
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'AarsakSmerte_PasRap'
+outfile=paste0(valgtVar, '.pdf')
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+@
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{paste0(valgtVar, '.pdf')}}
+\caption{Pasientrapporterte årsaker til smerte}
+\end{figure}
+
+
+<<'Tab:samlet', results='asis', echo=FALSE>>=
+tabell2 <- apply(RegData[,c('SoktUforetrygd', 'SoktErstatning', 'OnsketTilbake', 'DagligRoyk')], 2, table)
+tabell2 <- t(tabell2)[,c(2,3,1)]
+row.names(tabell2) <- c('Har du søkt uføretrygd?', 'Har du søkt erstatning?',
+                        'Føler du at din arbeidsgiver ønsker deg tilbake i jobb?', 'Røyker du daglig?')
+
+
+print(xtable::xtable(tabell2, digits=0, align=c('l','l', rep('r', ncol(tabell2)-1)),
+                     caption = 'Om pasienten'), include.rownames=TRUE)
+@
+
+
+<<'Tab:eq5d_mm', results='asis', echo=FALSE>>=
+Gj.snitt <- apply(RegData[,c("EQ5D.Score", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2")], 2, mean, na.rm=T)
+Median <- apply(RegData[,c("EQ5D.Score", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2")], 2, median, na.rm=T)
+Std.avvik <- apply(RegData[,c("EQ5D.Score", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2")], 2, sd, na.rm=T)
+N <- apply(RegData[,c("EQ5D.Score", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2")], 2, function(x){length(which(!is.na(x)))})
+
+tabell3 <- cbind(Gj.snitt, Median, Std.avvik, N)
+rownames(tabell3) <- c('EQ5D-score', 'EQ5D-VAS', 'FABQ fysisk aktivitet', 'FABQ arbeid')
+
+print(xtable::xtable(tabell3, digits=c(1,1,1,1,0), align=c('l','l', rep('r', ncol(tabell3)-1)),
+                     caption = 'Preintervensjonsdata'), include.rownames=TRUE)
+@
+
+<<'Tab:PrShus', results='asis', echo=FALSE>>=
+Gj.snitt <- aggregate(RegData[,c("EQ5D.Score", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2")], by=list(RegData$SykehusNavn), mean, na.rm=T)
+Gj.snitt[,2:5] <- round(Gj.snitt[,2:5], 1)
+Median <- aggregate(RegData[,c("EQ5D.Score", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2")], by=list(RegData$SykehusNavn), median, na.rm=T)
+Median[,2:5] <- round(Median[,2:5], 1)
+Std.avvik <- aggregate(RegData[,c("EQ5D.Score", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2")], by=list(RegData$SykehusNavn), sd, na.rm=T)
+Std.avvik[,2:5] <- round(Std.avvik[,2:5], 1)
+N <- aggregate(RegData[,c("EQ5D.Score", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2")], by=list(RegData$SykehusNavn), function(x){length(which(!is.na(x)))})
+
+eq5d_score <- rbind(cbind(Gj.snitt[,1:2], Median[,2], Std.avvik[,2], N[,2]), c('Totalt', round(tabell3[1,],1)))
+colnames(eq5d_score) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+eq5d_vas <- rbind(cbind(Gj.snitt[,c(1,3)], Median[,3], Std.avvik[,3], N[,3]), c('Totalt', round(tabell3[2,],1)))
+colnames(eq5d_vas) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+FABQ1 <- rbind(cbind(Gj.snitt[,c(1,4)], Median[,4], Std.avvik[,4], N[,4]), c('Totalt', round(tabell3[3,],1)))
+colnames(FABQ1) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+FABQ2 <- rbind(cbind(Gj.snitt[,c(1,5)], Median[,5], Std.avvik[,5], N[,5]), c('Totalt', round(tabell3[4,],1)))
+colnames(FABQ2) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+
+print(xtable::xtable(eq5d_score, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(eq5d_score)-1)),
+                     caption = 'EQ5D-score'), include.rownames=FALSE)
+print(xtable::xtable(eq5d_vas, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(eq5d_vas)-1)),
+                     caption = 'EQ5D-VAS'), include.rownames=FALSE)
+print(xtable::xtable(FABQ1, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(FABQ1)-1)),
+                     caption = 'FABQ fysisk aktivitet'), include.rownames=FALSE)
+print(xtable::xtable(FABQ2, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(FABQ2)-1)),
+                     caption = 'FABQ arbeid'), include.rownames=FALSE)
+@
+
+
+
+
+<<'Fig:FABQ', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
+valgtVar <- 'FABQ.Score1'
+outfile='FABQScore1.pdf'
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'FABQ.Score2'
+outfile='FABQScore2.pdf'
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'HSCL10.Score'
+outfile='HSCL10Score.pdf'
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'Hvor.fornoyd.er.du.med.behandlingen.du.har.faatt.for.de.aktuelle.plagene.inntil.i.dag.'
+outfile='Pasientfornoydhet.pdf'
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+                          maxald=maxald, erMann=erMann, outfile=outfile,
+                          reshID=reshID, enhetsUtvalg=enhetsUtvalg,  preprosess=preprosess, hentData=hentData)
+
+gr_var <- 'SykehusNavn'
+
+valgtVar <- 'ODI_PrePost'
+outfile='ODI_PrePost.pdf'
+ODI <- nnrrFigGjsnPrePostGrVar(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
+                                    minald=minald, maxald=maxald, erMann=erMann, outfile=outfile,
+                                    enhetsUtvalg=enhetsUtvalg, preprosess=preprosess, hentData=preprosess, gr_var=gr_var)
+write.csv2(ODI, 'ODItabell.csv')
+
+valgtVar <- 'NDI_PrePost'
+outfile='NDI_PrePost.pdf'
+NDI <- nnrrFigGjsnPrePostGrVar(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
+                                    minald=minald, maxald=maxald, erMann=erMann, outfile=outfile,
+                                    enhetsUtvalg=enhetsUtvalg, preprosess=preprosess, hentData=preprosess, gr_var=gr_var)
+write.csv2(NDI, 'NDItabell.csv')
+
+valgtVar <- 'SmertestillendeResept'
+outfile='SmertestillendeResept.pdf'
+nnrrFigAndelerPrePost(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
+                      minald=minald, maxald=maxald, erMann=erMann, outfile=outfile,
+                      enhetsUtvalg=enhetsUtvalg, preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'SmertestillendeUtenResept'
+outfile='SmertestillendeUtenResept.pdf'
+nnrrFigAndelerPrePost(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
+                      minald=minald, maxald=maxald, erMann=erMann, outfile=outfile,
+                      enhetsUtvalg=enhetsUtvalg, preprosess=preprosess, hentData=hentData)
+@
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{FABQScore1.pdf}
+\caption{FABQ fysisk aktivitet}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{FABQScore2.pdf}
+\caption{FABQ arbeid}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{HSCL10Score.pdf}
+\caption{Hopkins symptom checklist skår}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{Pasientfornoydhet.pdf}
+\caption{Behandlingstilfredshet}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{ODI_PrePost.pdf}
+\caption{Oswestry disability index før og etter behandling}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{NDI_PrePost.pdf}
+\caption{Neck disability index før og etter behandling}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{SmertestillendeUtenResept.pdf}
+\caption{Forbruk av ikke-reseptbelagte smertestillende før og etter behandling}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{SmertestillendeResept.pdf}
+\caption{Forbruk av reseptbelagte smertestillende før og etter behandling}
+\end{figure}
+
+
+<<'Tab:ODI_NDI', results='asis', echo=FALSE>>=
+RegDataNy <- RegData[which(!is.na(RegData$ODI.Score) & !is.na(RegData$ODI.Score_post)), ]
+
+ODI <- aggregate(RegDataNy[, c("ODI.Score", "ODI.Score_post")],
+                       by=list(RegDataNy$SykehusNavn), mean, na.rm = TRUE)
+ODI[ , 2:3] <- round(ODI[ , 2:3], 1)
+ODI_N <- aggregate(RegDataNy[, c("ODI.Score")],
+                       by=list(RegDataNy$SykehusNavn), length)
+ODI <- cbind(ODI, N=ODI_N[,2])
+
+ODI <- rbind(ODI, c('Totalt', round(apply(RegDataNy[, c("ODI.Score", "ODI.Score_post")], 2, mean, na.rm = TRUE),1), dim(RegDataNy)[1]))
+names(ODI) <- c('Sykehus', 'ODI pre', 'ODI post', 'N')
+
+print(xtable::xtable(ODI, digits=0, align=c('l','l', rep('r', ncol(ODI)-1)),
+                     caption = 'ODI skår pre og post'), include.rownames=FALSE)
+
+RegDataNy <- RegData[which(!is.na(RegData$NDI.Score) & !is.na(RegData$NDI.Score_post)), ]
+
+NDI <- aggregate(RegDataNy[, c("NDI.Score", "NDI.Score_post")],
+                       by=list(RegDataNy$SykehusNavn), mean, na.rm = TRUE)
+NDI[ , 2:3] <- round(NDI[ , 2:3], 1)
+NDI_N <- aggregate(RegDataNy[, c("NDI.Score")],
+                       by=list(RegDataNy$SykehusNavn), length)
+NDI <- cbind(NDI, N=NDI_N[,2])
+
+NDI <- rbind(NDI, c('Totalt', round(apply(RegDataNy[, c("NDI.Score", "NDI.Score_post")], 2, mean, na.rm = TRUE),1), dim(RegDataNy)[1]))
+names(NDI) <- c('Sykehus', 'NDI pre', 'NDI post', 'N')
+
+print(xtable::xtable(NDI, digits=0, align=c('l','l', rep('r', ncol(NDI)-1)),
+                     caption = 'NDI skår pre og post'), include.rownames=FALSE)
+
+@
+
+
+
+
+
+\end{document}

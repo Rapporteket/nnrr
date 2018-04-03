@@ -1,0 +1,649 @@
+Feltnavn;Variabelnavn;Felttype;Obligatorisk;DataDumpnavn;Gyldighet
+Besøksdato;S1b_DateOfCompletion;Dato/Tid;Nei;S1b_DateOfCompletion;v1.0
+Besøksdato;Person.DateOfCompletion;Dato/Tid;Nei;DateOfCompletion;v1.0
+Sivilstand;Person.FamilyStatus;Enum;Ja;FamilyStatus;v1.0
+;0 = Ikke svart;;;;
+;1 = Gift/Reg. partner;;;;
+;2 = Samboende;;;;
+;3 = Enslig;;;;
+Antall egne barn;Person.OwnChildren;Numerisk (heltall);Nei;OwnChildren;v1.0
+Antall barn i husholdningen;Person.HouseholdChildren;Numerisk (heltall);Nei;HouseholdChildren;v1.0
+Nasjonalitet;Person.NationalCountry;Enum;Ja;NationalCountry;v1.0
+;0 = Ikke svart;;;;
+;1 = Norge;;;;
+;2 = Europa;;;;
+;3 = Afrika;;;;
+;4 = Asia;;;;
+;5 = Nord- og Mellom Amerika;;;;
+;6 = Sør Amerika;;;;
+;7 = Annet;;;;
+Tolk ved konsultasjon;Person.NationalInterpreter;Enum;Ja;NationalInterpreter;v1.0
+;1 = Ja;;;;
+;0 = Nei;;;;
+Hva er din høyeste fullførte utdanning?;Person.EducationLevel;Enum;Ja;EducationLevel;v1.0
+;0 = Ikke svart;;;;
+;1 = Grunnskole 7-10 år, framhaldskole eller folkehøyskole;;;;
+;2 = Yrkesfaglig videregående skole, yrkesskole eller realskole;;;;
+;3 = Allmennfaglig videregående skole eller gymnas;;;;
+;4 = Høyskole eller universitet (mindre en 4 år);;;;
+;5 = Høyskole eller universitet (4 år eller mer);;;;
+Hvilket yrke har du nå, eller hadde du tidligere? (før du eventuelt ble arbeidsledig, permittert, trygdet eller pensjonert);Person.Profession;Text;Nei;Profession;v1.0
+Har du lese og skrivevansker?;Person.ReadWriteDifficulties;Enum;Ja;ReadWriteDifficulties;v1.0
+;0 = Ikke svart;;;;
+;1 = Ja, i stor grad;;;;
+;2 = Ja, i noen grad;;;;
+;3 = Nei;;;;
+På en skala fra 0 til 10, hvor fysisk tungt arbeid har du?;Person.ProfessionalHeavy;Numerisk (heltall);Nei;ProfessionalHeavy;v1.0
+På en skala fra 0 til 10, hvor ensformig arbeid har du?;Person.ProfessionalMonotonous;Numerisk (heltall);Nei;ProfessionalMonotonous;v1.0
+På en skala fra 0 til 10, hvor fornøyd er du med jobben?;Person.ProfessionalSatisfied;Numerisk (heltall);Nei;ProfessionalSatisfied;v1.0
+Sammenhengende varighet av nåværende smerter;Person.PainDurationNow;Enum;Ja;PainDurationNow;v1.0
+;0 = Ikke svart;;;;
+;1 = Ingen smerter;;;;
+;2 = Mindre enn 3 måneder;;;;
+;3 = 3 til 12 måneder;;;;
+;4 = 1-2 år;;;;
+;5 = Mer enn 2 år;;;;
+Har du søkt uføretrygd?;Person.PainDisable;Enum;Ja;PainDisable;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Ja;;;;
+;2 = Nei;;;;
+;3 = Ukjent;;;;
+Har du søkt erstatning?;Person.PainCompensation;Enum;Ja;PainCompensation;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Ja;;;;
+;2 = Nei;;;;
+;3 = Ukjent;;;;
+Føler du at din arbeidsgiver ønsker deg tilbake i jobb?;Person.ProfessionWantedBack;Enum;Ja;ProfessionWantedBack;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Ja;;;;
+;2 = Nei;;;;
+;3 = Ukjent;;;;
+Arbeidsbelastning;Person.PainCausesWork;Avkrysning;Ja;PainCausesWork;v1.0
+Hjemmebelastning;Person.PainCausesHome;Avkrysning;Ja;PainCausesHome;v1.0
+Følelsesmessig belastning;Person.PainCausesMental;Avkrysning;Ja;PainCausesMental;v1.0
+Fritidsaktivitet;Person.PainCausesLeisure;Avkrysning;Ja;PainCausesLeisure;v1.0
+Skade i skjelett;Person.PainCausesSkeleton;Avkrysning;Ja;PainCausesSkeleton;v1.0
+Skade i muskulatur;Person.PainCausesMuscle;Avkrysning;Ja;PainCausesMuscle;v1.0
+Skade i nerve;Person.PainCausesNerve;Avkrysning;Ja;PainCausesNerve;v1.0
+Feilbehandling;Person.PainCausesWrongTreatmen;Avkrysning;Ja;PainCausesWrongTreatmen;v1.0
+Vet ikke;Person.PainCausesUknown;Avkrysning;Ja;PainCausesUknown;v1.0
+Andre årsaker;Person.PainCausesOther;Text;Nei;PainCausesOther;v1.0
+Røyker du daglig?;Person.Smoking;Enum;Ja;Smoking;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Ja;;;;
+;2 = Nei;;;;
+;3 = Ukjent;;;;
+Smertene i hvile;Person.PainExperiencesNoActivity;Numerisk (heltall);Nei;PainExperiencesNoActivity;v1.0
+Smertene i aktivitet;Person.PainExperiencesActivity;Numerisk (heltall);Nei;PainExperiencesActivity;v1.0
+Smertestillende på resept;Person.PainMedicinePrescription;Enum;Ja;PainMedicinePrescription;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke brukt siste 4 uker;;;;
+;2 = Sjeldnere enn hver uke;;;;
+;3 = Hver uke men ikke daglig;;;;
+;4 = Daglig;;;;
+Smertestillende uten resept;Person.PainMedicineNoPrescription;Enum;Ja;PainMedicineNoPrescription;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke brukt siste 4 uker;;;;
+;2 = Sjeldnere enn hver uke;;;;
+;3 = Hver uke men ikke daglig;;;;
+;4 = Daglig;;;;
+Hvordan er aktivitetsnivået når det gjelder trening/bevegelse/kroppslige anstrengelser i din fritid? Hvis aktiviteten varier mye f.eks. mellom sommer og vinter, så ta et gjennomsnitt. NB! spørsmålet gjelder bare det siste året.;Person.PhysicalActivity;Enum;Ja;PhysicalActivity;v1.0
+;0 = Ikke svart;;;;
+;1 = Min fritid består hovedsakelig av å lese, se på TV eller annen stillesittende beskjeftigelse;;;;
+;2 = Jeg spaserer, sykler eller beveger meg på annen måte minst 4 timer i uken. Herunder medregnes gange/sykling til arbeidssted, søndagsturer etc.;;;;
+;3 = Jeg driver mosjonsidrett, tyngre hagearbeid eller lignende. (Virksomheten skal vare minst 4 timer i uken);;;;
+;4 = Jeg trener hardt eller driver konkurranseidrett, regelmessig og flere ganger i uken.;;;;
+Har du vært til annen behandling for dine aktuelle plager?;Person.TreatmentEarlierOther;Enum;Ja;TreatmentEarlierOther;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Ja;;;;
+;2 = Nei;;;;
+;3 = Ukjent;;;;
+Trening hos fysioterapeut;Person.TreatmentEarlierPhysioTherapist;Enum;Ja;TreatmentEarlierPhysioTherapist;v1.0
+;0 = Ikke aktuelt;;;;
+;1 = Bedre;;;;
+;2 = Uendret;;;;
+;3 = Forverring;;;;
+Annen behandling hos fysioterapeut. (massasje, varmepakninger, elektroterapi etc);Person.TreatmentEarlierPhysioTherapistOther;Enum;Ja;TreatmentEarlierPhysioTherapistOther;v1.0
+;0 = Ikke aktuelt;;;;
+;1 = Bedre;;;;
+;2 = Uendret;;;;
+;3 = Forverring;;;;
+Manuell terapi;Person.TreatmentEarlierManuelTherapi;Enum;Ja;TreatmentEarlierManuelTherapi;v1.0
+;0 = Ikke aktuelt;;;;
+;1 = Bedre;;;;
+;2 = Uendret;;;;
+;3 = Forverring;;;;
+Psykomotorisk fysioterapi;Person.TreatmentEarlierPcykomotorTherapist;Enum;Ja;TreatmentEarlierPcykomotorTherapist;v1.0
+;0 = Ikke aktuelt;;;;
+;1 = Bedre;;;;
+;2 = Uendret;;;;
+;3 = Forverring;;;;
+Kiropraktor;Person.TreatmentEarlierChiropractor;Enum;Ja;TreatmentEarlierChiropractor;v1.0
+;0 = Ikke aktuelt;;;;
+;1 = Bedre;;;;
+;2 = Uendret;;;;
+;3 = Forverring;;;;
+Operasjon;Person.TreatmentEarlierOperation;Enum;Ja;TreatmentEarlierOperation;v1.0
+;0 = Ikke aktuelt;;;;
+;1 = Bedre;;;;
+;2 = Uendret;;;;
+;3 = Forverring;;;;
+Annen behandling;Person.TreatmentEarlierOtherTreatment;Enum;Ja;TreatmentEarlierOtherTreatment;v1.0
+;0 = Ikke aktuelt;;;;
+;1 = Bedre;;;;
+;2 = Uendret;;;;
+;3 = Forverring;;;;
+Annet (angi hva);Person.TreatmentEarlierOtherText;Text;Nei;TreatmentEarlierOtherText;v1.0
+PasientConcentDate;Person.PasientConcentDate;Dato/Tid;Nei;PasientConcentDate;v1.0
+PasientRegistrationImportDate;Person.PasientRegistrationImportDate;Dato/Tid;Nei;PasientRegistrationImportDate;v1.0
+Smerte;ODI.Pain;Enum;Ja;OdiPain;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg har ingen smerter for øyeblikket;;;;
+;2 = Smertene er veldig svake for øyeblikket;;;;
+;3 = Smertene er moderate for øyeblikket;;;;
+;4 = Smertene er temmelig sterke for øyeblikket;;;;
+;5 = Smertene er veldig sterke for øyeblikket;;;;
+;6 = Smertene er det verste jeg kan tenke meg for øyeblikket;;;;
+Personlig stell;ODI.PersonalCare;Enum;Ja;OdiPersonalCare;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan stelle meg selv på vanlig måte uten at det forårsaker ekstra smerter;;;;
+;2 = Jeg kan stelle meg selv på vanlig måte, men det er veldig smertefullt;;;;
+;3 = Det er smertefullt å stelle meg selv, og jeg gjør det langsomt og forsiktig;;;;
+;4 = Jeg trenger noe hjelp, men klarer det meste av mitt personlige stell;;;;
+;5 = Jeg trenger hjelp hver dag til det meste av eget stell;;;;
+;6 = Jeg kler ikke på meg, har vanskeligheter med å vaske meg og holder sengen;;;;
+Å løfte;ODI.Lift;Enum;Ja;OdiLift;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan løfte tunge ting uten å få mer smerter;;;;
+;2 = Jeg kan løfte tunge ting, men får mer smerter;;;;
+;3 = Smertene hindrer meg i å løfte tunge ting opp fra gulvet, men jeg greier det hvis det som skal løftes er gunstig plassert, for eksempel på et bord;;;;
+;4 = Smertene hindrer meg i å løfte tunge ting, men jeg klarer lette og middels tunge ting, hvis det er gunstig plassert;;;;
+;5 = Jeg kan bare løfte noe som er veldig lett;;;;
+;6 = Jeg kan ikke løfte eller bære noe i det hele tatt;;;;
+Å gå;ODI.Walk;Enum;Ja;OdiWalk;v1.0
+;0 = Ikke svart;;;;
+;1 = Smertene hindrer meg ikke å gå i det hele tatt;;;;
+;2 = Smertene hindrer meg i å gå mer en 1500m;;;;
+;3 = Smertene hindrer meg i å gå mer en 750m;;;;
+;4 = Smertene hindrer meg i å gå mer en 100m;;;;
+;5 = Jeg kan bare gå med stokk eller krykker;;;;
+;6 = Jeg ligger for det meste i sengen og jeg må krabbe til toalettet;;;;
+Å sitte;ODI.Sit;Enum;Ja;OdiSit;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan sitte så lenge jeg vil i en hvilken som helst stol;;;;
+;2 = Jeg kan sitte så lenge jeg vil i min favorittstol;;;;
+;3 = Smertene hindrer meg i å sitte mer enn en time;;;;
+;4 = Smertene hindrer meg i å sitte mer enn en halv time;;;;
+;5 = Smertene hindrer meg i å sitte mer enn ti minutter;;;;
+;6 = Smertene hindrer meg i å sitte i det hele tatt;;;;
+Å stå;ODI.Stand;Enum;Ja;OdiStand;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan stå så lenge jeg vil uten å få smerter;;;;
+;2 = Jeg kan stå så lenge jeg vil, men får smerter;;;;
+;3 = Smertene hindrer meg i å stå mer enn en time;;;;
+;4 = Smertene hindrer meg i å stå mer enn en halv time;;;;
+;5 = Smertene hindrer meg i å stå mer enn ti minutter;;;;
+;6 = Smertene hindrer meg i å stå i det hele tatt;;;;
+Å sove;ODI.Sleep;Enum;Ja;OdiSleep;v1.0
+;0 = Ikke svart;;;;
+;1 = Søvnen min forstyrres aldri av smerter;;;;
+;2 = Søvnen min forstyrres av og til av smerter;;;;
+;3 = På grunn av smerter får jeg mindre en seks timers søvn;;;;
+;4 = På grunn av smerter får jeg mindre en fire timers søvn;;;;
+;5 = På grunn av smerter får jeg mindre en to timers søvn;;;;
+;6 = Smerter hindrer all søvn;;;;
+Sexualliv;ODI.Sex;Enum;Ja;OdiSex;v1.0
+;0 = Ikke svart;;;;
+;1 = Seksuallivet mitt er normalt og forårsaker ikke mer smerter;;;;
+;2 = Seksuallivet mitt er normalt, men forårsaker noe mer smerter;;;;
+;3 = Seksuallivet mitt er normalt, men svært smertefullt;;;;
+;4 = Seksuallivet mitt er svært begrenset av smerter;;;;
+;5 = Seksuallivet mitt er nesten borte på grunn av smerter;;;;
+;6 = Smerter forhindrer alt seksualliv;;;;
+Sosialt liv (omgang med venner og bekjente);ODI.Social;Enum;Ja;OdiSocial;v1.0
+;0 = Ikke svart;;;;
+;1 = Det sosiale livet mitt er normalt og forårsaker ikke mer smerter;;;;
+;2 = Det sosiale livet mitt er normalt, men øker graden av smerter;;;;
+;3 = Smerter har ingen betydelige innvirkninger på mitt sosiale liv, bortsett fra at de begrenser mine mer fysisk aktive sider, som sport osv;;;;
+;4 = Smerter har begrenset mitt sosiale liv, og jeg går ikke så ofte ut;;;;
+;5 = Smerter har begrenset mitt sosiale liv til hjemmet;;;;
+;6 = På grunn av smerter har jeg ikke noe sosialt liv;;;;
+Å reise;ODI.Travel;Enum;Ja;OdiTravel;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan reise hvor som helst uten smerter;;;;
+;2 = Jeg kan reise hvor som helst, men det gir mer smerter;;;;
+;3 = Smertene er ille, men jeg klarer reiser på to timer;;;;
+;4 = Smerter begrenser meg til korte reiser på under en time;;;;
+;5 = Smerter begrenser meg til korte, nødvendige reiser på under 30 minutter;;;;
+;6 = Smerter hindrer meg fra å reise, unntatt for å få behandling;;;;
+Score;ODI.Score;Numerisk (flyttall);Nei;OdiScore;v1.0
+Index;ODI.Index;Numerisk (heltall);Nei;OdiIndex;v1.0
+Smerteintensitet;NDI.Intensity;Enum;Ja;NdiIntensity;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg har ingen smerter for øyeblikket;;;;
+;2 = Smertene er svake for øyeblikket;;;;
+;3 = Smertene kommer og går og er moderate;;;;
+;4 = Smertene er moderate og varierer lite;;;;
+;5 = Smertene er sterke, men kommer og går;;;;
+;6 = Smertene er sterke og varierer lite;;;;
+Personlig stell;NDI.PersonalCare;Enum;Ja;NdiPersonalCare;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan stelle meg selv på vanlig måte uten at det forårsaker ekstra smerter;;;;
+;2 = Jeg kan stelle meg selv på vanlig måte, men det er veldig smertefullt;;;;
+;3 = Det er smertefullt å stelle meg selv, og jeg gjør det langsomt og forsiktig;;;;
+;4 = Jeg trenger noe hjelp, men klarer det meste av mitt personlige stell;;;;
+;5 = Jeg trenger hjelp hver dag til det meste av eget stell;;;;
+;6 = Jeg kler ikke på meg, har vanskeligheter med å vaske meg og holder sengen;;;;
+Å løfte;NDI.Lift;Enum;Ja;NdiLift;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan løfte tunge ting uten å få mer smerter;;;;
+;2 = Jeg kan løfte tunge ting, men får mer smerter;;;;
+;3 = Smertene hindrer meg i å løfte tunge ting opp fra gulvet, men jeg greier det hvis det som skal løftes er gunstig plassert, for eksempel på et bord;;;;
+;4 = Smertene hindrer meg i å løfte tunge ting, men jeg klarer lette og middels tunge ting, hvis det er gunstig plassert;;;;
+;5 = Jeg kan bare løfte noe som er veldig lett;;;;
+;6 = Jeg kan ikke løfte eller bære noe i det hele tatt;;;;
+Lese;NDI.Read;Enum;Ja;NdiRead;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan lese så mye jeg vil, uten smerter i nakken;;;;
+;2 = Jeg kan lese så mye jeg vil, med svake smerter i nakken;;;;
+;3 = Jeg kan lese så mye jeg vil, med moderate smerter i nakken;;;;
+;4 = Jeg kan ikke lese så mye jeg vil, på grunn av moderate nakkesmerter;;;;
+;5 = Jeg kan ikke lese så mye jeg vil, på grunn av sterke smerter i nakken;;;;
+;6 = Jeg kan ikke lese i det hele tatt;;;;
+Hodepine;NDI.Headache;Enum;Ja;NdiHeadache;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg har aldri hodepine;;;;
+;2 = Jeg har svak hodepine som kommer av og til;;;;
+;3 = Jeg har moderat hodepine som kommer av og til;;;;
+;4 = Jeg har moderat hodepine som kommer ofte;;;;
+;5 = Jeg har sterk hodepine som kommer ofte;;;;
+;6 = Jeg har hodepine nesten hele tiden;;;;
+Konsentrasjon;NDI.Concentration;Enum;Ja;NdiConcentration;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan konsentrere meg fullt ut når jeg vil, og uten problemer;;;;
+;2 = Jeg kan konsentrer meg fullt ut når jeg vil, med litt problemer;;;;
+;3 = Jeg har en del problemer med å konsentrere meg når jeg vil;;;;
+;4 = Jeg har store problemer med å konsentrere meg når jeg vil;;;;
+;5 = Jeg har svært store problemer med å konsentrere meg når jeg vil;;;;
+;6 = Jeg kan ikke konsentrere meg i det hele tatt;;;;
+Arbeid;NDI.Work;Enum;Ja;NdiWork;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan arbeide så mye jeg vil;;;;
+;2 = Jeg kan bare utføre mitt vanlige arbeid, men ikke mer;;;;
+;3 = Jeg kan utføre det meste av mitt vanlige arbeid, men ikke mer;;;;
+;4 = Jeg kan ikke utføre mitt vanlige arbeid;;;;
+;5 = Jeg kan nesten ikke utføre noe arbeid i det hele tatt;;;;
+;6 = Jeg kan ikke utføre noe arbeid i det hele tatt;;;;
+Kjøre bil;NDI.Driving;Enum;Ja;NdiDriving;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan kjøre bil uten smerter i nakke;;;;
+;2 = Jeg kan kjøre bil så lenge jeg vil, med svake smerter i nakken;;;;
+;3 = Jeg kan kjøre bil så lenge jeg vil med moderate smerter i nakken;;;;
+;4 = Jeg kan ikke kjøre bil så lenge jeg vil på grunn av moderate smerter i nakken;;;;
+;5 = Jeg kan nesten ikke kjøre bil i det hele tatt på grunn av sterke smerter i nakken;;;;
+;6 = Jeg kan ikke kjøre bil i det hele tatt;;;;
+Sove;NDI.Sleep;Enum;Ja;NdiSleep;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg har ingen problemer med å sove;;;;
+;2 = Søvnen min er litt forstyrret (mindre enn 1 søvnløs time);;;;
+;3 = Søvnen min er en del forstyrret (1-2 søvnløse timer);;;;
+;4 = Søvnen min er moderat forstyrret (2-3 søvnløse timer);;;;
+;5 = Søvnen min er sterkt forstyrret (3-5 søvnløse timer);;;;
+;6 = Søvnen min er totalt forstyrret (5-7 søvnløse timer);;;;
+Rekreasjon/fritidsaktiviteter;NDI.Leisure;Enum;Ja;NdiLeisure;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg kan delta i alle slags fritidsaktiviteter uten smerter i nakken;;;;
+;2 = Jeg kan delta i alle slags fritidsaktiviteter med litt smerter i nakken;;;;
+;3 = Jeg kan delta i de fleste, men ikke alle, fritidsaktiviteter på grunn av smerter i nakken;;;;
+;4 = Jeg kan delta i noen få av mine vanlige fritidsaktiviteter på grunn av smerter i nakken;;;;
+;5 = Jeg kan nesten ikke delta i noen fritidsaktiviteter på grunn av smerter i nakken;;;;
+;6 = Jeg kan ikke delta i fritidsaktiviteter i det hele tatt;;;;
+Score;NDI.Score;Numerisk (flyttall);Nei;NdiScore;v1.0
+Index;NDI.Index;Numerisk (heltall);Nei;NdiIndex;v1.0
+Fysisk aktivitet forverrer smertene mine;FABQ.Q1;Numerisk (heltall);Nei;FabQ1;v1.0
+Fysisk aktivitet kan skade ryggen/nakken min;FABQ.Q2;Numerisk (heltall);Nei;FabQ2;v1.0
+Jeg burde ikke utføre fysisk aktivitet som (kan) forverre smertene mine;FABQ.Q3;Numerisk (heltall);Nei;FabQ3;v1.0
+Jeg kan ikke utføre fysisk aktivitet som (kan) forverre smertene mine;FABQ.Q4;Numerisk (heltall);Nei;FabQ4;v1.0
+Smertene mine ble forårsaket av arbeidet mitt eller et uhell på jobben;FABQ.Q5;Numerisk (heltall);Nei;FabQ5;v1.0
+Arbeidet mitt forverret smertene mine;FABQ.Q6;Numerisk (heltall);Nei;FabQ6;v1.0
+Arbeidet mitt er for tungt for meg;FABQ.Q7;Numerisk (heltall);Nei;FabQ7;v1.0
+Arbeidet mitt forverrer eller kan forverre smertene mine;FABQ.Q8;Numerisk (heltall);Nei;FabQ8;v1.0
+Arbeidet mitt kan skade ryggen/nakken min;FABQ.Q9;Numerisk (heltall);Nei;FabQ9;v1.0
+Jeg burde ikke utføre det vanlige arbeidet mitt med mine nåværende smerter;FABQ.Q10;Numerisk (heltall);Nei;FabQ10;v1.0
+Jeg tror ikke jeg vil være tilbake på det vanlige arbeidet mitt innen tre måneder;FABQ.Q11;Numerisk (heltall);Nei;FabQ11;v1.0
+Score1;FABQ.Score1;Numerisk (heltall);Nei;FABQ.Score1;v1.0
+Score2;FABQ.Score2;Numerisk (heltall);Nei;FABQ.Score2;v1.0
+Score3;FABQ.Score3;Numerisk (heltall);Nei;FABQ.Score3;v1.0
+Plutselig skremt uten grunn?;HSCL10.Q1;Enum;Ja;Hscl10Q1;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Føler du deg engstelig?;HSCL10.Q2;Enum;Ja;Hscl10Q2;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Føler du deg svimmel eller kraftløs?;HSCL10.Q3;Enum;Ja;Hscl10Q3;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Føler du deg anspent eller opphisset?;HSCL10.Q4;Enum;Ja;Hscl10Q4;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Anklager du deg selv for ting?;HSCL10.Q5;Enum;Ja;Hscl10Q5;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Vanskelig for å sove?;HSCL10.Q6;Enum;Ja;Hscl10Q6;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Følelse av håpløshet mht. framtiden?;HSCL10.Q7;Enum;Ja;Hscl10Q7;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Føler deg nedfor?;HSCL10.Q8;Enum;Ja;Hscl10Q8;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Føler du at alt krever stor anstrengelse?;HSCL10.Q9;Enum;Ja;Hscl10Q9;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Føler at du ikke er verdt noe?;HSCL10.Q10;Enum;Ja;Hscl10Q10;v1.0
+;0 = Ikke svart;;;;
+;1 = Ikke i det hele tatt;;;;
+;2 = Litt;;;;
+;3 = En god del;;;;
+;4 = Svært mye;;;;
+Score;HSCL10.Score;Numerisk (flyttall);Nei;HSCL10.Score;v1.0
+1. Forkjølelse, influensa;UHI.Q1;Enum;Ja;UhiQ1;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+2. Hoste, bronkitt;UHI.Q2;Enum;Ja;UhiQ2;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+3. Astma;UHI.Q3;Enum;Ja;UhiQ3;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+4. Hodepine;UHI.Q4;Enum;Ja;UhiQ4;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+5. Nakkesmerter;UHI.Q5;Enum;Ja;UhiQ5;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+6. Smerter øverst i ryggen;UHI.Q6;Enum;Ja;UhiQ6;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+7. Smerter øverst i korsryggen;UHI.Q7;Enum;Ja;UhiQ7;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+8. Smerter i armer;UHI.Q8;Enum;Ja;UhiQ8;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+9. Smerter i skuldre;UHI.Q9;Enum;Ja;UhiQ9;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+10. Migrene;UHI.Q10;Enum;Ja;UhiQ10;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+11. Hjertebank, ekstra slag;UHI.Q11;Enum;Ja;UhiQ11;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+12. Brystsmerter;UHI.Q12;Enum;Ja;UhiQ12;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+13. Pustevansker;UHI.Q13;Enum;Ja;UhiQ13;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+14. Smerter i føttene ved anstrengelse;UHI.Q14;Enum;Ja;UhiQ14;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+"15. Sure oppstøt, ""halsbrann""";UHI.Q15;Enum;Ja;UhiQ15;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+16. Sug eller svie i magen;UHI.Q16;Enum;Ja;UhiQ16;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+17. Magekatarr, magesår;UHI.Q17;Enum;Ja;UhiQ17;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+18. Mageknip;UHI.Q18;Enum;Ja;UhiQ18;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+19. Luftplager;UHI.Q19;Enum;Ja;UhiQ19;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+20. Løs avføring, diare;UHI.Q20;Enum;Ja;UhiQ20;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+21. Forstoppelse;UHI.Q21;Enum;Ja;UhiQ21;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+22. Eksem;UHI.Q22;Enum;Ja;UhiQ22;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+23. Allergi;UHI.Q23;Enum;Ja;UhiQ23;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+24. Hetetokter;UHI.Q24;Enum;Ja;UhiQ24;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+25. Søvnproblemer;UHI.Q25;Enum;Ja;UhiQ25;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+26. Tretthet;UHI.Q26;Enum;Ja;UhiQ26;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+27. Svimmelhet;UHI.Q27;Enum;Ja;UhiQ27;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+28. Angst;UHI.Q28;Enum;Ja;UhiQ28;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+29. Nedtrykt, depresjon;UHI.Q29;Enum;Ja;UhiQ29;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+30. Premenstruelle spenninger;UHI.Q30;Enum;Ja;UhiQ30;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+31. Menstruasjonssmerter;UHI.Q31;Enum;Ja;UhiQ31;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+32. Kvalme;UHI.Q32;Enum;Ja;UhiQ32;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+33. Bekkensmerter;UHI.Q33;Enum;Ja;UhiQ33;v1.0
+;-1 = Ikke svart;;;;
+;0 = Ikke plaget;;;;
+;1 = Litt plaget;;;;
+;2 = En del plaget;;;;
+;3 = Alvorlig plaget;;;;
+Score;UHI.Score;Numerisk (heltall);Nei;UHI.Score;v1.0
+Index;UHI.Index;Numerisk (heltall);Nei;UHI.Index;v1.0
+På en skala fra 0 (verst tenkelig tilstand) til 100 (best tenkelige tilstand), angi din nåværende helsetilstand. ;EQ5D.HealthLevel;Numerisk (heltall);Nei;Eq5dHealthLevel;v1.0
+Gange;EQ5D.Walk;Enum;Ja;Eq5dWalk;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg har ingen problemer med å gå omkring;;;;
+;2 = Jeg har litt problemer med å gå omkring;;;;
+;3 = Jeg er sengeliggende;;;;
+Personlig stell;EQ5D.PersonalCare;Enum;Ja;Eq5dPersonalCare;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg har ingen problemer med personlig stell;;;;
+;2 = Jeg har litt problemer med personlig stell;;;;
+;3 = Jeg er ute av stand til å vaske meg eller kle meg;;;;
+Vanlige gjøremål;EQ5D.OrdinaryActivities;Enum;Ja;Eq5dOrdinaryActivities;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg har ingen problemer med å utføre mine vanlige gjøremål;;;;
+;2 = Jeg har litt problemer med å utføre mine vanlige gjøremål;;;;
+;3 = Jeg er ute av stand til å gjøre mine vanlige gjøremål;;;;
+Smerte og ubehag;EQ5D.Pain;Enum;Ja;Eq5dPain;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg har verken smerter eller ubehag;;;;
+;2 = Jeg har moderate smerter eller ubehag;;;;
+;3 = Jeg har sterke smerter eller ubehag;;;;
+Angst og depresjon;EQ5D.Anxiety;Enum;Ja;Eq5dAnxiety;v1.0
+;0 = Ikke svart;;;;
+;1 = Jeg er verken engstelig eller deprimert;;;;
+;2 = Jeg er noe engstelig eller deprimert;;;;
+;3 = Jeg er svært engstelig eller deprimert;;;;
+Hvor fornøyd er du med behandlingen du har fått for de aktuelle plagene inntil i dag?;EQ5D.SatisfactionTreatment;Enum;Ja;Eq5dSatisfactionTreatment;v1.0
+;0 = Ikke svart;;;;
+;1 = Fornøyd;;;;
+;2 = Litt fornøyd;;;;
+;3 = Hverken fornøyd eller misfornøyd;;;;
+;4 = Litt misfornøyd;;;;
+;5 = Misfornøyd;;;;
+Score;EQ5D.Score;Numerisk (flyttall);Nei;Eq5dScore;v1.0
+Smertetegning;PainDrawing.PainDrawing;Text;Nei;PainDrawing;v1.0
+Hode;PainDrawing.IsPainHead;Avkrysning;Ja;IsPainHead;v1.0
+Hode;PainDrawing.IsPainBackHead;Avkrysning;Ja;IsPainBackHead;v1.0
+Nakke;PainDrawing.IsPainNeckBack;Avkrysning;Ja;IsPainNeckBack;v1.0
+Nakke;PainDrawing.IsPainNeckFront;Avkrysning;Ja;IsPainNeckFront;v1.0
+Høyre skulder;PainDrawing.IsPainShoulderFrontRight;Avkrysning;Ja;IsPainShoulderFrontRight;v1.0
+Høyre skulder;PainDrawing.IsPainShoulderBackRight;Avkrysning;Ja;IsPainShoulderBackRight;v1.0
+Venstre skulder;PainDrawing.IsPainShoulderFrontLeft;Avkrysning;Ja;IsPainShoulderFrontLeft;v1.0
+Venstre skulder;PainDrawing.IsPainShoulderBackLeft;Avkrysning;Ja;IsPainShoulderBackLeft;v1.0
+Høyre albue;PainDrawing.IsPainArmFrontRight;Avkrysning;Ja;IsPainArmFrontRight;v1.0
+Høyre albue;PainDrawing.IsPainArmBackRight;Avkrysning;Ja;IsPainArmBackRight;v1.0
+Venstre albue;PainDrawing.IsPainArmFrontLeft;Avkrysning;Ja;IsPainArmFrontLeft;v1.0
+Venstre albue;PainDrawing.IsPainArmBackLeft;Avkrysning;Ja;IsPainArmBackLeft;v1.0
+Høyre håndledd;PainDrawing.IsPainHandFrontRight;Avkrysning;Ja;IsPainHandFrontRight;v1.0
+Venstre håndledd;PainDrawing.IsPainHandFrontLeft;Avkrysning;Ja;IsPainHandFrontLeft;v1.0
+Høyre håndledd;PainDrawing.IsPainHandBackRight;Avkrysning;Ja;IsPainHandBackRight;v1.0
+Venstre håndledd;PainDrawing.IsPainHandBackLeft;Avkrysning;Ja;IsPainHandBackLeft;v1.0
+Øvre del av rygg;PainDrawing.IsPainUpperBack;Avkrysning;Ja;IsPainUpperBack;v1.0
+Øvre del mage;PainDrawing.IsPainUpperStomach;Avkrysning;Ja;IsPainUpperStomach;v1.0
+Mage;PainDrawing.IsPainStomach;Avkrysning;Ja;IsPainStomach;v1.0
+Korsrygg;PainDrawing.IsPainLowBack;Avkrysning;Ja;IsPainLowBack;v1.0
+Høyre hofte/lår;PainDrawing.IsPainHipsThighsFrontRight;Avkrysning;Ja;IsPainHipsThighsFrontRight;v1.0
+Venstre hofte/lår;PainDrawing.IsPainHipsThighsFrontLeft;Avkrysning;Ja;IsPainHipsThighsFrontLeft;v1.0
+Høyre hofte/lår;PainDrawing.IsPainHipsThighsBackRight;Avkrysning;Ja;IsPainHipsThighsBackRight;v1.0
+Venstre hofte/lår;PainDrawing.IsPainHipsThighsBackLeft;Avkrysning;Ja;IsPainHipsThighsBackLeft;v1.0
+Høyre kne;PainDrawing.IsPainKneeFrontRight;Avkrysning;Ja;IsPainKneeFrontRight;v1.0
+Venstre kne;PainDrawing.IsPainKneeFrontLeft;Avkrysning;Ja;IsPainKneeFrontLeft;v1.0
+Høyre kne;PainDrawing.IsPainKneeBackRight;Avkrysning;Ja;IsPainKneeBackRight;v1.0
+Venstre kne;PainDrawing.IsPainKneeBackLeft;Avkrysning;Ja;IsPainKneeBackLeft;v1.0
+Høyre ankel/fot;PainDrawing.IsPainFeetFrontRight;Avkrysning;Ja;IsPainFeetFrontRight;v1.0
+Høyre ankel/fot;PainDrawing.IsPainFeetBackRight;Avkrysning;Ja;IsPainFeetBackRight;v1.0
+Venstre ankel/fot;PainDrawing.IsPainFeetFrontLeft;Avkrysning;Ja;IsPainFeetFrontLeft;v1.0
+Venstre ankel/fot;PainDrawing.IsPainFeetBackLeft;Avkrysning;Ja;IsPainFeetBackLeft;v1.0
+NofPainRegions;PainDrawing.NofPainRegions;Numerisk (heltall);Nei;NofPainRegions;v1.0
+Importert;Importert;Enum;Ja;Importert;v1.1
+;0 = False;;;;
+;1 = True;;;;
+MainFormId;MainFormId;Id (Guid);Ja;HovedskjemaGUID;v1.0

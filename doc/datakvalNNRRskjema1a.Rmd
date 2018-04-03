@@ -1,0 +1,304 @@
+---
+title: "Rapport om pasientskjema 1a i NNRR"
+author: "Kevin Thon"
+date: "Oktober 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, echo = FALSE, warning=FALSE}
+datoFra <- '2016-01-01'
+datoTil <- '2017-09-30'
+
+avdRESH <- 0
+
+### Ta ut for en avdeling: Velg resh: OUS=109834, Haukeland=102959, St.Olavs=104293, UNN=601032
+shus <- data.frame(resh=c(109834, 102959, 104293, 601032, 0), shusnavn=c('OUS', 'Haukeland', 'St.Olavs', 'UNN', 'alle avdelinger'))
+
+skjema1a <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-09-29.csv', sep=';',
+                              header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+skjema1a$Hoveddato <- as.POSIXlt(substr(skjema1a$DateOfCompletion, 1, 10), format="%d.%m.%Y")
+skjema1a <- skjema1a[which(skjema1a$Hoveddato >= datoFra & skjema1a$Hoveddato <= datoTil), ]
+skjema1a <- skjema1a[order(skjema1a$Hoveddato), ]
+
+if (avdRESH!=0) {skjema1a <- skjema1a[skjema1a$ReshId == avdRESH, ]}
+
+
+```
+
+## Bakgrunn/innledning
+
+Det er ingen valideringsregler eller logikk i MRS-løsningen til NNRR som forhindrer at skjema kan leveres med ingen eller minimalt av feltene utfylt. Denne rapporten ser nærmere på pasientregistreringsskjemaet 1a med henblikk på utfyllingsgrad og datakvalitet. Det benyttes registreringer fra `r datoFra` til `r datoTil` fra **`r shus$shusnavn[match(avdRESH, shus$resh)]`**, totalt `r dim(skjema1a)[1]` registreringer.
+
+Rapporten fokuserer på utfyllingsgrad og ser på følgende problemstillinger:
+
+* Antall tomme skjemaer
+* Andel besvart av spørsmålene
+
+## Metode
+
+Skjemaene har felter som i MRS-løsningen er delt inn i følgende datatyper:
+
+* Dato/Tid
+* Enum
+* Numerisk (heltall)
+* Numerisk (flyttall)
+* Text
+* Avkrysning
+* Id (Guid)
+
+Skjema 1a har følgende fordeling av datatyper.
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+library(nnrr)
+library(knitr)
+library(printr)
+kodebok1a <- read.table('P:/MinData/nnrr/Kodebok1a.csv', sep=';', header=T, stringsAsFactors=F)
+
+tab_1a <- table(kodebok1a$Felttype)[-1]
+tab_1a
+
+# knitr::kable(tab_1a, caption = 'Fordeling av felttyper')
+```
+
+Denne rapporten vil fokusere på tre datatyper, nemlig Avkrysning, Enum og Numerisk (heltall) siden de fleste feltene faller under en av disse kategoriene. Her følger en kort forklaring til datatypene og metodene som benyttes til telling i denne rapporten.
+
+### Avkrysning
+
+Dette er boolske variabler (True/False) med default-verdi "False". Avkrysningsboksene er typisk organisert under overskrifter hvor én eller flere kryss forventes satt. For skjema 1a er det to slike overskrifter, "Årsak til smerter" og "Smertetegning". Hvis det er ingen avkrysninger under en overskrift regnes det som ikke utfylt.
+
+### Enum
+
+Dette er kategoriske variabler hvor ett alternativ velges fra en liste. I de fleste tilfeller er manglende verdier kodet som 0 men i noen tilfeller kodes de med -1. For å komplisere bildet ytterligere er ikke verdiene i datadump konsistent med verdiene i kodebok. Det er derfor ikke mulig å automatisere prosessen med å finne de ikke utfylte variablene.
+
+### Numerisk (heltall)
+
+Disse variablene er som regel én av to typer:
+
+* Velg et antall (f.eks. barn) eller tall på en skala (f.eks. smerter fra 0-10).
+* Koding for et svaralternativ som skal inngå i beregningen av en score.
+
+
+```{r, echo = FALSE, warning=FALSE}
+# skjema1a <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-09-29.csv', sep=';',
+#                               header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+# 
+# skjema1a$Hoveddato <- as.POSIXlt(substr(skjema1a$DateOfCompletion, 1, 10), format="%d.%m.%Y")
+# skjema1a <- skjema1a[which(skjema1a$Hoveddato >= datoFra & skjema1a$Hoveddato <= datoTil), ]
+# skjema1a <- skjema1a[order(skjema1a$Hoveddato), ]
+
+### Ta ut for en avdeling: Velg resh: OUS=109834, Haukeland=102959, St.Olavs=104293, UNN=601032
+# skjema1a <- skjema1a[skjema1a$ReshId == 601032, ]
+
+boolske_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Avkrysning')]
+enum_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Enum')]
+numerisk_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Numerisk (heltall)')]
+# numerisk_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Numerisk (heltall)')]
+
+skjema1a[, boolske_var1a] <- apply(skjema1a[, boolske_var1a], 2, as.logical)
+skjema1a_bak <- skjema1a
+
+# skjema1a[, enum_var1a] <- apply(skjema1a[, enum_var1a], 2, function(x){as.numeric(!(x %in% c(-1,0)))})
+
+ingen_avkrysninger1a <- which(rowSums(skjema1a[, boolske_var1a])==0)
+# ingen_enum1a <- which(rowSums(skjema1a[, enum_var1a])<=1)
+
+```
+
+
+## Dobbelregistreringer
+
+```{r, echo = FALSE, warning=FALSE}
+FinnDobbel <- sort(table(skjema1a$PasientGUID), decreasing = T)
+FinnDobbel <- FinnDobbel[FinnDobbel>1]
+Dobbel1a <- skjema1a[skjema1a$PasientGUID %in% names(FinnDobbel), ]
+flerhoved <- sort(table(skjema1a$HovedskjemaGUID), decreasing = T)
+flerhoved <- flerhoved[flerhoved>1]
+ 
+```
+
+For Skjema 1a er det `r length(unique(Dobbel1a$PasientGUID))` pasienter som har mer enn ett skjema tilknyttet sin pasientGUID. Det er `r length(flerhoved)` klinikerskjema (1b) som har mer enn ett pasientskjema som peker mot seg.
+
+
+# Gjennomgang av skjema
+
+Her følger en gjennomgang av utfyllingsgrad for pasientskjemaet. 
+
+<!-- Som en grov oversikt oppsummerer vi i tabellen under utfyllingsgraden til variablene som er kodet 0 når de ikke er besvart: -->
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- Utfyllingsgrad <- 100-apply(skjema1a_bak[, kodebok1a$DataDumpnavn[which(kodebok1a$Variabelnavn=='0 = Ikke svart')-1]], 2, -->
+<!--       function(x){round(length(which(x==0))/length(x)*100,1)}) -->
+
+<!-- Utfyllingsgrad <- as.data.frame(Utfyllingsgrad) -->
+<!-- Utfyllingsgrad$Variabelnavn <- row.names(Utfyllingsgrad) -->
+<!-- Utfyllingsgrad <- Utfyllingsgrad[order(Utfyllingsgrad$Utfyllingsgrad, decreasing = F), ] -->
+<!-- kable(Utfyllingsgrad[,c(2,1)], row.names = F) -->
+<!-- ``` -->
+
+## Enum
+
+Mange av variablene må ses i sammenheng med hverandre, f.eks. når det skal beregnes en score basert på besvarelsene. Oversikten under presenterer antall utfylte variabler under hver av avsnittene.
+
+
+```{r, echo = FALSE, warning=FALSE}
+TomErLik0Navn <- kodebok1a$DataDumpnavn[which(kodebok1a$Variabelnavn=='0 = Ikke svart')-1]
+
+AntBesvODI <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Odi')]], 1, function(x){sum(x!=0)})
+manglerODI <- sum(AntBesvODI < length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Odi')]))/dim(skjema1a)[1]*100
+manglerODIPstil <- quantile(AntBesvODI, (1:5)/10)
+
+AntBesvNDI <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Ndi')]], 1, function(x){sum(x!=0)})
+manglerNDI <- sum(AntBesvNDI<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Ndi')]))/dim(skjema1a_bak)[1]*100
+
+AntBesvHSCL <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Hscl')]], 1, function(x){sum(x!=0)})
+manglerHSCL <- sum(AntBesvHSCL<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Hscl')]))/dim(skjema1a_bak)[1]*100
+
+AntBesvEQ5D <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Eq5d')]], 1, function(x){sum(x!=0)})
+manglerEQ5D <- sum(AntBesvEQ5D<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Eq5d')]))/dim(skjema1a_bak)[1]*100
+
+UHIvar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,4)=='UhiQ']
+AntBesvUHI <- apply(skjema1a_bak[, UHIvar], 1, function(x){sum(x!=-1)})
+manglerUHI <- sum(AntBesvUHI < length(UHIvar))/dim(skjema1a_bak)[1]*100
+
+FabQvar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,4)=='FabQ']
+AntBesvFabQ <- apply(skjema1a_bak[, FabQvar], 1, function(x){sum(!is.na(x))})
+manglerFabQ <- sum(AntBesvFabQ < length(FabQvar))/dim(skjema1a_bak)[1]*100
+
+TidlBehVar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,16)=='TreatmentEarlier']
+AntBesvTidlBeh <- apply(skjema1a_bak[, TidlBehVar], 1, function(x){sum(x!=0)})
+manglerTidlBeh <- sum(AntBesvTidlBeh < length(TidlBehVar))/dim(skjema1a_bak)[1]*100
+
+AntBesv <- data.frame(AntBesvODI, AntBesvNDI, AntBesvHSCL, AntBesvEQ5D, AntBesvUHI, AntBesvFabQ, AntBesvTidlBeh)
+# apply(AntBesv, 2, table, useNA='ifany')
+
+IkkeAlleUtfylt <- data.frame(manglerODI,manglerNDI, manglerHSCL, manglerEQ5D, manglerUHI, manglerFabQ, manglerTidlBeh)
+
+# round(IkkeAlleUtfylt, 1)
+```
+
+### ODI
+```{r, echo = FALSE, warning=FALSE}
+ODItab <- as.data.frame(table(AntBesv$AntBesvODI, useNA = 'ifany'))
+ODItab$Andel <- ODItab$Freq/ sum(ODItab$Freq) * 100
+row.names(ODItab) <- ODItab$Var1
+ODItab <- t(ODItab[ , -1])
+row.names(ODItab)[row.names(ODItab)=='Freq'] <- 'Antall'
+ODItab[1,] <- round(ODItab[1,])
+ODItab[2,] <- paste0(round(ODItab[2,],1), ' %')
+ODItab
+```
+
+### NDI
+```{r, echo = FALSE, warning=FALSE}
+ODItab <- as.data.frame(table(AntBesv$AntBesvNDI, useNA = 'ifany'))
+ODItab$Andel <- ODItab$Freq/ sum(ODItab$Freq) * 100
+row.names(ODItab) <- ODItab$Var1
+ODItab <- t(ODItab[ , -1])
+row.names(ODItab)[row.names(ODItab)=='Freq'] <- 'Antall'
+ODItab[1,] <- round(ODItab[1,])
+ODItab[2,] <- paste0(round(ODItab[2,],1), ' %')
+ODItab
+```
+
+### HSCL
+```{r, echo = FALSE, warning=FALSE}
+ODItab <- as.data.frame(table(AntBesv$AntBesvHSCL, useNA = 'ifany'))
+ODItab$Andel <- ODItab$Freq/ sum(ODItab$Freq) * 100
+row.names(ODItab) <- ODItab$Var1
+ODItab <- t(ODItab[ , -1])
+row.names(ODItab)[row.names(ODItab)=='Freq'] <- 'Antall'
+ODItab[1,] <- round(ODItab[1,])
+ODItab[2,] <- paste0(round(ODItab[2,],1), ' %')
+ODItab
+```
+
+### EQ5D
+```{r, echo = FALSE, warning=FALSE}
+ODItab <- as.data.frame(table(AntBesv$AntBesvEQ5D, useNA = 'ifany'))
+ODItab$Andel <- ODItab$Freq/ sum(ODItab$Freq) * 100
+row.names(ODItab) <- ODItab$Var1
+ODItab <- t(ODItab[ , -1])
+row.names(ODItab)[row.names(ODItab)=='Freq'] <- 'Antall'
+ODItab[1,] <- round(ODItab[1,])
+ODItab[2,] <- paste0(round(ODItab[2,],1), ' %')
+ODItab
+```
+
+### UHI
+```{r, echo = FALSE, warning=FALSE}
+ODItab <- as.data.frame(table(AntBesv$AntBesvUHI, useNA = 'ifany'))
+ODItab$Andel <- ODItab$Freq/ sum(ODItab$Freq) * 100
+row.names(ODItab) <- ODItab$Var1
+ODItab <- t(ODItab[ , -1])
+row.names(ODItab)[row.names(ODItab)=='Freq'] <- 'Antall'
+ODItab[1,] <- round(ODItab[1,])
+ODItab[2,] <- paste0(round(ODItab[2,],1), ' %')
+ODItab
+```
+
+### FABQ
+```{r, echo = FALSE, warning=FALSE}
+ODItab <- as.data.frame(table(AntBesv$AntBesvFabQ, useNA = 'ifany'))
+ODItab$Andel <- ODItab$Freq/ sum(ODItab$Freq) * 100
+row.names(ODItab) <- ODItab$Var1
+ODItab <- t(ODItab[ , -1])
+row.names(ODItab)[row.names(ODItab)=='Freq'] <- 'Antall'
+ODItab[1,] <- round(ODItab[1,])
+ODItab[2,] <- paste0(round(ODItab[2,],1), ' %')
+ODItab
+```
+
+## Avkrysninger
+
+```{r, echo = FALSE, warning=FALSE}
+Smerte <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,6)=='IsPain']
+AntKryssSmerte <- apply(skjema1a_bak[, Smerte], 1, sum)
+tommeSmerte <- sum(AntKryssSmerte==0)
+myesmerte <- sum(AntKryssSmerte>=30)
+ingenreg_smertepst <- round(tommeSmerte/dim(skjema1a_bak)[1]*100, 1)
+
+AarsakSmerte <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,10)=='PainCauses']
+AntKryssSmerteaarsak <- apply(skjema1a_bak[, AarsakSmerte[1:9]], 1, sum)
+tommeSmerteaasak <- sum(AntKryssSmerteaarsak==0)
+ingenreg_smerteaarsakpst <- round(tommeSmerteaasak/dim(skjema1a_bak)[1]*100, 1)
+
+```
+
+Det er `r ingenreg_smertepst` prosent som har ingen avkrysninger på smertetegningen og `r ingenreg_smerteaarsakpst` prosent som ikke har krysset av noe på årsak til smerte.
+
+
+## Numeric
+Tabellen under viser antallet og andelen av de numeriske variabler som er ikke-tomme blant de `r dim(skjema1a_bak)[1]` skjemaene som inngår i denne rapporten. Mange av variablene er beregnede scorer så det kan være verd å undersøke at alle regler følges ved beregningen i forhold til nødvendig utfyllingsgrad for de underliggende variablene.
+
+```{r, echo = FALSE, warning=FALSE}
+numvar <- c('OwnChildren', 'HouseholdChildren', 'ProfessionalHeavy', 'ProfessionalMonotonous', 'ProfessionalSatisfied', 
+  'PainExperiencesNoActivity', 'PainExperiencesActivity', 'OdiIndex', 'NdiIndex', 'FABQ.Score1', 'FABQ.Score2', 
+  'FABQ.Score3', 'UHI.Score', 'UHI.Index', 'Eq5dHealthLevel', 'NofPainRegions')
+
+
+ikketommeNum <- as.data.frame(colSums(apply(skjema1a_bak[, numvar], 2, function(x){!is.na(x)})))
+names(ikketommeNum) <- 'Antall'
+ikketommeNum$Andel <- round(ikketommeNum$Antall/dim(skjema1a_bak)[1]*100, 1)
+ikketommeNum <- ikketommeNum[order(ikketommeNum$Andel), ]
+
+ikketommeNum
+
+# tmp <- rowSums(apply(skjema1a_bak[, numvar], 2, is.na))==0
+
+"%i%" <- intersect
+
+AntHeltTomme <- length(which(rowSums(AntBesv)<=1) %i% which(rowSums(apply(skjema1a_bak[, numvar], 2, is.na))==0) %i% 
+  which(AntKryssSmerteaarsak==0) %i% which(AntKryssSmerte==0))
+
+```
+
+
+## Tomme skjemaer
+
+Det er `r AntHeltTomme` helt tomme skjemaer.
+
+

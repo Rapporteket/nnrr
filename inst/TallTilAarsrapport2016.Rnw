@@ -1,0 +1,482 @@
+\documentclass[norsk,a4paper]{article} % ,twoside
+\usepackage[norsk]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{subfig}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{amssymb}
+\usepackage[a4paper]{geometry}
+\usepackage[pdftex, colorlinks, linkcolor=lysblaa, urlcolor=lysblaa]{hyperref}
+
+\title{Figurer og tabeller til årsrapport for NNRR}
+\author{NNRR}
+
+%setter grå skrift fremfort sort
+\usepackage{xcolor}
+\usepackage{graphicx}
+\pagestyle{myheadings}
+\definecolor{lysblaa}{rgb}{0.27,0.51,0.71}
+\definecolor{moerkgraa}{rgb}{0.25,0.25,0.25}
+\color{moerkgraa}
+
+<<'initOpts',include=FALSE>>=
+knitr::opts_chunk$set(warnings=FALSE,echo=FALSE)
+knitr::opts_knit$set(root.dir = './')
+@
+
+\begin{document}
+
+<<LastData, include=FALSE, cache=FALSE>>=
+rm(list=ls())
+library(nnrr)
+legeskjema <- read.table('P:/MinData/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-09-29.csv', sep=';',
+                         header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-09-29.csv', sep=';',
+                              header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('P:/MinData/nnrr/DataDump_2%3aSpørreskjema+etter+behandling_2017-10-04.csv', sep=';',
+                               header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+varnavn_1b <- read.table('P:/MinData/nnrr/Kodebok1b.csv', sep=';', header=T, stringsAsFactors = F)
+boolske_var1b <- as.character(varnavn_1b$DataDumpnavn)[which(as.character(varnavn_1b$Felttype) == 'Avkrysning')]
+legeskjema[, boolske_var1b] <- apply(legeskjema[, boolske_var1b], 2, as.logical)
+varnavn_1a <- read.table('P:/MinData/nnrr/Kodebok1a.csv', sep=';', header=T, stringsAsFactors = F)
+boolske_var1a <- as.character(varnavn_1a$DataDumpnavn)[which(as.character(varnavn_1a$Felttype) == 'Avkrysning')]
+pasientsvar_pre[, boolske_var1a] <- apply(pasientsvar_pre[, boolske_var1a], 2, as.logical)
+varnavn_2 <- read.table('P:/MinData/nnrr/Kodebok2.csv', sep=';', header=T, stringsAsFactors = F)
+boolske_var2 <- as.character(varnavn_2$DataDumpnavn)[which(as.character(varnavn_2$Felttype) == 'Avkrysning')]
+pasientsvar_post[, boolske_var2] <- apply(pasientsvar_post[, boolske_var2], 2, as.logical)
+
+legeskjema$regstatus <- 1
+pasientsvar_pre$regstatus <- 1
+pasientsvar_post$regstatus <- 1
+
+names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
+names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
+names(legeskjema)[names(legeskjema)=='S1b_DateOfCompletion'] <- 'Besoksdato'
+names(pasientsvar_pre)[names(pasientsvar_pre)=='DateOfCompletion'] <- 'Besoksdato'
+names(pasientsvar_post)[names(pasientsvar_post)=='DateOfCompletion'] <- 'Besoksdato'
+
+
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all = TRUE)
+RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all = TRUE)
+
+RegData <- nnrrPreprosess(RegData = RegData)
+RegData <- RegData[which(RegData$Aar == 2016), ]
+
+figstr <- 0.61
+tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+@
+
+%%%%% Forside
+
+\color{moerkgraa}
+\thispagestyle{empty}
+
+\maketitle
+%
+% \tableofcontents
+% \newpage
+\thispagestyle{empty}
+\listoffigures
+% \newpage
+% \thispagestyle{empty}
+\listoftables
+
+\clearpage
+
+\newpage
+
+<<'Tab', results='asis', echo=FALSE>>=
+Gj.snitt <- apply(RegData[,c("ProfessionalHeavy", "ProfessionalMonotonous", "ProfessionalSatisfied")], 2, mean, na.rm=T)
+Median <- apply(RegData[,c("ProfessionalHeavy", "ProfessionalMonotonous", "ProfessionalSatisfied")], 2, median, na.rm=T)
+Std.avvik <- apply(RegData[,c("ProfessionalHeavy", "ProfessionalMonotonous", "ProfessionalSatisfied")], 2, sd, na.rm=T)
+N <- apply(RegData[,c("ProfessionalHeavy", "ProfessionalMonotonous", "ProfessionalSatisfied")], 2, function(x){length(which(!is.na(x)))})
+
+
+tabell1 <- cbind(Gj.snitt, Median, Std.avvik, N)
+tabell1 <- cbind(round(tabell1, 1), Paa.en.skala = c('hvor fysisk tungt arbeid har du?',
+                                           'hvor ensformig arbeid har du?', 'hvor fornøyd er du med jobben?'))
+tabell1 <- tabell1[, c(5, 1:4)]
+colnames(tabell1) <- c('På en skala fra 0 til 10,', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+
+print(xtable::xtable(tabell1, digits=0, align=c('l','l', rep('r', ncol(tabell1)-1)), caption = 'Pasientens arbeidsforhold'), include.rownames=FALSE)
+@
+
+<<'Fig:andeler', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
+# valgtVar <- 'AarsakSmerte_PasRap'
+datoFra='2016-01-01'
+datoTil='2016-12-31'
+minald=0
+maxald=130
+erMann=99
+# outfile=''
+reshID <- 0
+enhetsUtvalg=0
+preprosess=F
+hentData=F
+
+valgtVar <- 'PainDurationNow'
+outfile=paste0(valgtVar, '.pdf')
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'AarsakSmerte_PasRap'
+outfile=paste0(valgtVar, '.pdf')
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+@
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{PainDurationNow.pdf}
+\caption{Sammenhengende varighet av smerter}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{AarsakSmerte_PasRap.pdf}
+\caption{Pasientrapporterte årsaker til smerte}
+\end{figure}
+
+
+<<'Tab:samlet', results='asis', echo=FALSE>>=
+tabell2 <- apply(RegData[,c('SoktUforetrygd', 'SoktErstatning', 'OnsketTilbake', 'DagligRoyk')], 2, table) #('PainDisable', 'PainCompensation', 'ProfessionWantedBack', 'Smoking')
+tabell2 <- t(tabell2)[,c(2,3,1)]
+row.names(tabell2) <- c('Har du søkt uføretrygd?', 'Har du søkt erstatning?',
+                        'Føler du at din arbeidsgiver ønsker deg tilbake i jobb?', 'Røyker du daglig?')
+
+
+print(xtable::xtable(tabell2, digits=0, align=c('l','l', rep('r', ncol(tabell2)-1)),
+                     caption = 'Om pasienten'), include.rownames=TRUE)
+@
+
+
+<<'Tab:eq5d_mm', results='asis', echo=FALSE>>=
+Gj.snitt <- apply(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
+                             "OdiScore", "NdiScore", "HSCL10.Score")], 2, mean, na.rm=T)
+Median <- apply(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
+                           "OdiScore", "NdiScore", "HSCL10.Score")], 2, median, na.rm=T)
+Std.avvik <- apply(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
+                              "OdiScore", "NdiScore", "HSCL10.Score")], 2, sd, na.rm=T)
+N <- apply(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
+                      "OdiScore", "NdiScore", "HSCL10.Score")], 2, function(x){length(which(!is.na(x)))})
+
+tabell3 <- cbind(Gj.snitt, Median, Std.avvik, N)
+rownames(tabell3) <- c('EQ5D-score', 'EQ5D-VAS', 'FABQ fysisk aktivitet', 'FABQ arbeid', 'ODI', 'NDI', 'HSCL-10')
+
+print(xtable::xtable(tabell3, digits=c(1,1,1,1,0), align=c('l','l', rep('r', ncol(tabell3)-1)),
+                     caption = 'Preintervensjonsdata'), include.rownames=TRUE)
+@
+
+<<'Tab:PrShus', results='asis', echo=FALSE>>=
+Gj.snitt <- aggregate(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
+                                 "OdiScore", "NdiScore", "HSCL10.Score")], by=list(RegData$SykehusNavn), mean, na.rm=T)
+Gj.snitt[,2:dim(Gj.snitt)[2]] <- round(Gj.snitt[,2:dim(Gj.snitt)[2]], 1)
+Median <- aggregate(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
+                               "OdiScore", "NdiScore", "HSCL10.Score")], by=list(RegData$SykehusNavn), median, na.rm=T)
+Median[,2:dim(Gj.snitt)[2]] <- round(Median[,2:dim(Gj.snitt)[2]], 1)
+Std.avvik <- aggregate(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
+                                  "OdiScore", "NdiScore", "HSCL10.Score")], by=list(RegData$SykehusNavn), sd, na.rm=T)
+Std.avvik[,2:dim(Gj.snitt)[2]] <- round(Std.avvik[,2:dim(Gj.snitt)[2]], 1)
+N <- aggregate(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
+                          "OdiScore", "NdiScore", "HSCL10.Score")], by=list(RegData$SykehusNavn), function(x){length(which(!is.na(x)))})
+
+eq5d_score <- rbind(cbind(Gj.snitt[,1:2], Median[,2], Std.avvik[,2], N[,2]), c('Totalt', round(tabell3[1,],1)))
+colnames(eq5d_score) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+eq5d_vas <- rbind(cbind(Gj.snitt[,c(1,3)], Median[,3], Std.avvik[,3], N[,3]), c('Totalt', round(tabell3[2,],1)))
+colnames(eq5d_vas) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+FABQ1 <- rbind(cbind(Gj.snitt[,c(1,4)], Median[,4], Std.avvik[,4], N[,4]), c('Totalt', round(tabell3[3,],1)))
+colnames(FABQ1) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+FABQ2 <- rbind(cbind(Gj.snitt[,c(1,5)], Median[,5], Std.avvik[,5], N[,5]), c('Totalt', round(tabell3[4,],1)))
+colnames(FABQ2) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+OdiScore <- rbind(cbind(Gj.snitt[,c(1,6)], Median[,6], Std.avvik[,6], N[,6]), c('Totalt', round(tabell3[5,],1)))
+colnames(OdiScore) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+NdiScore <- rbind(cbind(Gj.snitt[,c(1,7)], Median[,7], Std.avvik[,7], N[,7]), c('Totalt', round(tabell3[6,],1)))
+colnames(NdiScore) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+HSCL10.Score <- rbind(cbind(Gj.snitt[,c(1,8)], Median[,8], Std.avvik[,8], N[,8]), c('Totalt', round(tabell3[7,],1)))
+colnames(HSCL10.Score) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+
+
+print(xtable::xtable(eq5d_score, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(eq5d_score)-1)),
+                     caption = 'EQ5D-score'), include.rownames=FALSE)
+print(xtable::xtable(eq5d_vas, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(eq5d_vas)-1)),
+                     caption = 'EQ5D-VAS'), include.rownames=FALSE)
+print(xtable::xtable(FABQ1, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(FABQ1)-1)),
+                     caption = 'FABQ fysisk aktivitet'), include.rownames=FALSE)
+print(xtable::xtable(FABQ2, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(FABQ2)-1)),
+                     caption = 'FABQ arbeid'), include.rownames=FALSE)
+print(xtable::xtable(OdiScore, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(OdiScore)-1)),
+                     caption = 'ODI score'), include.rownames=FALSE)
+print(xtable::xtable(NdiScore, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(NdiScore)-1)),
+                     caption = 'NDI score'), include.rownames=FALSE)
+print(xtable::xtable(HSCL10.Score, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(HSCL10.Score)-1)),
+                     caption = 'HSCL-10'), include.rownames=FALSE)
+@
+
+
+<<'Fig:FABQ', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
+valgtVar <- 'FABQ.Score1'
+outfile='FABQScore1.pdf'
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'FABQ.Score2'
+outfile='FABQScore2.pdf'
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'HSCL10.Score'
+outfile='HSCL10Score.pdf'
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'Eq5dSatisfactionTreatment'
+outfile='Pasientfornoydhet.pdf'
+
+FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+                          maxald=maxald, erMann=erMann, outfile=outfile,
+                          reshID=reshID, enhetsUtvalg=enhetsUtvalg,  preprosess=preprosess, hentData=hentData)
+
+gr_var <- 'SykehusNavn'
+
+valgtVar <- 'ODI_PrePost'
+outfile='ODI_PrePost.pdf'
+ODI <- nnrrFigGjsnPrePostGrVar(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
+                                    minald=minald, maxald=maxald, erMann=erMann, outfile=outfile,
+                                    enhetsUtvalg=enhetsUtvalg, preprosess=preprosess, hentData=preprosess, gr_var=gr_var)
+write.csv2(ODI, 'ODItabell.csv')
+
+valgtVar <- 'NDI_PrePost'
+outfile='NDI_PrePost.pdf'
+NDI <- nnrrFigGjsnPrePostGrVar(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
+                                    minald=minald, maxald=maxald, erMann=erMann, outfile=outfile,
+                                    enhetsUtvalg=enhetsUtvalg, preprosess=preprosess, hentData=preprosess, gr_var=gr_var)
+write.csv2(NDI, 'NDItabell.csv')
+
+valgtVar <- 'SmertestillendeResept'
+outfile='SmertestillendeResept.pdf'
+nnrrFigAndelerPrePost(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
+                      minald=minald, maxald=maxald, erMann=erMann, outfile=outfile,
+                      enhetsUtvalg=enhetsUtvalg, preprosess=preprosess, hentData=hentData)
+
+valgtVar <- 'SmertestillendeUtenResept'
+outfile='SmertestillendeUtenResept.pdf'
+nnrrFigAndelerPrePost(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, reshID=reshID,
+                      minald=minald, maxald=maxald, erMann=erMann, outfile=outfile,
+                      enhetsUtvalg=enhetsUtvalg, preprosess=preprosess, hentData=hentData)
+@
+
+\clearpage
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{FABQScore1.pdf}
+\caption{FABQ fysisk aktivitet}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{FABQScore2.pdf}
+\caption{FABQ arbeid}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{HSCL10Score.pdf}
+\caption{Hopkins symptom checklist skår}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{Pasientfornoydhet.pdf}
+\caption{Behandlingstilfredshet}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{ODI_PrePost.pdf}
+\caption{Oswestry disability index før og etter behandling}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{NDI_PrePost.pdf}
+\caption{Neck disability index før og etter behandling}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{SmertestillendeUtenResept.pdf}
+\caption{Forbruk av ikke-reseptbelagte smertestillende før og etter behandling}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{SmertestillendeResept.pdf}
+\caption{Forbruk av reseptbelagte smertestillende før og etter behandling}
+\end{figure}
+
+
+<<'Tab:ODI_NDI', results='asis', echo=FALSE>>=
+RegDataNy <- RegData[which(!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post)), ]
+
+ODI <- aggregate(RegDataNy[, c("OdiScore", "OdiScore_post")],
+                       by=list(RegDataNy$SykehusNavn), mean, na.rm = TRUE)
+ODI[ , 2:3] <- round(ODI[ , 2:3], 1)
+ODI_N <- aggregate(RegDataNy[, c("OdiScore")],
+                       by=list(RegDataNy$SykehusNavn), length)
+ODI <- cbind(ODI, N=ODI_N[,2])
+
+ODI <- rbind(ODI, c('Totalt', round(apply(RegDataNy[, c("OdiScore", "OdiScore_post")], 2, mean, na.rm = TRUE),1), dim(RegDataNy)[1]))
+names(ODI) <- c('Sykehus', 'ODI pre', 'ODI post', 'N')
+
+print(xtable::xtable(ODI, digits=0, align=c('l','l', rep('r', ncol(ODI)-1)),
+                     caption = 'ODI skår pre og post'), include.rownames=FALSE)
+
+RegDataNy <- RegData[which(!is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post)), ]
+
+NDI <- aggregate(RegDataNy[, c("NdiScore", "NdiScore_post")],
+                       by=list(RegDataNy$SykehusNavn), mean, na.rm = TRUE)
+NDI[ , 2:3] <- round(NDI[ , 2:3], 1)
+NDI_N <- aggregate(RegDataNy[, c("NdiScore")],
+                       by=list(RegDataNy$SykehusNavn), length)
+NDI <- cbind(NDI, N=NDI_N[,2])
+
+NDI <- rbind(NDI, c('Totalt', round(apply(RegDataNy[, c("NdiScore", "NdiScore_post")], 2, mean, na.rm = TRUE),1), dim(RegDataNy)[1]))
+names(NDI) <- c('Sykehus', 'NDI pre', 'NDI post', 'N')
+
+print(xtable::xtable(NDI, digits=0, align=c('l','l', rep('r', ncol(NDI)-1)),
+                     caption = 'NDI skår pre og post'), include.rownames=FALSE)
+
+@
+
+<<'Tab:eq5dprepostPrShus', results='asis', echo=FALSE>>=
+RegDataNy <- RegData[which(!is.na(RegData$Eq5dScore) & !is.na(RegData$Eq5dScore_post)), ]
+
+eq5d <- aggregate(RegDataNy[, c("Eq5dScore", "Eq5dScore_post")],
+                       by=list(RegDataNy$SykehusNavn), mean)
+eq5d_std <- aggregate(RegDataNy[, c("Eq5dScore", "Eq5dScore_post")],
+                       by=list(RegDataNy$SykehusNavn), sd)
+N <- tapply(RegDataNy$SykehusNavn, RegDataNy$SykehusNavn, length)
+
+eq5dtab <- cbind(eq5d, eq5d_std, N)[, c(2,5,3,6,7)]
+names(eq5dtab) <- c('Eq5d pre', 'Std.avvik', 'Eq5d post', 'Std.avvik', 'N')
+eq5dtab <- rbind(eq5dtab, c(mean(RegDataNy$Eq5dScore), sd(RegDataNy$Eq5dScore), mean(RegDataNy$Eq5dScore_post),
+                            sd(RegDataNy$Eq5dScore_post), dim(RegDataNy)[1]))
+row.names(eq5dtab)[5] <- 'Totalt'
+
+eq5dtab <- eq5dtab[, c(1,3,5)]
+
+print(xtable::xtable(eq5dtab, digits=c(rep(1, ncol(eq5dtab)),0), align=c('l', rep('r', ncol(eq5dtab))), caption = 'Eq5d før og etter, fordelt på sykehus'), include.rownames=T)
+
+RegDataNy <- RegData[which(!is.na(RegData$EQ5D.VAS) & !is.na(RegData$EQ5D.VAS_post)), ]
+
+
+@
+
+
+<<'Tab:DemografiskPrSykehus', results='asis', echo=FALSE>>=
+
+RegData <- RegData[order(RegData$Besoksdato, decreasing = TRUE), ]
+UnikePre <- RegData[which(RegData$regstatus_pre==1), ]
+UnikePre <- UnikePre[match(unique(UnikePre$PasientGUID_pre), UnikePre$PasientGUID_pre), ]
+
+kjonn <- addmargins(table(UnikePre$PatientGender, UnikePre$SykehusNavn, useNA = 'ifany'),2)
+row.names(kjonn)[3] <- 'Ikke reg.'
+colnames(kjonn)[5] <- 'Totalt'
+
+print(xtable::xtable(kjonn, digits=0, align=c('l', rep('r', ncol(kjonn))), caption = 'Kjønnsfordeling'), include.rownames=T)
+
+alder <- tapply(UnikePre$PatientAge, UnikePre$SykehusNavn, mean, na.rm = T)
+alderStd <- tapply(UnikePre$PatientAge, UnikePre$SykehusNavn, sd, na.rm = T)
+AldersTab <- t(data.frame(Gj.snitt=alder, Std.avvik= alderStd))
+AldersTab <- cbind(AldersTab, c(mean(UnikePre$PatientAge),sd(UnikePre$PatientAge)))
+colnames(AldersTab)[5] <- 'Totalt'
+UtfyllingsPstAlder <- tapply(UnikePre$PatientAge, UnikePre$SykehusNavn, function(x){length(which(!is.na(x)))/length(x)*100})
+print(xtable::xtable(AldersTab, digits=1, align=c('l', rep('r', ncol(AldersTab))), caption = 'Gjennomsnittsalder'), include.rownames=T)
+
+
+sivilstatus <- addmargins(table(UnikePre$FamilyStatus, UnikePre$SykehusNavn, useNA = 'ifany'), 2)
+print(xtable::xtable(sivilstatus, digits=0, align=c('l', rep('r', ncol(sivilstatus))), caption = 'Sivilstatus'), include.rownames=T)
+
+utdanning <- addmargins(table(UnikePre$EducationLevel, UnikePre$SykehusNavn, useNA = 'ifany'), 2)
+print(xtable::xtable(utdanning, digits=0, align=c('l', rep('r', ncol(utdanning))), caption = 'Utdanningsnivå'), include.rownames=T)
+
+smertevarighet <- addmargins(table(UnikePre$PainDurationNow, UnikePre$SykehusNavn, useNA = 'ifany'), 2)
+print(xtable::xtable(smertevarighet, digits=0, align=c('l', rep('r', ncol(smertevarighet))), caption = 'Varighet av smerter'), include.rownames=T)
+
+Unike1b <- RegData[which(RegData$regstatus==1), ]
+Unike1b <- Unike1b[match(unique(Unike1b$PasientGUID), Unike1b$PasientGUID), ]
+
+
+tidlOpRygg <- addmargins(table(Unike1b$BackSurgery, Unike1b$SykehusNavn, useNA = 'ifany'), 2)
+tidlOpNakke <- addmargins(table(Unike1b$NeckSurgery, Unike1b$SykehusNavn, useNA = 'ifany'), 2)
+
+print(xtable::xtable(tidlOpRygg, digits=0, align=c('l', rep('r', ncol(tidlOpRygg))), caption = 'Tidligere operert i rygg'), include.rownames=T)
+
+print(xtable::xtable(tidlOpNakke, digits=0, align=c('l', rep('r', ncol(tidlOpNakke))), caption = 'Tidligere operert i nakke'), include.rownames=T)
+
+@
+
+
+\clearpage
+
+<<'Tab:DemografiskPrSykehusMer', results='asis', echo=FALSE>>=
+skjema1b <- RegData[which(RegData$regstatus==1), ]
+valgtVar='FABQ.Score1'
+skjema1b$Variabel <- skjema1b[, valgtVar]
+gr <- c(0, 14, 17, 24)
+skjema1b$VariabelGr <- cut(skjema1b$Variabel, breaks=gr, include.lowest=TRUE, right=FALSE)
+FABQ1 <- addmargins(table(skjema1b$VariabelGr, skjema1b$SykehusNavn, useNA = 'ifany'), 2)
+# row.names(FABQ1) <- c(' ubetydelig', ' moderat', ' høy', ' Ikke reg.')
+# row.names(FABQ1) <- paste0(levels(skjema1b$VariabelGr), c(' ubetydelig', ' moderat', ' høy', ' Ikke reg.'))
+row.names(FABQ1) <- c('<14 ubetydelig', '14-16 moderat', '>=17 høy', ' Ikke reg.')
+# row.names(FABQ1)[4] <- 'Ikke reg.'
+
+print(xtable::xtable(FABQ1, digits=0, align=c('l', rep('r', ncol(FABQ1))), caption = 'FABQ aktivitet'),
+      include.rownames=T)
+
+valgtVar='FABQ.Score2'
+skjema1b$Variabel <- skjema1b[, valgtVar]
+# RegData <- RegData[which(!is.na(RegData$Variabel)), ]
+# tittel <- 'FABQ arbeid'
+gr <- c(0, 20, 25, 42)
+skjema1b$VariabelGr <- cut(skjema1b$Variabel, breaks=gr, include.lowest=TRUE, right=FALSE)
+FABQ2 <- addmargins(table(skjema1b$VariabelGr, skjema1b$SykehusNavn, useNA = 'ifany'), 2)
+# row.names(FABQ2) <- paste0(levels(skjema1b$VariabelGr), c(' ubetydelig', ' moderat', ' høy', 'bul'))
+# row.names(FABQ2)[4] <- 'Ikke reg.'
+row.names(FABQ2) <- c('<20 ubetydelig', '20-24 moderat', '>=25 høy', 'Ikke reg.')
+
+print(xtable::xtable(FABQ2, digits=0, align=c('l', rep('r', ncol(FABQ2))), caption = 'FABQ arbeid'), include.rownames=T)
+
+@
+
+
+<<'Tab:smertetegning', results='asis', echo=FALSE>>=
+kodebok1a <- read.table('P:/MinData/nnrr/Kodebok1a.csv', sep=';', header=T, stringsAsFactors=F)
+skjema1a <- RegData[which(RegData$regstatus_pre==1), ]
+
+smertetegningsvar <- kodebok1a$DataDumpnavn[which(substr(kodebok1a$DataDumpnavn, 1,6) == 'IsPain')]
+table(rowSums(skjema1a[, smertetegningsvar]), useNA = 'ifany')
+table(skjema1a$NofPainRegions, useNA = 'ifany')
+
+
+SmrtReg <- data.frame(reg1 = skjema1a$IsPainHead | skjema1a$IsPainBackHead, reg2 = skjema1a$IsPainNeckFront| skjema1a$IsPainNeckBack)
+
+table(cut(rowSums(skjema1a[, smertetegningsvar]), breaks = (0:8)*4, include.lowest = T))
+
+@
+
+\end{document}

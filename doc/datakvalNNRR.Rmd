@@ -1,0 +1,300 @@
+---
+title: "En enkel rapport om utfyllingsgrad av skjema i NNRR"
+author: "Kevin Thon"
+date: "29 mai 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## Bakgrunn/innledning
+
+Det er ingen valideringsregler eller logikk i MRS-løsningen som forhindrer at skjema kan leveres med ingen eller minimalt av feltene utfylt. Dette skal endres i kommende versjoner av registeret, i første omgang for behandlerskjemaet 1b. For nå er det interessant å gjøre opp status for NNRR sine registreringer fra 2016 og frem til datadump ble hentet til denne rapporten 24. mai 2017.
+
+Denne rapporten tar for seg datakvaliteten i NNRR. Den fokuserer på utfyllingsgrad og ser på følgende problemstillinger:
+
+* Antall tomme skjemaer
+* Andel besvart av spørsmålene
+* Sammenheng mellom tomme pasientskjema og behandlerskjema
+
+## Metode
+
+NNRR består av tre skjemaer:
+
+* Pasientskjema før behandling - 1a
+* Behandlerskjema - 1b
+* Pasientskjema etter behandling - 2
+
+Skjemaene har felter som i MRS-løsningen er delt inn i følgende datatyper:
+
+* Dato/Tid
+* Enum
+* Numerisk (heltall)
+* Numerisk (flyttall)
+* Text
+* Avkrysning
+* Id (Guid)
+
+De tre NNRR-skjemaene har (ifølge kodebok hentet fra MRS-løsningen) følgende fordeling av datatyper.
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+library(nnrr)
+# library(xtable)
+library(knitr)
+library(printr)
+kodebok1a <- read.table('P:/MinData/nnrr/Kodebok1a.csv', sep=';', header=T, stringsAsFactors=F)
+kodebok1b <- read.table('P:/MinData/nnrr/Kodebok1b.csv', sep=';', header=T, stringsAsFactors=F)
+kodebok2 <- read.table('P:/MinData/nnrr/Kodebok2.csv', sep=';', header=T, stringsAsFactors=F)
+
+tab_1a <- table(kodebok1a$Felttype)[-1]
+tab_1b <- table(kodebok1b$Felttype)[-1]
+tab_2 <- table(kodebok2$Felttype)[-1]
+
+Oppsum <- rbind(rbind(tab_1a, tab_2), tab_1b)
+Oppsum[3, 6] <- Oppsum[3, 4]
+Oppsum[3, 7] <- Oppsum[3, 5]
+Oppsum[3, 4:5] <- 0
+row.names(Oppsum) <- c('Skjema 1a', 'Skjema 2', 'Skjema 1b')
+
+knitr::kable(Oppsum, caption = 'Antallet felter på NNRR sine skjema etter felttype')
+```
+
+Denne rapporten vil fokusere på tre datatyper, nemlig Avkrysning, Enum og Numerisk (heltall) siden disse utgjør mesteparten av feltene. Her følger en kort forklaring til datatypene og hvorfor jeg har valgt å telle på den måten jeg gjør.
+
+### Avkrysning
+
+Dette er boolske variabler (True/False) med default-verdi "False". Avkrysningsboksene er typisk organisert under overskrifter hvor én eller flere kryss forventes satt. Det finnes derfor ingen fasit på hvor mange bokser som skal være avkrysset ved en komplett utfylling. En mer grundig gjennomgang enn hva det er tid til her kan telle hver overskrift som har minst en avkrysning under seg, samt ta høyde for at en del felter bare skal fylles ut når man har krysset av for et annet. For nå vil det presenteres en fordeling av antall utfylte variabler.
+
+### Enum
+
+Dette er kategoriske variabler hvor ett alternativ velges fra en liste. I de fleste tilfeller er manglende verdier kodet som -1 men i noen tilfeller kodes de med 0. For å komplisere bildet ytterligere er ikke verdiene i datadump konsistent med verdiene i kodebok, og ofte gis etikettene fremfor kodingen i datadumpen. Det er ikke mulig å automatisere prosessen med å finne de ikke utfylte variablene i disse tilfellene.
+
+I presentasjon av utfyllingsgrad brukes kun de Enum variablene som er kodet numerisk i datadumpen, hvilket gjør at en del variabler faller bort fra vurderingen. I tillegg må det presiseres at ikke alle registrerte nødvendigvis skal svare på alle spørsmål. F.eks. finnes det nakkespesifikke verktøy som ikke skal benyttes av de med utelukkende ryggsmerter.
+
+### Numerisk (heltall)
+
+Disse variablene er som regel én av to typer:
+
+* Velg et antall (f.eks. barn) eller tall på en skala (f.eks. smerter fra 0-10).
+* Koding for et svaralternativ som skal inngå i beregningen av en score.
+
+Denne variabeltypen vil rapporteres på i en senere utgave av denne rapporten.
+
+## Skjema 1b
+
+### Tomme skjema
+
+Skjema 1b er behandlerskjemaet og består i stor grad av avkrysningsbokser. Med hele 63 avkrysningsbokser antar jeg at skjema som ikke har et eneste kryss er tomme også på andre felter. Avdelingsvis fordeler de helt tomme skjema 1b seg slik:
+
+```{r, echo = FALSE, warning=FALSE}
+datoFra <- '2016-01-01'
+datoTil <- '2017-12-31'
+
+# skjema1a <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-05-24.csv', sep=';',
+#                        header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
+# skjema1b <- read.table('P:/MinData/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-05-24.csv', sep=';',
+#                    header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
+# skjema2 <- read.table('P:/MinData/nnrr/DataDump_2%3aSpørreskjema+etter+behandling_2017-05-24.csv', sep=';',
+#                        header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
+
+skjema1b <- read.table('P:/MinData/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-09-29.csv', sep=';',
+                         header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+skjema1a <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-09-29.csv', sep=';',
+                              header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+skjema2 <- read.table('P:/MinData/nnrr/DataDump_2%3aSpørreskjema+etter+behandling_2017-09-29.csv', sep=';',
+                               header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+skjema1b$Hoveddato <- as.POSIXlt(skjema1b$S1b_DateOfCompletion, format="%d.%m.%Y")
+skjema1b <- skjema1b[which(skjema1b$Hoveddato >= datoFra & skjema1b$Hoveddato <= datoTil), ]
+skjema1b <- skjema1b[order(skjema1b$Hoveddato), ]
+skjema1a$Hoveddato <- as.POSIXlt(skjema1a$DateOfCompletion, format="%d.%m.%Y")
+skjema1a <- skjema1a[which(skjema1a$Hoveddato >= datoFra & skjema1a$Hoveddato <= datoTil), ]
+skjema1a <- skjema1a[order(skjema1a$Hoveddato), ]
+skjema2$Hoveddato <- as.POSIXlt(skjema2$DateOfCompletion, format="%d.%m.%Y")
+skjema2 <- skjema2[which(skjema2$Hoveddato >= datoFra & skjema2$Hoveddato <= datoTil), ]
+skjema2 <- skjema2[order(skjema2$Hoveddato), ]
+
+
+boolske_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Avkrysning')]
+enum_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Enum')]
+numerisk_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Numerisk (heltall)')]
+boolske_var1b <- as.character(kodebok1b$DataDumpnavn)[which(as.character(kodebok1b$Felttype) == 'Avkrysning')]
+enum_var1b <- as.character(kodebok1b$DataDumpnavn)[which(as.character(kodebok1b$Felttype) == 'Enum')]
+enum_var1b <- c('NeckSurgery', 'PelvisSurgery', 'PrevSickLeave', 'RadiologicalF_Spondylolisthesis', 'RadiologicalF_Scoliosis_Subcategory', 'Treatment_InvidualInterdisciplinary', 'Treatment_GroupInterdisciplinary')
+numerisk_var1b <- as.character(kodebok1b$DataDumpnavn)[which(as.character(kodebok1b$Felttype) == 'Numerisk (heltall)')]
+boolske_var2 <- as.character(kodebok2$DataDumpnavn)[which(as.character(kodebok2$Felttype) == 'Avkrysning')]
+enum_var2 <- as.character(kodebok2$DataDumpnavn)[which(as.character(kodebok2$Felttype) == 'Enum')]
+numerisk_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Numerisk (heltall)')]
+
+skjema1a[, boolske_var1a] <- apply(skjema1a[, boolske_var1a], 2, as.logical)
+skjema1b[, boolske_var1b] <- apply(skjema1b[, boolske_var1b], 2, as.logical)
+skjema2[, boolske_var2] <- apply(skjema2[, boolske_var2], 2, as.logical)
+
+skjema1a_bak <- skjema1a
+
+
+skjema1a[, enum_var1a] <- apply(skjema1a[, enum_var1a], 2, function(x){as.numeric(!(x %in% c(-1,0)))})
+skjema1b[, enum_var1b] <- apply(skjema1b[, enum_var1b], 2, function(x){as.numeric(!(x %in% c(-1,0)))})
+skjema2[, enum_var2] <- apply(skjema2[, enum_var2], 2, function(x){as.numeric(!(x %in% c(-1,0)))})
+
+# table(cut(rowSums(skjema1a[, enum_var1a]), breaks = c(0,10,20,30,40,50,60,70,80,90)))
+# table(cut(rowSums(skjema1b[, enum_var1b]), breaks = c(0, 5, 10, 15, 20)))
+# table(cut(rowSums(skjema2[, enum_var2]), breaks = c(0,10,20,30,40,50)))
+
+
+ingen_avkrysninger1a <- which(rowSums(skjema1a[, boolske_var1a])==0)
+ingen_enum1a <- which(rowSums(skjema1a[, enum_var1a])<=1)
+ingen_avkrysninger1b <- which(rowSums(skjema1b[, boolske_var1b])==0)
+ingen_enum1b <- which(rowSums(skjema1b[, enum_var1b])<=1)
+ingen_avkrysninger2 <- which(rowSums(skjema2[, boolske_var2])==0)
+ingen_enum2 <- which(rowSums(skjema2[, enum_var2])<=1)
+
+manglende1bPrShus <- tapply(skjema1b$SkjemaGUID[ingen_avkrysninger1b], skjema1b$ReshId[ingen_avkrysninger1b], length)
+names(manglende1bPrShus) <- c('Haukeland', 'St. Olavs', 'UNN')
+Totalt1bPrShus <- tapply(skjema1b$SkjemaGUID, skjema1b$ReshId, length) #[-3]
+tmp <- Totalt1bPrShus[3]
+Totalt1bPrShus <- Totalt1bPrShus[-3]
+names(Totalt1bPrShus) <- c('Haukeland', 'St. Olavs', 'UNN')
+manglende1bPrShus <- as.data.frame(cbind(manglende1bPrShus, Totalt1bPrShus))
+names(manglende1bPrShus) <- c('Tomme', 'Totalt')
+manglende1bPrShus <- rbind(manglende1bPrShus, c(0, tmp))
+row.names(manglende1bPrShus)[4] <- 'OUS'
+
+knitr::kable(manglende1bPrShus)
+
+```
+
+Av de tomme registreringene er det ingen som har et koblet 1a skjema (fra 2016 eller seinere). Til gjengjeld finnes det 73 skjema 2 koblet til de tomme registreringene.
+
+
+### Mangelfullt utfylte skjema 
+
+Vi ser nå på utfyllingsgraden totalt for Avkrysninger. Første rad angir antallet avkrysninger mens andre rad gir antallet skjema med gitt antall avkrysninger. Konsistent med tabellen over er det 222 skjema med ingen avkrysninger, men det er verd å merke seg at det finnes alle mulige mellomnivåer av utfylling. Det er grunn til å være skeptisk til datakvaliteten når det kan virke noe vilkårlig hvor mye av skjemaene fylles ut. Det vil formodentlig bedre seg når MRS-løsningen gis et sett med regler og valideringer som gjør at skjema ikke kan lagres uten at felter er utfylt.
+
+```{r, echo = FALSE, warning=FALSE}
+# Tabell1 <- as.data.frame(t(as.data.frame(table(rowSums(skjema1b[, boolske_var1b])))))
+Tabell1 <- table(rowSums(skjema1b[, boolske_var1b]))
+Tabell1
+
+```
+
+For skjema 1b finnes det 14 variabler av type Enum. Av disse er det bare syv som er kodet numerisk og dermed mulig å automatisk beregne utfyllingsgrad. Denne er oppsummert i tabellen under, hvor første rad angir antall utfylte felter og andre rad angir hvor mange skjema som har gitt antall utfylte Enum-felter.
+
+```{r, echo = FALSE, warning=FALSE}
+# table(cut(rowSums(skjema1b[, enum_var1b]), breaks = c(0, 5, 10, 15, 20)))
+table(rowSums(skjema1b[, enum_var1b]))
+# table(rowSums(skjema1b[which(rowSums(skjema1b[, boolske_var1b])!=0), enum_var1b]))
+
+```
+
+På skjema 1b er det bare tre numeriske variabler ("WorkingPercent", "SickLeave_percent", "Pension_percent") og disse skal kun fylles ut ved avkrysnig av gitte felter. Det gir derfor ikke mening å se på utfyllingsgraden i denne sammenhengen.
+
+
+## Skjema 1a
+
+### Utfyllingsgrad
+
+Skjema 1a består for det meste av variabler av type Enum, så vi begynner med å se på utfyllingsgraden av disse feltene. For skjema 1a er alle feltene av Enum-type kodet numerisk hvilket gjør jobben overkommelig. Skjemaet har 91 variabler av denne typen og tabellen under oppsummerer utfyllingsgraden. Også på de pasientutfylte skjemaene er det stor variasjon i utfyllingsgrad og det kan stilles spørsmål om verdien til dataen når utfyllingsgraden er så lav som den er for svært mange registreringer.
+
+```{r, echo = FALSE, warning=FALSE}
+table(cut(rowSums(skjema1a[, enum_var1a]), breaks = c(0,10,20,30,40,50,60,70,80,90)))
+```
+
+
+For Avkrysninger ser det ut som i tabellen under. Igjen er det vanskelig å vite hvor mange avkrysninger man skal forvente men det er tydelig at utfyllingsgraden er lav.
+
+```{r, echo = FALSE, warning=FALSE}
+Tabell2 <- table(rowSums(skjema1a[, boolske_var1a]))
+Tabell2
+```
+
+
+## Skjema 2
+
+Skjema 2 består i all hovedsak av variabler av typen Enum og utfyllingsgraden til disse er oppsummert i tabellen under. Også her er utfyllingsgraden nokså varierende.
+
+```{r, echo = FALSE, warning=FALSE}
+table(cut(rowSums(skjema2[, enum_var2]), breaks = c(0,10,20,30,40,50)))
+```
+
+## Dobbelregistreringer
+
+```{r, echo = FALSE, warning=FALSE}
+FinnDobbel <- sort(table(skjema1a$PasientGUID), decreasing = T)
+FinnDobbel <- FinnDobbel[FinnDobbel>1]
+Dobbel1a <- skjema1a[skjema1a$PasientGUID %in% names(FinnDobbel), ]
+  
+```
+
+For Skjema 1a er det to pasienter som har to skjema tilknyttet sin pasientGUID. For begge pasientene peker skjemaene mot samme HovedskjemaGUID.
+
+
+```{r, echo = FALSE, warning=FALSE}
+FinnDobbel <- sort(table(skjema1b$PasientGUID), decreasing = T)
+FinnDobbel <- FinnDobbel[FinnDobbel>1]
+Dobbel1b <- skjema1b[skjema1b$PasientGUID %in% names(FinnDobbel), ]
+# Dobbel1b$PasientGUID[which(Dobbel1b$SkjemaGUID %in% skjema1b$SkjemaGUID[ingen_avkrysninger1b])]
+```
+
+For Skjema 1b er det 11 pasienter som har to skjemaer tilknyttet seg. Av disse er det en pasient med ett tomt skjema og to pasienter med to tomme skjemaer. Det er ingen pasienter med mer enn ett skjema 2.
+
+```{r, echo = FALSE, warning=FALSE}
+FinnDobbel <- sort(table(skjema2$PasientGUID), decreasing = T)
+FinnDobbel <- FinnDobbel[FinnDobbel>1]
+Dobbel2 <- skjema2[skjema2$PasientGUID %in% names(FinnDobbel), ]
+
+```
+
+# Gjennomgang av pasientskjema
+
+Her følger en gjennomgang av avsnittsvis utfyllingsgrad for pasientskjemaet
+
+
+```{r, echo = FALSE, warning=FALSE}
+100-apply(skjema1a_bak[, kodebok1a$DataDumpnavn[which(kodebok1a$Variabelnavn=='0 = Ikke svart')-1]], 2,
+      function(x){round(length(which(x==0))/length(x)*100,1)})
+
+```
+
+
+```{r, echo = FALSE, warning=FALSE}
+TomErLik0Navn <- kodebok1a$DataDumpnavn[which(kodebok1a$Variabelnavn=='0 = Ikke svart')-1]
+
+AntBesvODI <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Odi')]], 1, function(x){sum(x!=0)})
+manglerODI <- sum(AntBesvODI < length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Odi')]))/dim(skjema1a)[1]*100
+manglerODIPstil <- quantile(AntBesvODI, (1:5)/10)
+
+AntBesvNDI <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Ndi')]], 1, function(x){sum(x!=0)})
+manglerNDI <- sum(AntBesvNDI<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Ndi')]))/dim(skjema1a_bak)[1]*100
+
+AntBesvHSCL <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Hscl')]], 1, function(x){sum(x!=0)})
+manglerHSCL <- sum(AntBesvHSCL<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Hscl')]))/dim(skjema1a_bak)[1]*100
+
+AntBesvEQ5D <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Eq5d')]], 1, function(x){sum(x!=0)})
+manglerEQ5D <- sum(AntBesvEQ5D<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Eq5d')]))/dim(skjema1a_bak)[1]*100
+
+UHIvar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,4)=='UhiQ']
+AntBesvUHI <- apply(skjema1a_bak[, UHIvar], 1, function(x){sum(x!=-1)})
+manglerUHI <- sum(AntBesvUHI < length(UHIvar))/dim(skjema1a_bak)[1]*100
+
+FabQvar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,4)=='FabQ']
+AntBesvFabQ <- apply(skjema1a_bak[, FabQvar], 1, function(x){sum(!is.na(x))})
+manglerFabQ <- sum(AntBesvFabQ < length(FabQvar))/dim(skjema1a_bak)[1]*100
+
+TidlBehVar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,16)=='TreatmentEarlier']
+AntBesvTidlBeh <- apply(skjema1a_bak[, TidlBehVar], 1, function(x){sum(x!=0)})
+manglerTidlBeh <- sum(AntBesvTidlBeh < length(TidlBehVar))/dim(skjema1a_bak)[1]*100
+
+AntBesv <- data.frame(AntBesvODI, AntBesvNDI, AntBesvHSCL, AntBesvEQ5D, AntBesvUHI, AntBesvFabQ, AntBesvTidlBeh)
+apply(AntBesv, 2, table, useNA='ifany')
+
+IkkeAlleUtfylt <- data.frame(manglerODI,manglerNDI, manglerHSCL, manglerEQ5D, manglerUHI, manglerFabQ, manglerTidlBeh)
+
+round(IkkeAlleUtfylt, 1)
+
+
+```
+

@@ -1,0 +1,141 @@
+Feltnavn;Variabelnavn;Felttype;Obligatorisk;DataDumpnavn;Gyldighet
+FollowUpFormSentToPatient;FollowUpFormSentToPatient;Dato/Tid;Nei;FollowUpFormSentToPatient;v1.0
+Besøksdato;S1b_DateOfCompletion;Dato/Tid;Nei;S1b_DateOfCompletion;v1.0
+I arbeid;Working;Avkrysning;Ja;Working;v1.0
+Status prosent;WorkingPercent;Numerisk (heltall);Nei;WorkingPercent;v1.0
+Arbeidsledig;Unemployed;Avkrysning;Ja;Unemployed;v1.0
+Sykemeldt;SickLeave;Avkrysning;Ja;SickLeave;v1.0
+% sykemeldt;SickLeave_percent;Numerisk (heltall);Nei;SickLeave_percent;v1.0
+Hjemmeværende (ulønnet);Stay_at_home;Avkrysning;Ja;Stay_at_home;v1.0
+Student/skoleelev;Student;Avkrysning;Ja;Student;v1.0
+Arbeidsavklaringspenger;NAV;Avkrysning;Ja;NAV;v1.0
+Alderspensjonist;RetirementPension;Avkrysning;Ja;RetirementPension;v1.0
+Permanent uførepensjon;Pension;Avkrysning;Ja;Pension;v1.0
+% uføretrygdet;Pension_percent;Numerisk (heltall);Nei;Pension_percent;v1.0
+Tidligere operert i rygg;BackSurgery;Enum;Ja;BackSurgery;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Ja;;;;
+;2 = Nei;;;;
+;3 = Ukjent;;;;
+Tidligere operert i nakke;NeckSurgery;Enum;Ja;NeckSurgery;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Ja;;;;
+;2 = Nei;;;;
+;3 = Ukjent;;;;
+Tidligere operert i bekken;PelvisSurgery;Enum;Ja;PelvisSurgery;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Ja;;;;
+;2 = Nei;;;;
+;3 = Ukjent;;;;
+Mistanke om alvorlig sykdom?;SeriousIllnes;Avkrysning;Ja;SeriousIllnes;v1.0
+Har pasienten vært sykemeldt for samme eller lignende plager i løpet av de to siste år?;PrevSickLeave;Enum;Ja;PrevSickLeave;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Nei;;;;
+;2 = 1 gang;;;;
+;3 = 2 - 5 ganger;;;;
+;4 = 6 - 10 ganger;;;;
+;5 = Flere enn 10 ganger;;;;
+Nøyaktig dag er ukjent, angi måned;CurrentRehabStartIsMonth;Avkrysning;Ja;CurrentRehabStartIsMonth;v1.0
+Angi startdato for siste sykemeldingsperiode for aktuell plage.;CurrentRehabStartDate;Dato/Tid;Nei;CurrentRehabStartDate;v1.0
+CurrentRehabStartMonth;CurrentRehabStartMonth;Dato/Tid;Nei;CurrentRehabStartMonth;v1.0
+Lege;FirstMedExamDoctor;Avkrysning;Ja;FirstMedExamDoctor;v1.0
+Sykepleier;FirstMedExamNurse;Avkrysning;Ja;FirstMedExamNurse;v1.0
+Fysioterapeut;FirstMedExamPhys;Avkrysning;Ja;FirstMedExamPhys;v1.0
+Annen faggruppe;FirstMedExamOther;Avkrysning;Ja;FirstMedExamOther;v1.0
+Bruker ikke smertestillende;MedicationNone;Avkrysning;Ja;MedicationNone;v1.0
+A-preparat;MedicationA;Avkrysning;Ja;MedicationA;v1.0
+MedicationAFrequency;MedicationAFrequency;Enum;Ja;MedicationAFrequency;v1.2
+;0 = Ikke utfylt;;;;
+;1 = Daglig;;;;
+;2 = Sjeldnere enn daglig;;;;
+B-preparat;MedicationB;Avkrysning;Ja;MedicationB;v1.0
+MedicationBFrequency;MedicationBFrequency;Enum;Ja;MedicationBFrequency;v1.2
+;0 = Ikke utfylt;;;;
+;1 = Daglig;;;;
+;2 = Sjeldnere enn daglig;;;;
+C-preparat;MedicationC;Avkrysning;Ja;MedicationC;v1.0
+MedicationCFrequency;MedicationCFrequency;Enum;Ja;MedicationCFrequency;v1.2
+;0 = Ikke utfylt;;;;
+;1 = Daglig;;;;
+;2 = Sjeldnere enn daglig;;;;
+Ikke tatt bildediagnostikk;Radiological_None;Avkrysning;Ja;Radiological_None;v1.0
+CT;RadiologicalUS_CT;Avkrysning;Ja;RadiologicalUS_CT;v1.0
+MR;RadiologicalUS_MR;Avkrysning;Ja;RadiologicalUS_MR;v1.0
+Radikulografi;RadiologicalUS_Radikulgraphy;Avkrysning;Ja;RadiologicalUS_Radikulgraphy;v1.0
+Diskografi;RadiologicalUS_Discography;Avkrysning;Ja;RadiologicalUS_Discography;v1.0 - v2.1
+Røntgen LS-columna/C-columna;RadiologicalUS_LS_C_Columna;Avkrysning;Ja;RadiologicalUS_LS_C_Columna;v1.0
+Røntgen med fleksjon/ekstensjon;RadiologicalUS_FlexionExtention;Avkrysning;Ja;RadiologicalUS_FlexionExtention;v1.0
+Normal;RadiologicalF_Normal;Avkrysning;Ja;RadiologicalF_Normal;v1.0
+Skiveprolaps;RadiologicalF_DiscHernitation;Avkrysning;Ja;RadiologicalF_DiscHernitation;v1.0
+Sentral spinalstenose;RadiologicalF_CentralSpinalCord;Avkrysning;Ja;RadiologicalF_CentralSpinalCord;v1.0
+Recesstenose/ rotkanalstenose;RadiologicalF_RecesStenosis;Avkrysning;Ja;RadiologicalF_RecesStenosis;v1.0
+Spondylolistese;RadiologicalF_Spondylolisthesis;Enum;Ja;RadiologicalF_Spondylolisthesis;v1.0
+;0 = Ikke utfylt;;;;
+;1 = Nei;;;;
+;2 = Istmisk spondylolistese/lyse;;;;
+;3 = Degenerativ spondylolistese;;;;
+Skoliose;RadiologicalF_Scoliosis;Avkrysning;Ja;RadiologicalF_Scoliosis;v1.0
+Scoliose underkategori;RadiologicalF_Scoliosis_Subcategory;Enum;Ja;RadiologicalF_Scoliosis_Subcategory;v1.0
+;0 = Ikke utfylt;;;;
+;1 = 1. Barn og ungdom;;;;
+;2 = 2. Degenerativ skoliose;;;;
+Modicforandringer;RadiologicalF_Modicchanges1;Avkrysning;Ja;RadiologicalF_Modicchanges1;v1.0
+Modicforandringer;RadiologicalF_Modicchanges2;Avkrysning;Ja;RadiologicalF_Modicchanges2;v1.0
+Modicforandringer;RadiologicalF_Modicchanges3;Avkrysning;Ja;RadiologicalF_Modicchanges3;v1.0
+Modic-forandring uspesifisert;RadiologicalF_ModicchangesUnspecified;Avkrysning;Ja;RadiologicalF_ModicchangesUnspecified;v1.0
+Annet;RadiologicalF_Other;Text;Nei;RadiologicalF_Other;v1.0
+Diagnose nummer 1;DiagnosticNumber1;Text;Nei;DiagnosticNumber1;v1.0
+Diagnose nummer 2;DiagnosticNumber2;Text;Nei;DiagnosticNumber2;v1.0
+Diagnose nummer 3;DiagnosticNumber3;Text;Nei;DiagnosticNumber3;v1.0
+Oppfølging i kommunehelsetjenesten av lege;Treatment_FollowUpMunicipality;Avkrysning;Ja;Treatment_FollowUpMunicipality;v1.0
+Oppfølging i kommunehelsetjenesten av fysioterapeut;Treatment_FollowUpFysioterapeut;Avkrysning;Ja;Treatment_FollowUpFysioterapeut;v1.0
+Oppfølging i kommunehelsetjenesten av manuell terapeut;Treatment_FollowUpManuellTerapeut;Avkrysning;Ja;Treatment_FollowUpManuellTerapeut;v1.0
+Oppfølging i kommunehelsetjenesten av kiropraktor;Treatment_FollowUpKiropraktor;Avkrysning;Ja;Treatment_FollowUpKiropraktor;v1.0
+Oppfølging i kommunehelsetjenesten av psykolog;Treatment_FollowUpPsykolog;Avkrysning;Ja;Treatment_FollowUpPsykolog;v1.0
+Oppfølging i kommunehelsetjenesten;Treatment_FollowUpKommunalt;Avkrysning;Ja;Treatment_FollowUpKommunalt;v1.0
+Arbeidsrettet oppfølging;Treatment_FollowUpMunicipalityOther;Avkrysning;Ja;Treatment_FollowUpMunicipalityOther;v1.0
+Oppfølging i spesialisthelsetjenesten;Treatment_FollowUpSpecialist;Avkrysning;Ja;Treatment_FollowUpSpecialist;v1.0
+Henvist <u>til vurdering av</u> operasjon;Treatment_FollowUpOperation;Avkrysning;Ja;Treatment_FollowUpOperation;v1.0
+Annen utredning;Treatment_OtherAssessment;Enum;Ja;Treatment_OtherAssessment;v1.0
+;1 = Ja;;;;
+;0 = Nei;;;;
+Henvise til videre utredning hos annen spesialist;Treatment_EvaluationBySpecialist;Avkrysning;Ja;Treatment_EvaluationBySpecialist;v1.0
+Behandling i spesialhelsetjenesten;Treatment_TreatmentInSpecialistServices;Enum;Ja;Treatment_TreatmentInSpecialistServices;v1.0
+;1 = Ja;;;;
+;0 = Nei;;;;
+Anbefaler henvisning til annet opptrenings /rehabiliteringssenter;Treatment_TreatmentOtherRehabCentre;Avkrysning;Ja;Treatment_TreatmentOtherRehabCentre;v1.0
+Behandling som settes i verk i egen spesialisthelsetjeneste;Treatment_TreatmentOwnSpecialistServices;Avkrysning;Ja;Treatment_TreatmentOwnSpecialistServices;v1.0
+Individuell tverrfaglig behandling (antall ganger);Treatment_InvidualInterdisciplinary;Enum;Ja;Treatment_InvidualInterdisciplinary;v1.0
+;0 = Nei;;;;
+;1 = 1-3;;;;
+;2 = 4-10;;;;
+;3 = >10;;;;
+Tverrfaglig behandling i gruppe (antall ganger);Treatment_GroupInterdisciplinary;Enum;Ja;Treatment_GroupInterdisciplinary;v1.0
+;0 = Nei;;;;
+;1 = 1-3;;;;
+;2 = 4-10;;;;
+;3 = >10;;;;
+Kontroll etter vurdering eller behandling;Treatment_ControlAfterReviewOrTreatment;Avkrysning;Ja;Treatment_ControlAfterReviewOrTreatment;v1.0
+Individuell oppfølging 1-2 ganger;Treatment_IndividualFollowUp1to2Times;Avkrysning;Ja;Treatment_IndividualFollowUp1to2Times;v1.0
+Trening / aktivisering;Treatment_TrainingActivation;Avkrysning;Ja;Treatment_TrainingActivation;v1.0
+Arbeidsmessig oppfølging;Treatment_WorkFollowUp;Avkrysning;Ja;Treatment_WorkFollowUp;v1.0
+Kognitiv tilnærming;Treatment_CognitiveApproach;Avkrysning;Ja;Treatment_CognitiveApproach;v1.0
+Undervisning;Treatment_Education;Avkrysning;Ja;Treatment_Education;v1.0
+Psykomotorisk behandling;Treatment_PsykomotoricTherapy;Avkrysning;Ja;Treatment_PsykomotoricTherapy;v1.0
+Ingen behandling;Treatment_NoTreatment;Avkrysning;Ja;Treatment_NoTreatment;v1.0
+Annet;Treatment_Other;Text;Nei;Treatment_Other;v1.0
+Ikke tatt annen supplerende diagnostikk;OtherSupplementaryDiagnostic_None;Avkrysning;Ja;OtherSupplementaryDiagnostic_None;v1.0
+Diagnostiske injeksjoner;OtherSupplementaryDiagnostic_DiagnosticInjection;Avkrysning;Ja;OtherSupplementaryDiagnostic_DiagnosticInjection;v1.0
+Radikulografi;OtherSupplementaryDiagnostic_Radikulgraphy;Avkrysning;Ja;OtherSupplementaryDiagnostic_Radikulgraphy;v1.0
+Diagnostisk blokade;RadiologicalUS_DiagnosticBlock;Avkrysning;Ja;RadiologicalUS_DiagnosticBlock;v1.0
+EMG;OtherSupplementaryDiagnostic_Emg;Avkrysning;Ja;OtherSupplementaryDiagnostic_Emg;v1.0
+Nevrografi;OtherSupplementaryDiagnostic_Nevrografi;Avkrysning;Ja;OtherSupplementaryDiagnostic_Nevrografi;v1.0
+Diagnose 1;DiagName1;Text;Nei;DiagName1;v1.0
+Diagnose 2;DiagName2;Text;Nei;DiagName2;v1.0
+Diagnose 3;DiagName3;Text;Nei;DiagName3;v1.0
+Tolk;Interpreter;Avkrysning;Ja;Interpreter;v1.1
+Deltar i forskningsprosjekt;ParticipantResarch;Avkrysning;Ja;ParticipantResarch;v1.1
+Deltar i Raskere tilbake-prosjekt;ParticipantRaskereTilbake;Avkrysning;Ja;ParticipantRaskereTilbake;v1.1
+Importert;Importert;Enum;Ja;Importert;v1.1
+;0 = False;;;;
+;1 = True;;;;
