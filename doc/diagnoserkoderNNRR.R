@@ -5,8 +5,10 @@ library(tidyverse)
 # NNRR <- read.table('c:/SVN/jasper/nnrr/data/NNRRdiagnoser1feb.csv', sep=';', header=T, stringsAsFactors=F)
 # NNRR <- read.table('c:/SVN/jasper/nnrr/data/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-02-01.csv', sep=';',
 #                    header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
-NNRR <- read.table('P:/MinData/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-09-29.csv', sep=';',
+NNRR <- read.table('I:/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-09-29.csv', sep=';',
                    header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
+# NNRR <- read.table('P:/MinData/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-09-29.csv', sep=';',
+#                    header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
 NNRR$S1b_DateOfCompletion <- as.POSIXct(NNRR$S1b_DateOfCompletion, format="%d.%m.%Y")
 # Se bare på registreringer f.o.m. jan. 2016
 NNRR <- NNRR[!is.na(NNRR$S1b_DateOfCompletion), ]
