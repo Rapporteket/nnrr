@@ -9,10 +9,10 @@ Description: Pakke for generering av resultatrapporter for NNRR. Trenger skde-to
 License: GPL2
 LazyData: TRUE
 Encoding: UTF-8
-Depends: R (>= 3.0.2), rapbase
+Depends: R (>= 3.0.2), rapbase, tidyverse
 Imports:
-  xtable,
-RoxygenNote: 6.0.0
+  xtable
+RoxygenNote: 6.0.1
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
