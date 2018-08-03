@@ -30,11 +30,11 @@ knitr::opts_knit$set(root.dir = './')
 <<LastData, include=FALSE, cache=FALSE>>=
 rm(list=ls())
 library(nnrr)
-legeskjema <- read.table('P:/MinData/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-09-29.csv', sep=';',
+legeskjema <- read.table('I:/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-09-29.csv', sep=';',
                          header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_pre <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-09-29.csv', sep=';',
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-09-29.csv', sep=';',
                               header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('P:/MinData/nnrr/DataDump_2%3aSpørreskjema+etter+behandling_2017-10-04.csv', sep=';',
+pasientsvar_post <- read.table('I:/nnrr/DataDump_2%3aSpørreskjema+etter+behandling_2017-10-04.csv', sep=';',
                                header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 varnavn_1b <- read.table('P:/MinData/nnrr/Kodebok1b.csv', sep=';', header=T, stringsAsFactors = F)

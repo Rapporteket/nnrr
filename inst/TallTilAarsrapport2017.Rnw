@@ -36,14 +36,7 @@ pasientsvar_pre <- read.table('I:/nnrr/DataDump_Prod_1a%3aSpørreskjema+før+beh
 legeskjema <- read.table('I:/nnrr/DataDump_Prod_1b%3aRegistreringsskjema+poliklinikk_2018-06-28.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 pasientsvar_post <- read.table('I:/nnrr/DataDump_Prod_2%3aSpørreskjema+etter+behandling_2018-06-28.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
-# icd10 <- xlsx::read.xlsx('C:/GIT/nnrr/doc/ICD-10 2018 2017-06-14.xlsx', sheetIndex = 2)
 icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
-# icd10 <- icd10[-1, c("Kode", "Tekst.med.maksimalt.60.tegn")]
-# names(icd10)[2] <- 'Tekst'
-# write.csv2(icd10, 'icd10.csv', row.names = F)
-
-# duplikater <- names(table(pasientsvar_pre$HovedskjemaGUID)[table(pasientsvar_pre$HovedskjemaGUID) > 1])
-# legeskjema[legeskjema$SkjemaGUID %in% duplikater, c("S1b_DateOfCompletion", "SkjemaGUID")]
 
 legeskjema$regstatus <- 1
 pasientsvar_pre$regstatus <- 1
@@ -51,17 +44,9 @@ pasientsvar_post$regstatus <- 1
 
 names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
 names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
-# names(legeskjema)[names(legeskjema)=='S1b_DateOfCompletion'] <- 'Besoksdato'
-# names(pasientsvar_pre)[names(pasientsvar_pre)=='DateOfCompletion'] <- 'Besoksdato'
-# names(pasientsvar_post)[names(pasientsvar_post)=='DateOfCompletion'] <- 'Besoksdato'
 
 RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
 RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
-# RegData <- RegData[which(RegData$regstatus==1), ] # Beholder kun forløp med utfylt legeskjema
-
-# RegData2 <- left_join(legeskjema, pasientsvar_pre, by=c('SkjemaGUID' = 'HovedskjemaGUID'), suffix = c('', '_pre'))
-# RegData2 <- left_join(RegData2, pasientsvar_post, by=c('SkjemaGUID' = 'HovedskjemaGUID'), suffix = c('', '_post'))
-
 
 RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
 # RegData <- RegData[RegData$DiagnosticNumber1 != '', ]
@@ -69,7 +54,7 @@ RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
 
 RegData <- nnrrPreprosess(RegData = RegData)
 # RegDataAll <- RegData
-RegData <- RegData[which(RegData$Aar >= 2015), ]
+RegData <- RegData[which(RegData$Aar >= 2017 & RegData$Aar <= 2017), ]
 
 rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
 
@@ -79,6 +64,26 @@ tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 
 \begin{document}
 
+<<'Tab 0', results='asis', echo=FALSE, warning=F>>=
+
+tab0 <- RegData[, c("SykehusNavn", "regstatus", "regstatus_pre", "regstatus_post", "Aar")] %>% group_by (Aar, SykehusNavn) %>%
+  summarise(Pasientskjema = sum(regstatus_pre),
+            Behandlerskjema = sum(regstatus),
+            Oppfølgingsskjema = sum(regstatus_post)) %>% ungroup()
+tot <- RegData[, c("regstatus", "regstatus_pre", "regstatus_post", "Aar")] %>% group_by (Aar) %>%
+  summarise(Pasientskjema = sum(regstatus_pre),
+            Behandlerskjema = sum(regstatus),
+            Oppfølgingsskjema = sum(regstatus_post)) %>% ungroup()
+tot$SykehusNavn <- 'Totalt'     # '\\textbf{Totalt}'
+tot <- tot[, c(1, 5, 2:4)]
+tab0 <- rbind(tab0, tot)
+tab0 <- tab0[order(tab0$Aar), ]
+
+tab0$Aar[!as.logical(c(1, diff(tab0$Aar)))] <- NA
+names(tab0)[1:2] <- c('År', 'Sykehus')
+
+print(xtable::xtable(tab0, digits=0, align=c('l', 'l', 'l', rep('r', ncol(tab0)-2))), include.rownames=FALSE, sanitize.text.function = identity)
+@
 
 <<'Tab 1', results='asis', echo=FALSE>>=
 
@@ -120,8 +125,6 @@ print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1))), inclu
 @
 
 <<'Tab 2', results='asis', echo=FALSE>>=
-# library(tidyverse)
-
 
 tab2 <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQ.Score1",
                     "FABQ.Score2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>% group_by (SykehusNavn) %>%
@@ -192,11 +195,15 @@ print(xtable::xtable(tab3, align=c('l', 'l', rep('r', ncol(tab3)-1))), include.r
 RegData$Diagnose1Formatert <- vask_diagnoser(RegData$DiagnosticNumber1)
 
 
-RegData$Diagnose1navn <- icd10$Tekst[match(RegData$Diagnose1Formatert, icd10$Kode)]
+RegData$Diagnose1navn <- icd10$Tekst[match(RegData$Diagnose1Formatert, icd10$Kode)] # Match kode med tekst
 RegData$Diagnose1navn[which(nchar(RegData$Diagnose1Formatert)==3 & is.na(RegData$Diagnose1navn))] <-
   icd10$Tekst[match(paste0(RegData$Diagnose1Formatert[which(nchar(RegData$Diagnose1Formatert)==3 &
                                                               is.na(RegData$Diagnose1navn))], '0'), icd10$Kode)]
-
+RegData$Diagnose1Formatert[which(nchar(RegData$Diagnose1Formatert)==5 & is.na(RegData$Diagnose1navn))] <-
+  substr(RegData$Diagnose1Formatert[which(nchar(RegData$Diagnose1Formatert)==5 & is.na(RegData$Diagnose1navn))], 1, 4)
+RegData$Diagnose1navn[which(nchar(RegData$Diagnose1Formatert)==4 & is.na(RegData$Diagnose1navn))] <-
+  icd10$Tekst[match(RegData$Diagnose1Formatert[which(nchar(RegData$Diagnose1Formatert)==4 &
+                                                              is.na(RegData$Diagnose1navn))], icd10$Kode)]
 
 tab4 <- as.data.frame(sort(table(paste0(RegData$Diagnose1Formatert, ': ', RegData$Diagnose1navn), useNA = 'ifany'), decreasing = T))
 tab4 <- tab4[1:20, ]
@@ -381,8 +388,8 @@ tmp <- RegData #[which(RegData$regstatus_post==1 & RegData$Aar==2016), ]
 tmp <- tmp[!is.na(tmp$OdiScore) & !is.na(tmp$OdiScore_post), ]
 
 tab12 <- tmp %>% group_by(SykehusNavn) %>% summarise('N' = n(),
-                                                   'NDI konsultasjon' = mean(OdiScore),
-                                                   'NDI 6 måneder' = mean(OdiScore_post))
+                                                   'ODI konsultasjon' = mean(OdiScore),
+                                                   'ODI 6 måneder' = mean(OdiScore_post))
 
 names(tab12)[1] <- ''
 
