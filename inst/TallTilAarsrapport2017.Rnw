@@ -32,9 +32,9 @@ knitr::opts_knit$set(root.dir = './')
 rm(list=ls())
 library(nnrr)
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_Prod_1a%3aSpørreskjema+før+behandling_2018-06-28_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_Prod_1b%3aRegistreringsskjema+poliklinikk_2018-06-28.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_Prod_2%3aSpørreskjema+etter+behandling_2018-06-28.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_Prod_1a%3aSpørreskjema+før+behandling_2018-08-03_red.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_Prod_1b%3aRegistreringsskjema+poliklinikk_2018-08-03.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_Prod_2%3aSpørreskjema+etter+behandling_2018-08-03.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 
@@ -49,8 +49,8 @@ RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'Hoved
 RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
 
 RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
-# RegData <- RegData[RegData$DiagnosticNumber1 != '', ]
-# RegData <- RegData[RegData$DiagnosticNumber1 != '.', ]
+RegData <- RegData[RegData$DiagnosticNumber1 != '', ]
+RegData <- RegData[RegData$DiagnosticNumber1 != '.', ]
 
 RegData <- nnrrPreprosess(RegData = RegData)
 # RegDataAll <- RegData
@@ -204,6 +204,7 @@ RegData$Diagnose1Formatert[which(nchar(RegData$Diagnose1Formatert)==5 & is.na(Re
 RegData$Diagnose1navn[which(nchar(RegData$Diagnose1Formatert)==4 & is.na(RegData$Diagnose1navn))] <-
   icd10$Tekst[match(RegData$Diagnose1Formatert[which(nchar(RegData$Diagnose1Formatert)==4 &
                                                               is.na(RegData$Diagnose1navn))], icd10$Kode)]
+RegData$Diagnose1navn[is.na(RegData$Diagnose1navn)] <- ''
 
 tab4 <- as.data.frame(sort(table(paste0(RegData$Diagnose1Formatert, ': ', RegData$Diagnose1navn), useNA = 'ifany'), decreasing = T))
 tab4 <- tab4[1:20, ]
