@@ -49,12 +49,12 @@ RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'Hoved
 RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
 
 RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
-RegData <- RegData[RegData$DiagnosticNumber1 != '', ]
-RegData <- RegData[RegData$DiagnosticNumber1 != '.', ]
+# RegData <- RegData[RegData$DiagnosticNumber1 != '', ]
+# RegData <- RegData[RegData$DiagnosticNumber1 != '.', ]
 
 RegData <- nnrrPreprosess(RegData = RegData)
 # RegDataAll <- RegData
-RegData <- RegData[which(RegData$Aar >= 2017 & RegData$Aar <= 2017), ]
+RegData <- RegData[which(RegData$Aar >= 2016 & RegData$Aar <= 2017), ]
 
 rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
 
@@ -67,13 +67,13 @@ tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 <<'Tab 0', results='asis', echo=FALSE, warning=F>>=
 
 tab0 <- RegData[, c("SykehusNavn", "regstatus", "regstatus_pre", "regstatus_post", "Aar")] %>% group_by (Aar, SykehusNavn) %>%
-  summarise(Pasientskjema = sum(regstatus_pre),
-            Behandlerskjema = sum(regstatus),
-            Oppfølgingsskjema = sum(regstatus_post)) %>% ungroup()
+  summarise('Pasientskjema' = sum(regstatus_pre),
+            'Behandlerskjema' = sum(regstatus),
+            'Oppfølgingsskjema' = sum(regstatus_post)) %>% ungroup()
 tot <- RegData[, c("regstatus", "regstatus_pre", "regstatus_post", "Aar")] %>% group_by (Aar) %>%
-  summarise(Pasientskjema = sum(regstatus_pre),
-            Behandlerskjema = sum(regstatus),
-            Oppfølgingsskjema = sum(regstatus_post)) %>% ungroup()
+  summarise('Pasientskjema' = sum(regstatus_pre),
+            'Behandlerskjema' = sum(regstatus),
+            'Oppfølgingsskjema' = sum(regstatus_post)) %>% ungroup()
 tot$SykehusNavn <- 'Totalt'     # '\\textbf{Totalt}'
 tot <- tot[, c(1, 5, 2:4)]
 tab0 <- rbind(tab0, tot)
