@@ -20,9 +20,12 @@ nnrrPrepVar <- function(RegData, valgtVar)
   if (valgtVar=='PatientAge') {
     RegData$Variabel <- RegData[, valgtVar]
     tittel <- 'Alder ved registrering'
-    gr <- c(0, seq(10, 80, 10), 120)
+    gr <- c(0, seq(20, 80, 10)+1, 120)
     RegData$VariabelGr <- cut(RegData$Variabel, breaks=gr, include.lowest=TRUE, right=FALSE)
-    grtxt <- c(levels(RegData$VariabelGr)[1:(length(gr)-2)], '80+')
+    # grtxt <- c(levels(RegData$VariabelGr)[1:(length(gr)-2)], '80+')
+    grtxt <- c('0-20', '21-30', '31-40', '41-50', '51-60', '61-70', '71-80', '80+')
+    RegData <- RegData[order(RegData$S1b_DateOfCompletion, decreasing = TRUE), ] # pr. pasient, behold nyeste
+    RegData <- RegData[match(unique(RegData$PasientGUID), RegData$PasientGUID), ]
     subtxt <- 'Aldersgrupper'
   }
 

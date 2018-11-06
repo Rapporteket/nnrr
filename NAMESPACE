@@ -3,6 +3,7 @@
 export(lagKodebok)
 export(nnrrFigAndeler)
 export(nnrrFigAndelerPrePost)
+export(nnrrFigAntallKjonnsdelt)
 export(nnrrFigGjsnPrePostGrVar)
 export(nnrrHentRegData)
 export(nnrrPrepVar)

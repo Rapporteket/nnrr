@@ -125,6 +125,11 @@ nnrrPreprosess <- function(RegData)
   RegData$PhysicalActivityLabel <- factor(RegData$PhysicalActivity, levels = varnavn_1a$kode[c(indekser_kodebok[-1], indekser_kodebok[1])],
                                           labels = varnavn_1a$label[c(indekser_kodebok[-1], indekser_kodebok[1])])
 
+  RegData$WorkingStatus_label <- factor(RegData$WorkingStatus, levels = 0:8, labels = c('Ikke utfylt', 'Inntektsgivende arbeid',
+                                                                                        'Student/skoleelev', 'Arbeidsledig',
+                                                                                        'Alderspensjonist', 'Hjemmeværende',
+                                                                                        'Sykemeldt', 'Arbeidsavklaringspenger',
+                                                                                        'Permanent uførepensjon'))
 
   return(RegData)
 }
