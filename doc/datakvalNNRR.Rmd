@@ -1,7 +1,7 @@
 ---
 title: "En enkel rapport om utfyllingsgrad av skjema i NNRR"
 author: "Kevin Thon"
-date: "29 mai 2017"
+date: "Februar 2017"
 output: html_document
 ---
 
@@ -11,8 +11,6 @@ knitr::opts_chunk$set(echo = FALSE)
 
 
 ## Bakgrunn/innledning
-
-Det er ingen valideringsregler eller logikk i MRS-løsningen som forhindrer at skjema kan leveres med ingen eller minimalt av feltene utfylt. Dette skal endres i kommende versjoner av registeret, i første omgang for behandlerskjemaet 1b. For nå er det interessant å gjøre opp status for NNRR sine registreringer fra 2016 og frem til datadump ble hentet til denne rapporten 24. mai 2017.
 
 Denne rapporten tar for seg datakvaliteten i NNRR. Den fokuserer på utfyllingsgrad og ser på følgende problemstillinger:
 
@@ -41,13 +39,14 @@ Skjemaene har felter som i MRS-løsningen er delt inn i følgende datatyper:
 De tre NNRR-skjemaene har (ifølge kodebok hentet fra MRS-løsningen) følgende fordeling av datatyper.
 
 ```{r, echo = FALSE, warning=FALSE, message=FALSE}
+rm(list = ls())
 library(nnrr)
 # library(xtable)
 library(knitr)
 library(printr)
-kodebok1a <- read.table('P:/MinData/nnrr/Kodebok1a.csv', sep=';', header=T, stringsAsFactors=F)
-kodebok1b <- read.table('P:/MinData/nnrr/Kodebok1b.csv', sep=';', header=T, stringsAsFactors=F)
-kodebok2 <- read.table('P:/MinData/nnrr/Kodebok2.csv', sep=';', header=T, stringsAsFactors=F)
+kodebok1a <- read.table('I:/nnrr/Kodebok1a.csv', sep=';', header=T, stringsAsFactors=F)
+kodebok1b <- read.table('I:/nnrr/Kodebok1b.csv', sep=';', header=T, stringsAsFactors=F)
+kodebok2 <- read.table('I:/nnrr/Kodebok2.csv', sep=';', header=T, stringsAsFactors=F)
 
 tab_1a <- table(kodebok1a$Felttype)[-1]
 tab_1b <- table(kodebok1b$Felttype)[-1]
@@ -90,8 +89,8 @@ Denne variabeltypen vil rapporteres på i en senere utgave av denne rapporten.
 Skjema 1b er behandlerskjemaet og består i stor grad av avkrysningsbokser. Med hele 63 avkrysningsbokser antar jeg at skjema som ikke har et eneste kryss er tomme også på andre felter. Avdelingsvis fordeler de helt tomme skjema 1b seg slik:
 
 ```{r, echo = FALSE, warning=FALSE}
-datoFra <- '2016-01-01'
-datoTil <- '2017-12-31'
+datoFra <- '2017-01-01'
+datoTil <- '2019-12-31'
 
 # skjema1a <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-05-24.csv', sep=';',
 #                        header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
@@ -100,11 +99,11 @@ datoTil <- '2017-12-31'
 # skjema2 <- read.table('P:/MinData/nnrr/DataDump_2%3aSpørreskjema+etter+behandling_2017-05-24.csv', sep=';',
 #                        header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
 
-skjema1b <- read.table('P:/MinData/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-09-29.csv', sep=';',
+skjema1b <- read.table('I:/nnrr/DataDump_Prod_1b_Registreringsskjema+poliklinikk_2019-01-30.csv', sep=';',
                          header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-skjema1a <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-09-29.csv', sep=';',
-                              header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-skjema2 <- read.table('P:/MinData/nnrr/DataDump_2%3aSpørreskjema+etter+behandling_2017-09-29.csv', sep=';',
+skjema1a <- read.table('I:/nnrr/DataDump_Prod_1a_Spørreskjema+før+behandling_2019-01-30_red.csv', sep=';',
+                              header=T, stringsAsFactors = F)
+skjema2 <- read.table('I:/nnrr/DataDump_Prod_2_Spørreskjema+etter+behandling_2019-01-30.csv', sep=';',
                                header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 skjema1b$Hoveddato <- as.POSIXlt(skjema1b$S1b_DateOfCompletion, format="%d.%m.%Y")
@@ -152,16 +151,22 @@ ingen_enum1b <- which(rowSums(skjema1b[, enum_var1b])<=1)
 ingen_avkrysninger2 <- which(rowSums(skjema2[, boolske_var2])==0)
 ingen_enum2 <- which(rowSums(skjema2[, enum_var2])<=1)
 
-manglende1bPrShus <- tapply(skjema1b$SkjemaGUID[ingen_avkrysninger1b], skjema1b$ReshId[ingen_avkrysninger1b], length)
-names(manglende1bPrShus) <- c('Haukeland', 'St. Olavs', 'UNN')
-Totalt1bPrShus <- tapply(skjema1b$SkjemaGUID, skjema1b$ReshId, length) #[-3]
-tmp <- Totalt1bPrShus[3]
-Totalt1bPrShus <- Totalt1bPrShus[-3]
-names(Totalt1bPrShus) <- c('Haukeland', 'St. Olavs', 'UNN')
+skjema1b$SykehusNavn <- NA
+skjema1b$SykehusNavn[skjema1b$UnitId == 102959] <- 'Haukeland'
+skjema1b$SykehusNavn[skjema1b$UnitId == 104293] <- 'St. Olavs'
+skjema1b$SykehusNavn[skjema1b$UnitId == 109834] <- 'OUS'
+skjema1b$SykehusNavn[skjema1b$UnitId == 601032] <- 'UNN'
+
+manglende1bPrShus <- tapply(skjema1b$SkjemaGUID[ingen_avkrysninger1b], as.factor(skjema1b$SykehusNavn)[ingen_avkrysninger1b], length)
+# names(manglende1bPrShus) <- c('Haukeland', 'St. Olavs', 'UNN')
+Totalt1bPrShus <- tapply(skjema1b$SkjemaGUID, as.factor(skjema1b$SykehusNavn), length) #[-3]
+# tmp <- Totalt1bPrShus[3]
+# Totalt1bPrShus <- Totalt1bPrShus[-3]
+# names(Totalt1bPrShus) <- c('Haukeland', 'St. Olavs', 'UNN')
 manglende1bPrShus <- as.data.frame(cbind(manglende1bPrShus, Totalt1bPrShus))
 names(manglende1bPrShus) <- c('Tomme', 'Totalt')
-manglende1bPrShus <- rbind(manglende1bPrShus, c(0, tmp))
-row.names(manglende1bPrShus)[4] <- 'OUS'
+# manglende1bPrShus <- rbind(manglende1bPrShus, c(0, tmp))
+# row.names(manglende1bPrShus)[4] <- 'OUS'
 
 knitr::kable(manglende1bPrShus)
 
@@ -278,15 +283,15 @@ manglerEQ5D <- sum(AntBesvEQ5D<length(TomErLik0Navn[which(substr(TomErLik0Navn, 
 
 UHIvar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,4)=='UhiQ']
 AntBesvUHI <- apply(skjema1a_bak[, UHIvar], 1, function(x){sum(x!=-1)})
-manglerUHI <- sum(AntBesvUHI < length(UHIvar))/dim(skjema1a_bak)[1]*100
+manglerUHI <- sum(AntBesvUHI < length(UHIvar), na.rm = T)/dim(skjema1a_bak)[1]*100
 
 FabQvar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,4)=='FabQ']
 AntBesvFabQ <- apply(skjema1a_bak[, FabQvar], 1, function(x){sum(!is.na(x))})
 manglerFabQ <- sum(AntBesvFabQ < length(FabQvar))/dim(skjema1a_bak)[1]*100
 
 TidlBehVar <- kodebok1a$DataDumpnavn[substr(kodebok1a$DataDumpnavn,1,16)=='TreatmentEarlier']
-AntBesvTidlBeh <- apply(skjema1a_bak[, TidlBehVar], 1, function(x){sum(x!=0)})
-manglerTidlBeh <- sum(AntBesvTidlBeh < length(TidlBehVar))/dim(skjema1a_bak)[1]*100
+AntBesvTidlBeh <- apply(skjema1a_bak[, TidlBehVar[-9]], 1, function(x){sum(x!=0)})
+manglerTidlBeh <- sum(AntBesvTidlBeh < length(TidlBehVar[-9]), na.rm = T)/dim(skjema1a_bak)[1]*100
 
 AntBesv <- data.frame(AntBesvODI, AntBesvNDI, AntBesvHSCL, AntBesvEQ5D, AntBesvUHI, AntBesvFabQ, AntBesvTidlBeh)
 apply(AntBesv, 2, table, useNA='ifany')
