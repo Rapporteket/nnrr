@@ -12,7 +12,7 @@ Encoding: UTF-8
 Depends: R (>= 3.0.2), rapbase, tidyverse
 Imports:
   xtable
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr

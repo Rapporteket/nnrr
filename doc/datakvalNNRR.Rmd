@@ -1,7 +1,7 @@
 ---
 title: "En enkel rapport om utfyllingsgrad av skjema i NNRR"
 author: "Kevin Thon"
-date: "Februar 2017"
+date: "Februar 2019"
 output: html_document
 ---
 
@@ -61,15 +61,15 @@ row.names(Oppsum) <- c('Skjema 1a', 'Skjema 2', 'Skjema 1b')
 knitr::kable(Oppsum, caption = 'Antallet felter på NNRR sine skjema etter felttype')
 ```
 
-Denne rapporten vil fokusere på tre datatyper, nemlig Avkrysning, Enum og Numerisk (heltall) siden disse utgjør mesteparten av feltene. Her følger en kort forklaring til datatypene og hvorfor jeg har valgt å telle på den måten jeg gjør.
+Denne rapporten fokuserer på tre datatyper, Avkrysning, Enum og Numerisk (heltall) siden disse utgjør mesteparten av feltene. Her følger en kort forklaring til datatypene og hvordan utfyllingsgraden presenteres.
 
 ### Avkrysning
 
-Dette er boolske variabler (True/False) med default-verdi "False". Avkrysningsboksene er typisk organisert under overskrifter hvor én eller flere kryss forventes satt. Det finnes derfor ingen fasit på hvor mange bokser som skal være avkrysset ved en komplett utfylling. En mer grundig gjennomgang enn hva det er tid til her kan telle hver overskrift som har minst en avkrysning under seg, samt ta høyde for at en del felter bare skal fylles ut når man har krysset av for et annet. For nå vil det presenteres en fordeling av antall utfylte variabler.
+Dette er boolske variabler (True/False) med default-verdi "False". Avkrysningsboksene er typisk organisert under overskrifter hvor én eller flere kryss forventes satt. Det finnes derfor ingen fasit på hvor mange bokser som skal være avkrysset ved en komplett utfylling. Det presenteres i rapporten en fordeling av antall utfylte variabler.
 
 ### Enum
 
-Dette er kategoriske variabler hvor ett alternativ velges fra en liste. I de fleste tilfeller er manglende verdier kodet som -1 men i noen tilfeller kodes de med 0. For å komplisere bildet ytterligere er ikke verdiene i datadump konsistent med verdiene i kodebok, og ofte gis etikettene fremfor kodingen i datadumpen. Det er ikke mulig å automatisere prosessen med å finne de ikke utfylte variablene i disse tilfellene.
+Dette er kategoriske variabler hvor ett alternativ velges fra en liste. I de fleste tilfeller er manglende verdier kodet som -1 men i noen tilfeller kodes de med 0. For å komplisere bildet er ikke verdiene i datadump konsistent med verdiene i kodebok, og ofte gis etikettene fremfor kodingen i datadumpen. Det er ikke mulig å automatisere prosessen med å finne de ikke utfylte variablene i disse tilfellene.
 
 I presentasjon av utfyllingsgrad brukes kun de Enum variablene som er kodet numerisk i datadumpen, hvilket gjør at en del variabler faller bort fra vurderingen. I tillegg må det presiseres at ikke alle registrerte nødvendigvis skal svare på alle spørsmål. F.eks. finnes det nakkespesifikke verktøy som ikke skal benyttes av de med utelukkende ryggsmerter.
 
@@ -84,20 +84,13 @@ Denne variabeltypen vil rapporteres på i en senere utgave av denne rapporten.
 
 ## Skjema 1b
 
-### Tomme skjema
+<!-- ### Tomme skjema -->
 
-Skjema 1b er behandlerskjemaet og består i stor grad av avkrysningsbokser. Med hele 63 avkrysningsbokser antar jeg at skjema som ikke har et eneste kryss er tomme også på andre felter. Avdelingsvis fordeler de helt tomme skjema 1b seg slik:
+<!-- Skjema 1b er behandlerskjemaet og består i stor grad av avkrysningsbokser. Med hele 63 avkrysningsbokser antar jeg at skjema som ikke har et eneste kryss er tomme også på andre felter. Avdelingsvis fordeler de helt tomme skjema 1b seg slik: -->
 
 ```{r, echo = FALSE, warning=FALSE}
-datoFra <- '2017-01-01'
+datoFra <- '2018-01-01'
 datoTil <- '2019-12-31'
-
-# skjema1a <- read.table('P:/MinData/nnrr/DataDump_1a%3aSpørreskjema+før+behandling_2017-05-24.csv', sep=';',
-#                        header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
-# skjema1b <- read.table('P:/MinData/nnrr/DataDump_1b%3aRegistreringsskjema+poliklinikk_2017-05-24.csv', sep=';',
-#                    header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
-# skjema2 <- read.table('P:/MinData/nnrr/DataDump_2%3aSpørreskjema+etter+behandling_2017-05-24.csv', sep=';',
-#                        header=T, stringsAsFactors=F, fileEncoding = 'UTF-8-BOM')
 
 skjema1b <- read.table('I:/nnrr/DataDump_Prod_1b_Registreringsskjema+poliklinikk_2019-01-30.csv', sep=';',
                          header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
@@ -122,7 +115,7 @@ enum_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$
 numerisk_var1a <- as.character(kodebok1a$DataDumpnavn)[which(as.character(kodebok1a$Felttype) == 'Numerisk (heltall)')]
 boolske_var1b <- as.character(kodebok1b$DataDumpnavn)[which(as.character(kodebok1b$Felttype) == 'Avkrysning')]
 enum_var1b <- as.character(kodebok1b$DataDumpnavn)[which(as.character(kodebok1b$Felttype) == 'Enum')]
-enum_var1b <- c('NeckSurgery', 'PelvisSurgery', 'PrevSickLeave', 'RadiologicalF_Spondylolisthesis', 'RadiologicalF_Scoliosis_Subcategory', 'Treatment_InvidualInterdisciplinary', 'Treatment_GroupInterdisciplinary')
+# enum_var1b <- c('NeckSurgery', 'PelvisSurgery', 'PrevSickLeave', 'RadiologicalF_Spondylolisthesis', 'RadiologicalF_Scoliosis_Subcategory', 'Treatment_InvidualInterdisciplinary', 'Treatment_GroupInterdisciplinary')
 numerisk_var1b <- as.character(kodebok1b$DataDumpnavn)[which(as.character(kodebok1b$Felttype) == 'Numerisk (heltall)')]
 boolske_var2 <- as.character(kodebok2$DataDumpnavn)[which(as.character(kodebok2$Felttype) == 'Avkrysning')]
 enum_var2 <- as.character(kodebok2$DataDumpnavn)[which(as.character(kodebok2$Felttype) == 'Enum')]
@@ -168,16 +161,16 @@ names(manglende1bPrShus) <- c('Tomme', 'Totalt')
 # manglende1bPrShus <- rbind(manglende1bPrShus, c(0, tmp))
 # row.names(manglende1bPrShus)[4] <- 'OUS'
 
-knitr::kable(manglende1bPrShus)
+# knitr::kable(manglende1bPrShus)
 
 ```
 
-Av de tomme registreringene er det ingen som har et koblet 1a skjema (fra 2016 eller seinere). Til gjengjeld finnes det 73 skjema 2 koblet til de tomme registreringene.
+<!-- Av de tomme registreringene er det ingen som har et koblet 1a skjema (fra 2016 eller seinere). Til gjengjeld finnes det 73 skjema 2 koblet til de tomme registreringene. -->
 
 
 ### Mangelfullt utfylte skjema 
 
-Vi ser nå på utfyllingsgraden totalt for Avkrysninger. Første rad angir antallet avkrysninger mens andre rad gir antallet skjema med gitt antall avkrysninger. Konsistent med tabellen over er det 222 skjema med ingen avkrysninger, men det er verd å merke seg at det finnes alle mulige mellomnivåer av utfylling. Det er grunn til å være skeptisk til datakvaliteten når det kan virke noe vilkårlig hvor mye av skjemaene fylles ut. Det vil formodentlig bedre seg når MRS-løsningen gis et sett med regler og valideringer som gjør at skjema ikke kan lagres uten at felter er utfylt.
+Vi ser på utfyllingsgraden totalt for Avkrysninger. Første rad angir antallet avkrysninger mens andre rad gir antallet skjema med gitt antall avkrysninger. Det finnes ingen fasit for hvor mange avkysninger som bør gjøres på et skjema så det blir en vurderingssak hvilket antall man anser som mistenkelig lavt og indikativt av manglende registreringer. Antallet avkrysningsbokser totalt på skjema 1b er `r Oppsum[3,1]`.
 
 ```{r, echo = FALSE, warning=FALSE}
 # Tabell1 <- as.data.frame(t(as.data.frame(table(rowSums(skjema1b[, boolske_var1b])))))
@@ -186,7 +179,7 @@ Tabell1
 
 ```
 
-For skjema 1b finnes det 14 variabler av type Enum. Av disse er det bare syv som er kodet numerisk og dermed mulig å automatisk beregne utfyllingsgrad. Denne er oppsummert i tabellen under, hvor første rad angir antall utfylte felter og andre rad angir hvor mange skjema som har gitt antall utfylte Enum-felter.
+For skjema 1b finnes det `r Oppsum[3,3]` variabler av type Enum og antall utfylte variabler fordeler seg som under.
 
 ```{r, echo = FALSE, warning=FALSE}
 # table(cut(rowSums(skjema1b[, enum_var1b]), breaks = c(0, 5, 10, 15, 20)))
