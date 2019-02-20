@@ -84,10 +84,6 @@ Disse variablene er som regel én av tre typer:
 * En score eller prosent
 
 
-<!-- ### Tomme skjema -->
-
-<!-- Skjema 1b er behandlerskjemaet og består i stor grad av avkrysningsbokser. Med hele 63 avkrysningsbokser antar jeg at skjema som ikke har et eneste kryss er tomme også på andre felter. Avdelingsvis fordeler de helt tomme skjema 1b seg slik: -->
-
 ```{r, echo = FALSE, warning=FALSE}
 datoFra <- '2018-01-01'
 datoTil <- '2019-12-31'
@@ -99,16 +95,6 @@ skjema1a <- read.table('I:/nnrr/DataDump_Prod_1a_Spørreskjema+før+behandling_2
 skjema2 <- read.table('I:/nnrr/DataDump_Prod_2_Spørreskjema+etter+behandling_2019-01-30.csv', sep=';',
                                header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
-# skjema1b$Hoveddato <- as.Date(skjema1b$S1b_DateOfCompletion, format="%d.%m.%Y")
-# skjema1b <- skjema1b[which(skjema1b$Hoveddato >= datoFra & skjema1b$Hoveddato <= datoTil), ]
-# skjema1b <- skjema1b[order(skjema1b$Hoveddato), ]
-# skjema1a$Hoveddato <- as.Date(skjema1a$DateOfCompletion, format="%d.%m.%Y")
-# skjema1a <- skjema1a[which(skjema1a$Hoveddato >= datoFra & skjema1a$Hoveddato <= datoTil), ]
-# skjema1a <- skjema1a[order(skjema1a$Hoveddato), ]
-# skjema2$Hoveddato <- as.Date(skjema2$DateOfCompletion, format="%d.%m.%Y")
-# skjema2 <- skjema2[which(skjema2$Hoveddato >= datoFra & skjema2$Hoveddato <= datoTil), ]
-# skjema2 <- skjema2[order(skjema2$Hoveddato), ]
-
 dato_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Dato/tid')]
 dato_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Dato/tid')]
 dato_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Dato/tid')]
@@ -119,6 +105,11 @@ skjema2[, dato_var2] <- mutate_all(skjema2[, dato_var2], funs(as.Date(., format=
 skjema1b$Hoveddato <- skjema1b$S1b_DateOfCompletion
 skjema1b <- skjema1b[which(skjema1b$Hoveddato >= datoFra & skjema1b$Hoveddato <= datoTil), ]
 skjema1b <- skjema1b[order(skjema1b$Hoveddato), ]
+skjema1a$Hoveddato <- skjema1a$S1b_DateOfCompletion
+skjema1a <- skjema1a[which(skjema1a$Hoveddato >= datoFra & skjema1a$Hoveddato <= datoTil), ]
+skjema2$Hoveddato <- skjema2$DateOfCompletion
+skjema2 <- skjema2[which(skjema2$Hoveddato >= datoFra & skjema2$Hoveddato <= datoTil), ]
+
 
 boolske_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Avkrysning')]
 enum_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Enkeltvalg')]
@@ -140,7 +131,6 @@ skjema1a_bak <- skjema1a
 enum_var1b <- enum_var1b[sapply((skjema1b[, enum_var1b]), class) != "character"]
 enum_var1a <- enum_var1a[sapply((skjema1a[, enum_var1a]), class) != "character"]
 enum_var2 <- enum_var2[sapply((skjema2[, enum_var2]), class) != "character"]
-
 
 skjema1a[, enum_var1a] <- apply(skjema1a[, enum_var1a], 2, function(x){as.numeric(!(x == min(x, na.rm = T) | is.na(x)))})
 skjema1b[, enum_var1b] <- apply(skjema1b[, enum_var1b], 2, function(x){as.numeric(!(x == min(x, na.rm = T) | is.na(x)))})
@@ -170,17 +160,9 @@ skjema1a <- skjema1a[which(skjema1a$UnitId != 109834), ]
 skjema1b <- skjema1b[which(skjema1b$UnitId != 109834), ]
 
 manglende1bPrShus <- tapply(skjema1b$SkjemaGUID[ingen_avkrysninger1b], as.factor(skjema1b$SykehusNavn)[ingen_avkrysninger1b], length)
-# names(manglende1bPrShus) <- c('Haukeland', 'St. Olavs', 'UNN')
 Totalt1bPrShus <- tapply(skjema1b$SkjemaGUID, as.factor(skjema1b$SykehusNavn), length) #[-3]
-# tmp <- Totalt1bPrShus[3]
-# Totalt1bPrShus <- Totalt1bPrShus[-3]
-# names(Totalt1bPrShus) <- c('Haukeland', 'St. Olavs', 'UNN')
 manglende1bPrShus <- as.data.frame(cbind(manglende1bPrShus, Totalt1bPrShus))
 names(manglende1bPrShus) <- c('Tomme', 'Totalt')
-# manglende1bPrShus <- rbind(manglende1bPrShus, c(0, tmp))
-# row.names(manglende1bPrShus)[4] <- 'OUS'
-
-# knitr::kable(manglende1bPrShus)
 
 skjema1a[, numerisk_var1a] <- apply(skjema1a[, numerisk_var1a], 2, function(x){as.numeric(sapply(as.character(x), gsub, pattern = ",", replacement= "."))})
 skjema1b[, numerisk_var1b] <- apply(skjema1b[, numerisk_var1b], 2, function(x){as.numeric(sapply(as.character(x), gsub, pattern = ",", replacement= "."))})
@@ -192,14 +174,23 @@ skjema2[, numerisk_var2] <- apply(skjema2[, numerisk_var2], 2, function(x){as.nu
 ## Forhold mellom skjema
 
 ```{r, echo = FALSE, warning=FALSE}
-dobbel <- names(sort(table(skjema1a$HovedskjemaGUID), decreasing = T)[sort(table(skjema1a$HovedskjemaGUID), 
+dobbel_1a <- names(sort(table(skjema1a$HovedskjemaGUID), decreasing = T)[sort(table(skjema1a$HovedskjemaGUID), 
                                                                            decreasing = T)>1])
-# skjema1a[skjema1a$HovedskjemaGUID %in% dobbel, ]
+dobbel_2 <- names(sort(table(skjema2$HovedskjemaGUID), decreasing = T)[sort(table(skjema2$HovedskjemaGUID), 
+                                                                           decreasing = T)>1])
+dobbel_1b <- names(sort(table(skjema1b$SkjemaGUID), decreasing = T)[sort(table(skjema1b$SkjemaGUID), 
+                                                                           decreasing = T)>1])
+
+mangler1b <- length(setdiff(skjema1a$HovedskjemaGUID, skjema1b$SkjemaGUID))
+mangler1a <- length(setdiff(skjema1b$SkjemaGUID, skjema1a$HovedskjemaGUID))
+potensiellOppf <- length(skjema1b$SkjemaGUID[skjema1b$Hoveddato <= '2018-06-01'])
+manglerOppf <- length(setdiff(skjema1b$SkjemaGUID[skjema1b$Hoveddato <= '2018-06-01'], skjema2$HovedskjemaGUID))
 
 ```
 
-Denne rapporten benytter data fra pasienter med besøksdato mellom `r datoFra` og `r datoTil`. OUS er utelukket fra rapporten siden en kjent bug fra seneste oppdatering av registeret gjør at all data fra OUS fra mai 2018 og fremover i praksis er ubrukelige.
+Denne rapporten benytter data fra pasienter med besøksdato mellom `r min(skjema1a$Hoveddato)` og `r max(skjema1a$Hoveddato)` samt oppfølginger registrert mellom `r min(skjema2$Hoveddato)` og `r max(skjema2$Hoveddato)`. OUS er utelukket fra rapporten siden en kjent bug fra seneste oppdatering av registeret gjør at all data fra OUS fra mai 2018 og fremover i praksis er ubrukelige.
 
+Det er totalt `r dim(skjema1a)[1]` skjema 1a i utvalget og `r dim(skjema1b)[1]` skjema 1b. A disse er det `r mangler1b` pasientskjema som mangler klinikerskjema og `r mangler1a` klinikerskjema som mangler pasientskjema. Av de `r potensiellOppf` som hadde konsultasjon 7 eller flere måneder siden er det `r manglerOppf` som ikke har oppfølgingsdata.
 
 
 ## Manglende utfyllinger
