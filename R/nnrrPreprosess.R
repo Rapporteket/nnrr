@@ -130,6 +130,9 @@ nnrrPreprosess <- function(RegData)
                                                                                         'Alderspensjonist', 'Hjemmeværende',
                                                                                         'Sykemeldt', 'Arbeidsavklaringspenger',
                                                                                         'Permanent uførepensjon'))
+  RegData$Tverrfaglig_vurdering_antall <- rowSums(RegData[, c("FirstMedExamDoctor", "FirstMedExamNurse", "FirstMedExamPhys", "FirstMedExamOther")])
+  RegData$Tverrfaglig_vurdering <- 0
+  RegData$Tverrfaglig_vurdering[RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
 
   return(RegData)
 }
