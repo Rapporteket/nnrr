@@ -59,6 +59,9 @@ nnrrPreprosess <- function(RegData)
 
   # RegData$Aar <- RegData$Besoksdato$year+1900
   RegData$Aar <- as.numeric(format(RegData$Besoksdato, '%Y'))
+  # library(lubridate)
+  RegData$dato_oppfolg <- RegData$Besoksdato %m+% months(6)
+  RegData$aar_oppfolg <- as.numeric(format(RegData$dato_oppfolg, '%Y'))
 
   RegData$ErMann <- NA
   RegData$ErMann[which(RegData$PatientGender == 'Female')] <- 0

@@ -54,7 +54,7 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
   ind <- list(Hoved=which(RegData$AvdRESH == reshID), Rest=which(RegData$AvdRESH != reshID))
   Nrest <- 0
 
-  if (valgtVar %in% c('AarsakSmerte_PasRap')) {
+  if (valgtVar %in% c('AarsakSmerte_PasRap', 'beh_kommunalt', 'beh_spesialist', 'pasrapp_beh_klinikk')) {
     flerevar <- 1
   } else {
     flerevar <- 0
@@ -104,7 +104,7 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
   ##-----------Figur---------------------------------------
   tittel <- PlotParams$tittel; grtxt <- PlotParams$grtxt; #grtxt2 <- PlotParams$grtxt2;
   subtxt <- PlotParams$subtxt; retn <- PlotParams$retn; cexgr <- PlotParams$cexgr;
-  FigTypUt <- figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett, pointsizePDF=12)
+  FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett, pointsizePDF=12)
 
   if (NHoved < 5 | (Nrest<5 & enhetsUtvalg==1)) {
     farger <- FigTypUt$farger

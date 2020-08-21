@@ -1,6 +1,41 @@
 rm(list=ls())
 library(nnrr)
 
+########### Utlevering Karin Abeler 17.03.2020 ########################
+
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_Prod_1a_Spørreskjema+før+behandling_2019-06-11_red.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_Prod_1b_Registreringsskjema+poliklinikk_2019-06-11.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_Prod_2_Spørreskjema+etter+behandling_2019-06-11.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+
+icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+
+legeskjema$regstatus <- 1
+pasientsvar_pre$regstatus <- 1
+pasientsvar_post$regstatus <- 1
+
+names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
+names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
+
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
+
+RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
+
+RegData <- nnrrPreprosess(RegData = RegData)
+RegData <- RegData[RegData$Besoksdato >= '2015-01-01' & RegData$Besoksdato <= '2016-11-01', ]
+RegData <- RegData[RegData$SykehusNavn == 'UNN', ]
+write.csv2(RegData, 'I:/nnrr/utforskdata.csv', row.names = F)
+
+RegData <- RegData[ , c("Besoksdato", "PatientAge", "PatientGender", "EducationLevel",
+                        "DiagnosticNumber1", "DiagnosticNumber1Name", "DiagnosticNumber2", "DiagnosticNumber2Name",
+                        "DiagnosticNumber3", "DiagnosticNumber3Name", "PainExperiencesActivity", "PainExperiencesNoActivity",
+                        "HSCL10.Score")]
+
+write.csv2(RegData, 'I:/nnrr/utlevering17032020.csv', row.names = F)
+
 ########### Utlevering Kjetil Samuelsen 08.01.2020  #########################################
 
 skjema1a <- read.table('I:/nnrr/DataDump_Prod_1a_Spørreskjema+før+behandling_2020-01-07.csv', sep=';',

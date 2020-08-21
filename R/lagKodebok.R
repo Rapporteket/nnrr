@@ -1,6 +1,5 @@
 #' Denne funksjonen tilrettelegger en kodebok for bruk i rapportering
 #'
-#' @inheritParams nnrrFigAndeler
 #'
 #' @return En formatert kodebok
 #'

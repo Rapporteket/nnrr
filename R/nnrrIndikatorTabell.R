@@ -1,6 +1,7 @@
 #' Fremstill tabell med indikator over år og fordelt på sykehus
 #'
-#' Tar som input en dataramme som minimum inneholder kolonnene Aar, SykehusNavn samt en indikatorkolonne med navn man angir i funksjonskallet
+#' Tar som input en dataramme som minimum inneholder kolonnene Aar, SykehusNavn samt
+#' en indikatorkolonne med navn man angir i funksjonskallet
 #'
 #' @param RegData Dataramme
 #' @param indikator Navn på indikatorkolonne. Kolonne består av 0 og 1.

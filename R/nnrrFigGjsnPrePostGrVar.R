@@ -42,7 +42,9 @@ nnrrFigGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra='2000-01-01', dat
   PrePostVar <- switch(valgtVar,
                        ODI_PrePost = c('OdiScore', 'OdiScore_post'),
                        NDI_PrePost = c('NdiScore', 'NdiScore_post'),
-                       EQ5D_PrePost = c('Eq5dScore', 'Eq5dScore_post'))
+                       EQ5D_PrePost = c('Eq5dScore', 'Eq5dScore_post'),
+                       PainExperiencesNoActivity = c('PainExperiencesNoActivity', 'PainExperiencesNoActivity_post'),
+                       PainExperiencesActivity = c('PainExperiencesActivity', 'PainExperiencesActivity_post'))
 
   RegData$VarPre <- RegData[ ,PrePostVar[1]]
   RegData$VarPost <- RegData[ ,PrePostVar[2]]
@@ -100,7 +102,9 @@ nnrrFigGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra='2000-01-01', dat
   tittel <- switch(valgtVar,
                    ODI_PrePost = 'ODI-score før og etter behandling',
                    NDI_PrePost = 'NDI-score før og etter behandling',
-                   EQ5D_PrePost = 'EQ5D-Score før og etter behandling')
+                   EQ5D_PrePost = 'EQ5D-Score før og etter behandling',
+                   PainExperiencesNoActivity = 'Smerte i hvile',
+                   PainExperiencesActivity = 'Smerte i aktivitet')
 
   tittel <- c(tittel, 'med 95% konfidensintervall')
 
@@ -114,7 +118,7 @@ nnrrFigGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra='2000-01-01', dat
   retn<-'V'
   txtretn<-1
 
-  FigTypUt <- figtype(outfile, fargepalett='BlaaOff')
+  FigTypUt <- rapFigurer::figtype(outfile, fargepalett='BlaaOff')
   NutvTxt <- length(utvalgTxt)
   vmarg <- switch(retn, V=0, H=max(0, strwidth(grtxt, units='figure', cex=cexgr)*0.7))
   par('fig'=c(vmarg, 1, 0, 1-0.02*(NutvTxt-1+length(tittel)-1)))	#Har alltid datoutvalg med
@@ -135,7 +139,7 @@ nnrrFigGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra='2000-01-01', dat
   #Tekst som angir hvilket utvalg som er gjort
   mtext(utvalgTxt, side=3, las=1, cex=0.9, adj=0, col=farger[1], line=c(3+0.8*((NutvTxt-1):0)))
 
-  legend('top', c('Pre', 'Oppfølging')[1:(sammenlign+1)],
+  legend('top', c('Konsultasjon', 'Oppfølging')[1:(sammenlign+1)],
          border=c(fargeHoved,NA), col=farger[1:(sammenlign+1)], bty='n', pch=c(15,15), pt.cex=2,
          lwd=3,	lty=NA, ncol=2, cex=cexleg)
 

@@ -16,7 +16,7 @@ nnrrUtvalg <- function(RegData, datoFra, datoTil, minald, maxald, erMann, fargep
   Ninn <- dim(RegData)[1]
 
   indAld <- which(RegData$PatientAge >= minald & RegData$PatientAge <= maxald)
-  indDato <- which(RegData$Besoksdato >= as.POSIXlt(datoFra) & RegData$Besoksdato <= as.POSIXlt(datoTil))
+  indDato <- which(RegData$Besoksdato >= datoFra & RegData$Besoksdato <= datoTil)
   indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1:Ninn}
   indMed <- indAld %i% indDato %i% indKj
   RegData <- RegData[indMed,]

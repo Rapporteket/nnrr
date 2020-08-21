@@ -66,7 +66,7 @@ nnrrFigAntallKjonnsdelt  <- function(RegData, valgtVar, datoFra='2014-01-01', da
   ##-----------Figur---------------------------------------
   tittel <- PlotParams$tittel; grtxt <- PlotParams$grtxt; #grtxt2 <- PlotParams$grtxt2;
   subtxt <- PlotParams$subtxt; retn <- PlotParams$retn; cexgr <- PlotParams$cexgr;
-  FigTypUt <- figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett, pointsizePDF=12)
+  FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett, pointsizePDF=12)
 
   if (min(NHoved) < 5 | (min(Nrest)<5 & enhetsUtvalg==1)) {
     farger <- FigTypUt$farger
