@@ -4,10 +4,20 @@
 \alias{nnrrFigAntallKjonnsdelt}
 \title{Lag søylediagram som viser andeler av ulike variabler:}
 \usage{
-nnrrFigAntallKjonnsdelt(RegData, valgtVar, datoFra = "2014-01-01",
-  datoTil = "2050-12-31", enhetsUtvalg = 1, minald = 0,
-  maxald = 130, erMann = 99, outfile = "", reshID, preprosess = F,
-  hentData = F)
+nnrrFigAntallKjonnsdelt(
+  RegData,
+  valgtVar,
+  datoFra = "2014-01-01",
+  datoTil = "2050-12-31",
+  enhetsUtvalg = 1,
+  minald = 0,
+  maxald = 130,
+  erMann = 99,
+  outfile = "",
+  reshID,
+  preprosess = F,
+  hentData = F
+)
 }
 \arguments{
 \item{RegData}{- ei dataramme med alle nødvendige variable fra registeret}

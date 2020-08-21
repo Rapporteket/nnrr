@@ -4,10 +4,21 @@
 \alias{nnrrFigGjsnPrePostGrVar}
 \title{Søylediagram med gjennomsnitt før og etter intervensjon fordelt på sykehus}
 \usage{
-nnrrFigGjsnPrePostGrVar(RegData, valgtVar, datoFra = "2000-01-01",
-  datoTil = "2050-01-01", reshID, minald = 0, maxald = 120,
-  erMann = 99, outfile = "", enhetsUtvalg = 0, preprosess = F,
-  hentData = F, gr_var = "SykehusNavn")
+nnrrFigGjsnPrePostGrVar(
+  RegData,
+  valgtVar,
+  datoFra = "2000-01-01",
+  datoTil = "2050-01-01",
+  reshID,
+  minald = 0,
+  maxald = 120,
+  erMann = 99,
+  outfile = "",
+  enhetsUtvalg = 0,
+  preprosess = F,
+  hentData = F,
+  gr_var = "SykehusNavn"
+)
 }
 \arguments{
 \item{RegData}{- ei dataramme med alle nødvendige variable fra registeret}

@@ -15,5 +15,6 @@ nnrrIndikatorTabell(RegData, indikator = "Indikator")
 Tabell
 }
 \description{
-Tar som input en dataramme som minimum inneholder kolonnene Aar, SykehusNavn samt en indikatorkolonne med navn man angir i funksjonskallet
+Tar som input en dataramme som minimum inneholder kolonnene Aar, SykehusNavn samt
+en indikatorkolonne med navn man angir i funksjonskallet
 }

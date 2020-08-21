@@ -4,8 +4,15 @@
 \alias{nnrrUtvalg}
 \title{Gjør utvalg av dataen}
 \usage{
-nnrrUtvalg(RegData, datoFra, datoTil, minald, maxald, erMann,
-  fargepalett = "BlaaRapp")
+nnrrUtvalg(
+  RegData,
+  datoFra,
+  datoTil,
+  minald,
+  maxald,
+  erMann,
+  fargepalett = "BlaaRapp"
+)
 }
 \arguments{
 \item{RegData}{- ei dataramme med alle nødvendige variable fra registeret}
