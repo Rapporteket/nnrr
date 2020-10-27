@@ -289,21 +289,37 @@ reshID <- 0
 enhetsUtvalg <- 0
 preprosess <- F
 hentData <- F
+annetformat = ".wmf"
 
 FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
                maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
                preprosess=preprosess, hentData=hentData)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+}
 
 valgtVar <- 'PatientAge'
 outfile <- 'PatientAge.pdf'
 nnrrFigAntallKjonnsdelt(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
                           maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
                           preprosess=preprosess, hentData=hentData)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigAntallKjonnsdelt(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+                          maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+                          preprosess=preprosess, hentData=hentData)
+}
 
 valgtVar <- 'PatientAge'
 outfile <- 'Alder_pr_enhet_pr_aar.pdf'
 nnrrFigGjsnGrVarTid(RegDataAll, valgtVar=valgtVar, datoTil='2019-12-31', outfile=outfile, tittel='Gjennomsnittsalder')
-
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnGrVarTid(RegDataAll, valgtVar=valgtVar, datoTil='2019-12-31', outfile=outfile, tittel='Gjennomsnittsalder')
+}
 # valgtVar <- 'Eq5dSatisfactionTreatment'
 # outfile='Pasientfornoydhet.pdf'
 #
@@ -421,12 +437,21 @@ valgtVar <- "beh_kommunalt"
 outfile <- "beh_kommunalt.pdf"
 nnrrFigAndeler(RegDataAll, valgtVar = valgtVar, enhetsUtvalg = 0, reshID = 0, outfile=outfile,
                datoFra = '2019-01-01', datoTil = '2019-12-31')
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigAndeler(RegDataAll, valgtVar = valgtVar, enhetsUtvalg = 0, reshID = 0, outfile=outfile,
+               datoFra = '2019-01-01', datoTil = '2019-12-31')
+}
 
 valgtVar <- "beh_spesialist"
 outfile <- "beh_spesialist.pdf"
 nnrrFigAndeler(RegDataAll, valgtVar = valgtVar, enhetsUtvalg = 0, reshID = 0, outfile=outfile,
                datoFra = '2019-01-01', datoTil = '2019-12-31')
-
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigAndeler(RegDataAll, valgtVar = valgtVar, enhetsUtvalg = 0, reshID = 0, outfile=outfile,
+               datoFra = '2019-01-01', datoTil = '2019-12-31')
+}
 @
 
 \begin{figure}[ht]
@@ -493,16 +518,31 @@ print(xtable::xtable(tab10, align=c('l', 'l', 'r', rep('R{1.2in}', ncol(tab10)-2
 
 outfile <- "Smerte_i_ro.pdf"
 tmp <- nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = '2018-07-01', datoTil = '2019-06-30')
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = '2018-07-01', datoTil = '2019-06-30')
+}
 
 outfile <- "Smerte_i_aktivitet.pdf"
 tmp <- nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = '2018-07-01', datoTil = '2019-06-30')
-
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = '2018-07-01', datoTil = '2019-06-30')
+}
 
 outfile <- "ODI_PrePost.pdf"
 tmp <- nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = '2018-07-01', datoTil = '2019-06-30')
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = '2018-07-01', datoTil = '2019-06-30')
+}
 
 outfile <- "NDI_PrePost.pdf"
 tmp <- nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = '2018-07-01', datoTil = '2019-06-30')
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = '2018-07-01', datoTil = '2019-06-30')
+}
 @
 
 \begin{figure}[ht]
@@ -666,7 +706,12 @@ outfile=paste0(valgtVar, '.pdf')
 FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
                maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
                preprosess=preprosess, hentData=hentData)
-
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,
+               maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
+               preprosess=preprosess, hentData=hentData)
+}
 
 
 @
@@ -763,18 +808,20 @@ print(xtable::xtable(Tabell_Tverrfaglig, digits=c(0,0,0,0,0,1), caption='Andel s
 aux <- RegData[RegData$regstatus_post==1, ]
 aux$indx <- 1
 
-Tabell_pasrapp_beh <- aux %>% group_by(Aar, SykehusNavn) %>% summarise('Ingen behandling' = sum(!TreatmentPostHospital, na.rm = T),
-                                                          'Operasjon' = sum(TreatmentPostHospitalSurgery, na.rm = T),
-                                                          'Individuelt behandlingstilbud' = sum(TreatmentPostIndividual),
-                                                          'Gruppebasert behandling' = sum(TreatmentPostGroupbased),
-                                                          'Tilbud om videre kontroller' = sum(TreatmentPostHospitalExtendedExamination),
-                                                          N=n())
-tmp <- aux %>% group_by(Aar) %>% summarise('Ingen behandling' = sum(!TreatmentPostHospital, na.rm = T),
-                                                          'Operasjon' = sum(TreatmentPostHospitalSurgery, na.rm = T),
-                                                          'Individuelt behandlingstilbud' = sum(TreatmentPostIndividual),
-                                                          'Gruppebasert behandling' = sum(TreatmentPostGroupbased),
-                                                          'Tilbud om videre kontroller' = sum(TreatmentPostHospitalExtendedExamination),
-                                                          N=n())
+Tabell_pasrapp_beh <- aux %>% group_by(Aar, SykehusNavn) %>%
+  summarise('Ingen behandling' = sum(!TreatmentPostHospital & !TreatmentPostHospitalSurgery, na.rm = T),
+            'Operasjon' = sum(TreatmentPostHospital, na.rm = T),
+            'Individuelt behandlingstilbud' = sum(TreatmentPostIndividual),
+            'Gruppebasert behandling' = sum(TreatmentPostGroupbased),
+            'Tilbud om videre kontroller' = sum(TreatmentPostHospitalExtendedExamination),
+            N=n())
+tmp <- aux %>% group_by(Aar) %>%
+  summarise('Ingen behandling' = sum(!TreatmentPostHospital & !TreatmentPostHospitalSurgery, na.rm = T),
+            'Operasjon' = sum(TreatmentPostHospital, na.rm = T),
+            'Individuelt behandlingstilbud' = sum(TreatmentPostIndividual),
+            'Gruppebasert behandling' = sum(TreatmentPostGroupbased),
+            'Tilbud om videre kontroller' = sum(TreatmentPostHospitalExtendedExamination),
+            N=n())
 tmp$SykehusNavn <- 'Zmp'
 tmp <- tmp[, c(1,8,2:7)]
 Tabell_pasrapp_beh <- bind_rows(Tabell_pasrapp_beh, tmp)
@@ -793,7 +840,11 @@ print(xtable::xtable(Tabell_pasrapp_beh, digits=0, align=c('l', 'l', 'l', rep('R
 outfile <- 'pasrapp_beh_klinikk.pdf'
 nnrrFigAndeler(RegDataAll, valgtVar = 'pasrapp_beh_klinikk', enhetsUtvalg = 0, reshID = 0,
                datoFra = '2019-01-01', datoTil = '2019-12-31', outfile = outfile)
-
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigAndeler(RegDataAll, valgtVar = 'pasrapp_beh_klinikk', enhetsUtvalg = 0, reshID = 0,
+               datoFra = '2019-01-01', datoTil = '2019-12-31', outfile = outfile)
+}
 
 
 lag_beh_tabell<- function(regdata, varnavn, etikett) {
@@ -866,7 +917,10 @@ indikator$Nevner <- 1
 
 outfile <- "smertevarighet_str_enn_2aar.pdf"
 nnrrFigIndikator(indikator, 'Andel med varighet av plager >2 år', outfile=outfile)
-
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigIndikator(indikator, 'Andel med varighet av plager >2 år', outfile=outfile)
+}
 # tabell1 <- nnrrIndikatorTabell(skjema1b, indikator = 'tverrfaglig_behandlet')
 # print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel tverrfaglig behandlet'), include.rownames=FALSE)
 
@@ -882,7 +936,10 @@ indikator$Nevner <- 1
 
 outfile <- "hcsl_hoy.pdf"
 nnrrFigIndikator(indikator, 'Andel HSCL-score >= 1.85', outfile=outfile)
-
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigIndikator(indikator, 'Andel HSCL-score >= 1.85', outfile=outfile)
+}
 
 @
 
