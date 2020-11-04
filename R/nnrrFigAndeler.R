@@ -23,6 +23,10 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
                         minald=0, maxald=130, erMann=99, outfile='', reshID, preprosess=F, hentData=F)
 {
 
+  # valgtVar="tverrfaglig_behandlet"; datoFra='2016-01-01'; datoTil=Sys.Date();
+  # minald=0; maxald=120; erMann=99; outfile=''; reshID=601032; enhetsUtvalg=0;
+  # preprosess=F; hentData=F
+
   ## Hvis spørring skjer fra R på server. ######################
   if(hentData){
     RegData <- nnrrHentRegData()
@@ -34,13 +38,13 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
   }
 
   # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
-  if (enhetsUtvalg == 2) {RegData <- RegData[which(RegData$ReshId == reshID), ]}
+  if (enhetsUtvalg == 2) {RegData <- RegData[which(RegData$UnitId == reshID), ]}
 
   # Sykehustekst avhengig av bruker og brukervalg
   if (enhetsUtvalg==0) {
     shtxt <- 'Hele landet'
   } else {
-    shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$AvdRESH)])
+    shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
   }
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
@@ -51,8 +55,9 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
 
   # Initialiserer nødvendige størrelser
   Andeler <- list(Hoved = 0, Rest =0)
-  ind <- list(Hoved=which(RegData$AvdRESH == reshID), Rest=which(RegData$AvdRESH != reshID))
-  Nrest <- 0
+  ind <- list(Hoved=which(RegData$UnitId == reshID), Rest=which(RegData$UnitId != reshID))
+  NRest <- 0
+  NvarRest <- 0
 
   if (valgtVar %in% c('AarsakSmerte_PasRap', 'beh_kommunalt', 'beh_spesialist', 'pasrapp_beh_klinikk')) {
     flerevar <- 1
@@ -70,13 +75,16 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
       NHoved <- sum(AntHoved)
       Andeler$Hoved <- 100*AntHoved/NHoved
       AntRest <- table(RegData$VariabelGr[ind$Rest])
-      Nrest <- sum(AntRest)	#length(indRest)- Kan inneholde NA
-      Andeler$Rest <- 100*AntRest/Nrest
+      NRest <- sum(AntRest)	#length(indRest)- Kan inneholde NA
+      Andeler$Rest <- 100*AntRest/NRest
+      NvarRest <- rep(NRest, length(Andeler$Rest))
+      NvarHoved <- rep(NHoved, length(Andeler$Hoved))
     } else {
       AntHoved <- table(RegData$VariabelGr)
       NHoved <- sum(AntHoved)
       Andeler$Hoved <- 100*AntHoved/NHoved
       AntRest <- 0
+      NvarHoved <- rep(NHoved, length(Andeler$Hoved))
     }
   }
 
@@ -86,16 +94,19 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
       PlotParams <- nnrrPrepVar(RegData[ind$Hoved, ], valgtVar) # Hovegruppe
       AntHoved <- PlotParams$AntVar
       NHoved <- max(PlotParams$NVar, na.rm=T)
+      NvarHoved <- PlotParams$NVar
       Andeler$Hoved <- 100*PlotParams$AntVar/PlotParams$NVar
-      PlotParams2 <- MuskelPrepVar(RegData[ind$Rest, ], valgtVar) # Sammenligningsgruppe
+      PlotParams2 <- nnrrPrepVar(RegData[ind$Rest, ], valgtVar) # Sammenligningsgruppe
       AntRest <- PlotParams2$AntVar
       NRest <- max(PlotParams2$NVar,na.rm=T)	#length(indRest)- Kan inneholde NA
+      NvarRest <- PlotParams2$NVar
       Andeler$Rest <- 100*PlotParams2$AntVar/PlotParams2$NVar
       rm(PlotParams2)
     } else {
       PlotParams <- nnrrPrepVar(RegData, valgtVar)
       AntHoved <- PlotParams$AntVar
       NHoved <- max(PlotParams$NVar, na.rm=T)
+      NvarHoved <- PlotParams$NVar
       Andeler$Hoved <- 100*PlotParams$AntVar/PlotParams$NVar
       AntRest <- 0
     }
@@ -106,7 +117,7 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
   subtxt <- PlotParams$subtxt; retn <- PlotParams$retn; cexgr <- PlotParams$cexgr;
   FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett, pointsizePDF=12)
 
-  if (NHoved < 5 | (Nrest<5 & enhetsUtvalg==1)) {
+  if (NHoved < 5 | (NRest<5 & enhetsUtvalg==1)) {
     farger <- FigTypUt$farger
     plot.new()
     # title(tittel)	#, line=-6)
@@ -144,7 +155,7 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
       mtext(at=pos, grtxt2, side=1, las=1, cex=cexgr, adj=0.5, line=1.5)
       if (enhetsUtvalg == 1) {
         points(pos, as.numeric(Andeler$Rest), col=fargeRest,  cex=2, pch=18) #c("p","b","o"),
-        legend('top', c(paste(shtxt, ' (N=', NHoved,')', sep=''), paste('Landet forøvrig (N=', Nrest,')', sep='')),
+        legend('top', c(paste(shtxt, ' (N=', NHoved,')', sep=''), paste('Landet forøvrig (N=', NRest,')', sep='')),
                border=c(fargeHoved,NA), col=c(fargeHoved,fargeRest), bty='n', pch=c(15,18), pt.cex=2, lty=c(NA,NA),
                lwd=lwdRest, ncol=1, cex=cexgr)
       } else {
@@ -166,7 +177,7 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
 
       if (enhetsUtvalg == 1) {
         points(as.numeric(rev(Andeler$Rest)), pos, col=fargeRest,  cex=2, pch=18) #c("p","b","o"),
-        legend('top', c(paste(shtxt, ' (N=', NHoved,')', sep=''), paste('Landet forøvrig (N=', Nrest,')', sep='')),
+        legend('top', c(paste(shtxt, ' (N=', NHoved,')', sep=''), paste('Landet forøvrig (N=', NRest,')', sep='')),
                border=c(fargeHoved,NA), col=c(fargeHoved,fargeRest), bty='n', pch=c(15,18), pt.cex=2,
                lwd=lwdRest,	lty=NA, ncol=1, cex=cexgr)
       } else {
@@ -193,6 +204,8 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
 
   UtData <- list(paste(toString(tittel),'.', sep=''), AndelerUt, AntallUt, grtxt )
   names(UtData) <- c('Tittel', 'Andeler', 'Antall', 'GruppeTekst')
+  UtData$utvalgTxt <- utvalgTxt
+  UtData$N <- data.frame(NHoved = NvarHoved, NRest = NvarRest)
   return(invisible(UtData))
 
 

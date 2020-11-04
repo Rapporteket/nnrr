@@ -17,10 +17,13 @@ nnrrPrepVar <- function(RegData, valgtVar)
 
   # endre
   if (valgtVar=='tverrfaglig_behandlet') {
+    tittel <- "Tverrfaglig behandlet"
     RegData <- RegData[RegData$regstatus==1, ]
     RegData$Variabel <- 0
     RegData$Variabel[RegData$Treatment_GroupInterdisciplinary2018 != 0 | RegData$Treatment_GroupInterdisciplinary != 0] <- 1
     RegData$Variabel[RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
 
   }
 
@@ -178,8 +181,6 @@ nnrrPrepVar <- function(RegData, valgtVar)
 
   }
 
-
-
   if (valgtVar=='Eq5dSatisfactionTreatment') {
     RegData$Variabel <- RegData[, valgtVar]
     RegData <- RegData[which(!is.na(RegData$Variabel)), ]
@@ -190,6 +191,10 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- factor(RegData$Variabel, levels = gr, labels = grtxt)
     retn <- 'H'
   }
+
+
+########################################################################################
+########################## Pre-post variabler ##########################################
 
   if (valgtVar=='SmertestillendeResept') {
     RegData <- RegData[which(RegData$VarPre %in% 1:4 & RegData$VarPost %in% 1:4), ]
