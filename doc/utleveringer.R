@@ -1,6 +1,36 @@
 rm(list=ls())
 library(nnrr)
 
+########## Utlevering 02.12.2020 #######################################
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_1a_Spørreskjema+før+behandling_2020-10-27_red.csv',
+                              sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_1b_Registreringsskjema+poliklinikk_2020-10-27.csv',
+                         sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_2_Spørreskjema+etter+behandling_2020-10-27.csv',
+                               sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+legeskjema <- legeskjema[which(as.Date(legeskjema$S1b_DateOfCompletion, format="%d.%m.%Y") >= "2016-01-01"), ]
+pasientsvar_pre <- pasientsvar_pre[pasientsvar_pre$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+pasientsvar_post <- pasientsvar_post[pasientsvar_post$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+
+ikkemed <- c("BackSurgery", "NeckSurgery", "PelvisSurgery", "Radiological_None", "RadiologicalUS_CT", "RadiologicalUS_MR",
+  "RadiologicalUS_Radikulgraphy", "RadiologicalUS_Discography", "RadiologicalUS_LS_C_Columna",
+  "RadiologicalUS_FlexionExtention", "RadiologicalF_Normal", "RadiologicalF_DiscHernitation",
+  "RadiologicalF_CentralSpinalCord", "RadiologicalF_RecesStenosis", "RadiologicalF_Spondylolisthesis2018",
+  "RadiologicalF_Spondylolisthesis", "RadiologicalF_Scoliosis", "RadiologicalF_Scoliosis_Subcategory",
+  "RadiologicalF_Modicchanges", "RadiologicalF_Modicchanges1", "RadiologicalF_Modicchanges2",
+  "RadiologicalF_Modicchanges3", "RadiologicalF_ModicchangesUnspecified", "RadiologicalF_Other",
+  "OtherSupplementaryDiagnostic_DiagnosticInjection", "OtherSupplementaryDiagnostic_Radikulgraphy",
+  "RadiologicalUS_DiagnosticBlock", "OtherSupplementaryDiagnostic_Emg", "OtherSupplementaryDiagnostic_Nevrografi")
+legeskjema <- legeskjema[, -which(names(legeskjema) %in% ikkemed)]
+
+flere_hovedskjemaGuid_pre <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+flere_hovedskjemaGuid_post <- names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+
+write.csv2(legeskjema, "I:/nnrr/skjema1b_03122020.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(pasientsvar_pre, "I:/nnrr/skjema1a_03122020.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(pasientsvar_post, "I:/nnrr/skjema2_03122020.csv", row.names = F, fileEncoding = "Latin1")
+
 ########### Utlevering Karin Abeler 17.03.2020 ########################
 
 pasientsvar_pre <- read.table('I:/nnrr/DataDump_Prod_1a_Spørreskjema+før+behandling_2019-06-11_red.csv', sep=';', header=T, stringsAsFactors = F)
@@ -8,6 +38,7 @@ legeskjema <- read.table('I:/nnrr/DataDump_Prod_1b_Registreringsskjema+poliklini
 pasientsvar_post <- read.table('I:/nnrr/DataDump_Prod_2_Spørreskjema+etter+behandling_2019-06-11.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
 
 icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')

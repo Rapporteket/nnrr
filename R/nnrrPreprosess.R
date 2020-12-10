@@ -59,6 +59,10 @@ nnrrPreprosess <- function(RegData)
 
   # RegData$Aar <- RegData$Besoksdato$year+1900
   RegData$Aar <- as.numeric(format(RegData$Besoksdato, '%Y'))
+  RegData$Mnd <- as.numeric(format(RegData$Besoksdato, '%m')) # RegData$OperasjonsDato$mon +1
+  RegData$Kvartal <- floor((RegData$Mnd - 1)/3)+1
+  RegData$Halvaar <- floor((RegData$Mnd - 1)/6)+1
+
   # library(lubridate)
   RegData$dato_oppfolg <- RegData$Besoksdato %m+% months(6)
   RegData$aar_oppfolg <- as.numeric(format(RegData$dato_oppfolg, '%Y'))
@@ -88,7 +92,9 @@ nnrrPreprosess <- function(RegData)
   RegData$SykehusNavn[RegData$UnitId == 102959] <- 'Haukeland'
   RegData$SykehusNavn[RegData$UnitId == 104293] <- 'St. Olavs'
   RegData$SykehusNavn[RegData$UnitId == 109834] <- 'OUS'
-  RegData$SykehusNavn[RegData$UnitId == 601032] <- 'UNN'
+  RegData$SykehusNavn[RegData$UnitId == 601032] <- 'UNN-Tromsø'
+  RegData$SykehusNavn[RegData$UnitId == 700735] <- 'UNN-Harstad'
+
 
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel')] <- 'EQ5D.VAS'
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel_post')] <- 'EQ5D.VAS_post'
