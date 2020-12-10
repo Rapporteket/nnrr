@@ -164,7 +164,7 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
            sub='(Tall i boksene angir antall operasjoner)', cex.sub=cexgr)	#, axes=F)
       axis(side=1, at = xskala, labels = Tidtxt)
       if (!is.na(maal)) {
-        lines(range(xskala),rep(maal,2), col=farger[3], lwd=2, lty=2)
+        lines(range(xskala),rep(maal,2), col=farger[3], lwd=2, lty=1)
       }
 
       if (medSml==1) {
@@ -232,7 +232,7 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
            cex=2, lwd=3, xlab=xaksetxt, ylab="Andel (%)", ylim=c(0,ymax), yaxs = 'i',
            sub='(Tall ved punktene angir antall operasjoner)', cex.sub=cexgr)
       if (!is.na(maal)) {
-        lines(range(xskala),rep(maal,2), col=farger[3], lwd=2, lty=2)
+        lines(range(xskala),rep(maal,2), col=farger[3], lwd=2, lty=1)
       }
 
       axis(side=1, at = xskala, labels = Tidtxt, cex.axis=0.9)
@@ -251,7 +251,8 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
         #                                        paste(smltxt, ' (N=', NSmlRes, ')', sep='')), bty='n', ncol=1, cex=cexleg,
         #                col=c(fargeHoved, fargeRest, NA), lwd=3)
         legend('topleft', border=NA, c(paste0(shtxt, ' (N=', NHovedRes, ')'),
-                                       paste0(smltxt, ' (N=', NSmlRes, ')'), paste0(shtxt, ' Gj.snitt'), paste0(smltxt, ' Gj.snitt')), bty='n', lty=c(1,1,2,2), ncol=2, cex=cexleg,
+                                       paste0(smltxt, ' (N=', NSmlRes, ')'), paste0(shtxt, ' Gj.snitt'), paste0(smltxt, ' Gj.snitt')),
+               bty='n', lty=c(1,1,2,2), ncol=2, cex=cexleg,
                col=c(fargeHoved, fargeRest, fargeHoved, fargeRest), lwd=c(3,3,2,2))
         # lines(range(xskala),rep(AndelRestGjsn,2), col=fargeRest, lwd=2, lty=2)
         # mtext(sprintf("%.1f", AndelRestGjsn), side=2, at = AndelRestGjsn,las=1, cex=0.9, adj=0, col=fargeRest, line=2)
