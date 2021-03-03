@@ -19,8 +19,8 @@
 #'
 #' @export
 #'
-nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='2014-01-01', datoTil='2050-12-31', enhetsUtvalg=1,
-                               minald=0, maxald=130, erMann=99, outfile='', reshID, tidsenhet="Kvartal", inkl_konf=0, maal = NA)
+nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='2014-01-01', datoTil='2050-12-31', enhetsUtvalg=1, datovar="Besoksdato",
+                               minald=0, maxald=130, erMann=99, outfile='', reshID, tidsenhet="Kvartal", inkl_konf=0, maal = NA, maalnivaatxt=NA)
 {
 
   # Sykehustekst avhengig av bruker og brukervalg
@@ -37,9 +37,15 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(RegData=RegData, datoFra=datoFra, datoTil=datoTil, minald=minald,
-                           maxald=maxald, erMann=erMann)
+                           maxald=maxald, erMann=erMann, datovar=datovar)
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
+
+  RegData$Dato <- RegData[, datovar]
+  RegData$Aar <- as.numeric(format(RegData$Dato, '%Y'))
+  RegData$Mnd <- as.numeric(format(RegData$Dato, '%m'))
+  RegData$Kvartal <- floor((RegData$Mnd - 1)/3)+1
+  RegData$Halvaar <- floor((RegData$Mnd - 1)/6)+1
 
   RegData$TidsEnhet <- switch(tidsenhet,
                               Aar = RegData$Aar-min(RegData$Aar)+1,
@@ -158,39 +164,23 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
 
       plot(xskala, AndelHoved, xlim= c(xmin, xmax), ylim=c(ymin, ymax), type='n', frame.plot=FALSE,
            ylab=c(paste0('Andel ', VarTxt),'inkl. 95% konfidensintervall'),
-           xlab=switch(tidsenhet, Aar='Operasjonsår', Mnd='Operasjonsår og -måned',
-                       Kvartal='Operasjonsår og -kvartal', Halvaar='Operasjonsår og -halvår'),
+           xlab=switch(tidsenhet, Aar='Intervensjonsår', Mnd='Intervensjonsår og -måned',
+                       Kvartal='Intervensjonsår og -kvartal', Halvaar='Intervensjonsår og -halvår'),
            xaxt='n',
-           sub='(Tall i boksene angir antall operasjoner)', cex.sub=cexgr)	#, axes=F)
+           sub='(Tall i boksene angir antall intervensjoner)', cex.sub=cexgr)	#, axes=F)
       axis(side=1, at = xskala, labels = Tidtxt)
-      if (!is.na(maal)) {
-        lines(range(xskala),rep(maal,2), col=farger[3], lwd=2, lty=1)
-      }
 
       if (medSml==1) {
 
         polygon( c(xskala, xskala[Ant_tidpkt:1]), c(KonfRest[1,], KonfRest[2,Ant_tidpkt:1]),
                  col=fargeRestRes, border=NA)
-        #         legend('top', bty='n', fill=fargeRestRes, border=fargeRestRes, cex=cexgr,
-        #                legend = c(paste0('95% konfidensintervall for ', smltxt, ', N=', sum(NTidRest, na.rm=T)) ))
-        legend('top', cex=0.9, bty='o', bg='white', box.col='white', lty = c(NA, 2,2),
-               lwd=c(NA,2,2), pch=c(15,NA,NA), pt.cex=c(2,1,1), col=c(fargeRestRes,farger[1],farger[3]),
-               legend = c(paste0('95% konfidensintervall for ', smltxt, ', N=', sum(NTidRest, na.rm=T)),
-                          paste0('Gjennomsnitt hele perioden, ', shtxt, ' = ', sprintf("%.1f", AndelHovedGjsn), ' (',
-                                 sprintf("%.1f", binomkonf(sum(NTidHendHoved), sum(NTidHoved))[1]*100), '-',
-                                 sprintf("%.1f", binomkonf(sum(NTidHendHoved), sum(NTidHoved))[2]*100), ')'),
-                          paste0('Gjennomsnitt hele perioden, ', smltxt, ' = ', sprintf("%.1f", AndelRestGjsn), ' (',
-                                 sprintf("%.1f", binomkonf(sum(NTidHendRest), sum(NTidRest))[1]*100), '-',
-                                 sprintf("%.1f", binomkonf(sum(NTidHendRest), sum(NTidRest))[2]*100), ')')) )
-
-        # lines(range(xskala),rep(AndelRestGjsn,2), col=farger[3], lwd=2, lty=2)
-        # mtext(sprintf("%.1f", AndelRestGjsn), side=2, at = AndelRestGjsn,las=1, cex=0.9, adj=0, col=farger[3], line=2)
+        legend('top', cex=0.9, bty='o', bg='white', box.col='white', lty = NA,
+               lwd=NA, pch=15, pt.cex=2, col=fargeRestRes,
+               legend = paste0('95% konfidensintervall for ', smltxt, ', N=', sum(NTidRest, na.rm=T)) )
       } else {
         legend('top', cex=0.9, bty='o', bg='white', box.col='white', lty = 2,
                lwd=2, col=farger[1], legend = paste0('Gjennomsnitt hele perioden, ', shtxt, ' = ', round(AndelHovedGjsn, 1)))
       }
-      # lines(range(xskala),rep(AndelHovedGjsn,2), col=farger[1], lwd=2, lty=2)
-      # mtext(sprintf("%.1f", AndelHovedGjsn), side=2, at = AndelHovedGjsn,las=1, cex=0.9, adj=0, col=farger[1], line=2)
       h <- strheight(1, cex=cexgr)*0.7	#,  units='figure',
       b <- 1.1*strwidth(max(NTidHoved, na.rm=T), cex=cexgr)/2	#length(Aartxt)/30
       rect(xskala-b, AndelHoved-h, xskala+b, AndelHoved+h, border = fargeHovedRes, lwd=1)	#border=farger[4], col=farger[4]
@@ -204,11 +194,19 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
       ind2 <- which(Konf[2, ] < AndelHoved+h) #Øvre konfidensintervall som er mindre enn boksen
       arrows(x0=xskala, y0=AndelHoved+h, x1=xskala, y1=replace(Konf[2, ], ind2, AndelHoved[ind2]+h),
              length=0.08, code=2, angle=90, col=fargeHovedRes, lwd=1.5)
-      #       arrows(x0=xskala, y0=AndelHoved+h, x1=xskala, y1=replace(Konf[2, ], ind, AndelHoved[ind]+h),
-      #              length=0.08, code=2, angle=90, col=fargeHovedRes, lwd=1.5)
 
       title(main=tittel, font.main=1, line=1)
       mtext(utvalgTxt, side=3, las=1, cex=0.9, adj=0, col=farger[1], line=c(3+0.8*((NutvTxt-1):0)))
+
+      # if (!is.na(maal)) {
+      #   lines(range(xskala),rep(maal,2), col="green", lwd=2, lty=1)
+      # }
+      if (!is.na(maal)) {
+        lines(range(xskala),rep(maal,2), col="green", lwd=2, lty=2)
+        if (!is.na(maalnivaatxt)) {
+          text(x = length(Tidtxt), y = maal, labels = maalnivaatxt, adj = c(1,1), xpd=T)
+        }
+      }
 
       # par('fig'=c(0, 1, 0, 1))
       if ( outfile != '') {dev.off()}
@@ -223,39 +221,32 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
       cexleg <- 1	#Størrelse på legendtekst
       cexskala <- switch(tidsenhet, Aar=1, Mnd=0.9, Kvartal=0.9, Halvaar=0.9)
       xskala <- 1:length(Tidtxt)
-      xaksetxt <- switch(tidsenhet, Aar='Operasjonsår', Mnd='Operasjonsår og -måned',
-                         Kvartal='Operasjonsår og -kvartal', Halvaar='Operasjonsår og -halvår')
+      xaksetxt <- switch(tidsenhet, Aar='Intervensjonsår', Mnd='Intervensjonsår og -måned',
+                         Kvartal='Intervensjonsår og -kvartal', Halvaar='Intervensjonsår og -halvår')
       ymax <- min(119, 1.25*max(Andeler,na.rm=T))
 
       plot(AndelHoved,  font.main=1,  type='o', pch="'", col=fargeHoved, xaxt='n',
            frame.plot = FALSE,  xaxp=c(1,length(Tidtxt),length(Tidtxt)-1),xlim = c(1,length(Tidtxt)),
            cex=2, lwd=3, xlab=xaksetxt, ylab="Andel (%)", ylim=c(0,ymax), yaxs = 'i',
-           sub='(Tall ved punktene angir antall operasjoner)', cex.sub=cexgr)
-      if (!is.na(maal)) {
-        lines(range(xskala),rep(maal,2), col=farger[3], lwd=2, lty=1)
-      }
+           sub='(Tall ved punktene angir antall intervensjoner)', cex.sub=cexgr)
 
       axis(side=1, at = xskala, labels = Tidtxt, cex.axis=0.9)
       title(tittel, line=1, font.main=1)
       text(xskala, AndelHoved, pos=3, NTidHoved, cex=0.9, col=fargeHoved)#pos=1,
-      # lines(range(xskala),rep(AndelHovedGjsn,2), col=fargeHoved, lwd=2, lty=2)
-      # mtext(sprintf("%.1f", AndelHovedGjsn), side=2, at = AndelHovedGjsn,las=1, cex=0.9, adj=0, col=fargeRest, line=2)
 
-      # Ttxt <- paste('(Tall ved punktene angir antall ', VarTxt, ')', sep='')
       if (medSml == 1) {
 
         lines(xskala, AndelRest, col=fargeRest, lwd=3)
         points(xskala, AndelRest, pch="'", cex=2, col=fargeRest)	#}
         text(xskala, AndelRest, pos=3, NTidRest, cex=0.9, col=fargeRest)
-        #         legend('topleft', border=NA, c(paste(shtxt, ' (N=', NHovedRes, ')', sep=''),
-        #                                        paste(smltxt, ' (N=', NSmlRes, ')', sep='')), bty='n', ncol=1, cex=cexleg,
-        #                col=c(fargeHoved, fargeRest, NA), lwd=3)
-        legend('topleft', border=NA, c(paste0(shtxt, ' (N=', NHovedRes, ')'),
-                                       paste0(smltxt, ' (N=', NSmlRes, ')'), paste0(shtxt, ' Gj.snitt'), paste0(smltxt, ' Gj.snitt')),
-               bty='n', lty=c(1,1,2,2), ncol=2, cex=cexleg,
-               col=c(fargeHoved, fargeRest, fargeHoved, fargeRest), lwd=c(3,3,2,2))
-        # lines(range(xskala),rep(AndelRestGjsn,2), col=fargeRest, lwd=2, lty=2)
-        # mtext(sprintf("%.1f", AndelRestGjsn), side=2, at = AndelRestGjsn,las=1, cex=0.9, adj=0, col=fargeRest, line=2)
+        legend('top', border=NA, c(paste0(shtxt, ' (N=', NHovedRes, ')'),
+                                       paste0(smltxt, ' (N=', NSmlRes, ')')),
+               bty='n', lty=c(1,1), ncol=1, cex=cexleg,
+               col=c(fargeHoved, fargeRest), lwd=c(3,3))
+        # legend('topleft', border=NA, c(paste0(shtxt, ' (N=', NHovedRes, ')'),
+        #                                paste0(smltxt, ' (N=', NSmlRes, ')'), paste0(shtxt, ' Gj.snitt'), paste0(smltxt, ' Gj.snitt')),
+        #        bty='n', lty=c(1,1,2,2), ncol=2, cex=cexleg,
+        #        col=c(fargeHoved, fargeRest, fargeHoved, fargeRest), lwd=c(3,3,2,2))
 
       } else {
         legend('top', paste0(shtxt, ' (N=', NHovedRes, ')'),
@@ -274,6 +265,13 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
 
       #Tekst som angir hvilket utvalg som er gjort
       mtext(utvalgTxt, side=3, las=1, cex=0.9, adj=0, col=fargeRest, line=c(3+0.8*((NutvTxt-1):0)))
+
+      if (!is.na(maal)) {
+        lines(range(xskala),rep(maal,2), col="green", lwd=2, lty=2)
+        if (!is.na(maalnivaatxt)) {
+          text(x = length(Tidtxt), y = maal, labels = maalnivaatxt, adj = c(1,1), xpd=T)
+        }
+      }
 
       par('fig'=c(0, 1, 0, 1))
       if ( outfile != '') {dev.off()}

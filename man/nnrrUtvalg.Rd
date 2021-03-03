@@ -11,6 +11,7 @@ nnrrUtvalg(
   minald,
   maxald,
   erMann,
+  datovar = "Besoksdato",
   fargepalett = "BlaaRapp"
 )
 }

@@ -2,6 +2,7 @@
 
 export(binomkonf)
 export(lagKodebok)
+export(nnrrFigAndelGrvar)
 export(nnrrFigAndelTid)
 export(nnrrFigAndeler)
 export(nnrrFigAndelerPrePost)

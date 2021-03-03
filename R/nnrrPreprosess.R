@@ -14,8 +14,11 @@ nnrrPreprosess <- function(RegData)
   boolske_var1b <- as.character(varnavn_1b$Variabelnavn)[which(as.character(varnavn_1b$Felttype) == 'Avkrysning')]
   boolske_var1a <- as.character(varnavn_1a$Variabelnavn)[which(as.character(varnavn_1a$Felttype) == 'Avkrysning')]
   boolske_var2 <- as.character(varnavn_2$Variabelnavn)[which(as.character(varnavn_2$Felttype) == 'Avkrysning')]
-  RegData[, c(boolske_var1b, boolske_var1a, boolske_var2)] <-
-    apply(RegData[, c(boolske_var1b, boolske_var1a, boolske_var2)], 2, as.logical)
+  boolske_var <- intersect(c(boolske_var1b, boolske_var1a, boolske_var2), names(RegData))
+  RegData[, boolske_var] <-
+    apply(RegData[, boolske_var], 2, as.logical)
+  # RegData[, c(boolske_var1b, boolske_var1a, boolske_var2)] <-
+  #   apply(RegData[, c(boolske_var1b, boolske_var1a, boolske_var2)], 2, as.logical)
   # dato_var <- c(as.character(varnavn_1b$Variabelnavn)[which(as.character(varnavn_1b$Felttype) == 'Dato/tid')],
   #               as.character(varnavn_1a$Variabelnavn)[which(as.character(varnavn_1a$Felttype) == 'Dato/tid')],
   #               as.character(varnavn_2$Variabelnavn)[which(as.character(varnavn_2$Felttype) == 'Dato/tid')])
@@ -68,8 +71,8 @@ nnrrPreprosess <- function(RegData)
   RegData$aar_oppfolg <- as.numeric(format(RegData$dato_oppfolg, '%Y'))
 
   RegData$ErMann <- NA
-  RegData$ErMann[which(RegData$PatientGender == 'Female')] <- 0
-  RegData$ErMann[which(RegData$PatientGender == 'Male')] <- 1
+  RegData$ErMann[which(RegData$PatientGender == 2)] <- 0
+  RegData$ErMann[which(RegData$PatientGender == 1)] <- 1
 
   RegData$SoktUforetrygd <- factor(RegData$PainDisable,
                                    levels = c(1,2,0), labels = c('Ja', 'Nei', 'Ikke Reg.'))
@@ -142,6 +145,15 @@ nnrrPreprosess <- function(RegData)
   RegData$Tverrfaglig_vurdering_antall <- rowSums(RegData[, c("FirstMedExamDoctor", "FirstMedExamNurse", "FirstMedExamPhys", "FirstMedExamOther")])
   RegData$Tverrfaglig_vurdering <- 0
   RegData$Tverrfaglig_vurdering[RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
+
+  RegData$beh_spes <- 0
+  RegData$beh_spes[(RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0) &
+                     (RegData$Treatment_GroupInterdisciplinary == 0 & RegData$Treatment_GroupInterdisciplinary2018 == 0)] <- 1
+  RegData$beh_spes[(RegData$Treatment_GroupInterdisciplinary != 0 | RegData$Treatment_GroupInterdisciplinary2018 != 0) &
+                     (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 2
+  RegData$beh_spes[(RegData$Treatment_GroupInterdisciplinary != 0 | RegData$Treatment_GroupInterdisciplinary2018 != 0) &
+                     (RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0)] <- 3
+  RegData$beh_spes <- factor(RegData$beh_spes, levels = 0:3, labels = c("Ingen", "Individuell", "Gruppe", "Begge"))
 
   return(RegData)
 }
