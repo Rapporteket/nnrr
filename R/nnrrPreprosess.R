@@ -97,7 +97,14 @@ nnrrPreprosess <- function(RegData)
   RegData$SykehusNavn[RegData$UnitId == 109834] <- 'OUS'
   RegData$SykehusNavn[RegData$UnitId == 601032] <- 'UNN-Tromsø'
   RegData$SykehusNavn[RegData$UnitId == 700735] <- 'UNN-Harstad'
-
+  RegData$SykehusNavn[RegData$UnitId == 102169] <- 'Sandnessjøen'
+  RegData$SykehusNavn[RegData$UnitId == 114174] <- 'Kristiansand'
+  RegData$SykehusNavn[RegData$UnitId == 4211588] <- 'Stavanger'
+  RegData$SykehusNavn[RegData$UnitId == 4212982] <- 'Helse Møre og Romsdal'
+  # 102169 Sandnessjøen
+  # 114174 Kristiansand
+  # 4211588 Stavanger
+  # 4212982 Helse Møre og Romsdal
 
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel')] <- 'EQ5D.VAS'
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel_post')] <- 'EQ5D.VAS_post'

@@ -35,8 +35,16 @@ library(tidyverse)
 library(lubridate)
 
 # RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
-
-reshID <- 601032
+# 102959 <- 'Haukeland'
+# 104293 <- 'St. Olavs'
+# 109834 <- 'OUS'
+# 601032 <- 'UNN-Tromsø'
+# 700735 <- 'UNN-Harstad'
+# 102169 <- 'Sandnessjøen'
+# 114174 <- 'Kristiansand'
+# 4211588 <- 'Stavanger'
+# 4212982 <- 'Helse Møre og Romsdal'
+reshID <- 4212982
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
