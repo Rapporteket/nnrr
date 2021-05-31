@@ -261,6 +261,23 @@ nnrrPrepVar <- function(RegData, valgtVar)
 
   }
 
+  if (valgtVar=='pasrapp_beh_klinikk_v2') {
+    tittel <- c('Pasientrapportert behandling på', 'nakke- og ryggpoliklinikk')
+    RegData <- RegData[RegData$regstatus_post==1, ]
+    N <- dim(RegData)[1]
+    RegData$TreatmentOperation[is.na(RegData$TreatmentOperation)] <- 0
+    RegData$ingen_beh <- !RegData$TreatmentOperation & !RegData$TreatmentPostIndividual &
+      !RegData$TreatmentPostGroupbased & !RegData$TreatmentPostHospitalExtendedExamination
+    AntVar <- apply(RegData[,c("ingen_beh", "TreatmentPostIndividual", "TreatmentPostGroupbased",
+                               "TreatmentPostHospitalExtendedExamination")],
+                    2, function(x){sum(as.numeric(x), na.rm = T)})
+    NVar<-rep(N, length(AntVar))
+    grtxt <- c('Ingen behandling', 'Individuelt behandlingstilbud', 'Gruppebasert behandling',
+               'Tilbud om videre kontroller')
+    retn <- 'H'
+
+  }
+
   if (valgtVar=='Eq5dSatisfactionTreatment') {
     RegData$Variabel <- RegData[, valgtVar]
     RegData <- RegData[which(!is.na(RegData$Variabel)), ]

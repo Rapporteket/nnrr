@@ -59,7 +59,7 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
   NRest <- 0
   NvarRest <- 0
 
-  if (valgtVar %in% c('AarsakSmerte_PasRap', 'beh_kommunalt', 'beh_spesialist', 'pasrapp_beh_klinikk')) {
+  if (valgtVar %in% c('AarsakSmerte_PasRap', 'beh_kommunalt', 'beh_spesialist', 'pasrapp_beh_klinikk', 'pasrapp_beh_klinikk_v2')) {
     flerevar <- 1
   } else {
     flerevar <- 0

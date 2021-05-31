@@ -17,6 +17,7 @@ nnrrPreprosess <- function(RegData)
   boolske_var <- intersect(c(boolske_var1b, boolske_var1a, boolske_var2), names(RegData))
   RegData[, boolske_var] <-
     apply(RegData[, boolske_var], 2, as.logical)
+  RegData$TreatmentOperation <- as.logical(RegData$TreatmentOperation)
   # RegData[, c(boolske_var1b, boolske_var1a, boolske_var2)] <-
   #   apply(RegData[, c(boolske_var1b, boolske_var1a, boolske_var2)], 2, as.logical)
   # dato_var <- c(as.character(varnavn_1b$Variabelnavn)[which(as.character(varnavn_1b$Felttype) == 'Dato/tid')],
