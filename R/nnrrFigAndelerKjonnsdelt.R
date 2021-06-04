@@ -87,7 +87,7 @@ nnrrFigAntallKjonnsdelt  <- function(RegData, valgtVar, datoFra='2014-01-01', da
                    col=farger[c(1,2)], border='white', ylim=c(0, ymax), xaxt='n')
     mtext(at=colMeans(pos), grtxt, side=1, las=1, cex=cexgr, adj=0.5, line=0.5)
 
-    legend('topright', c(paste0('Kvinner, N=', NHoved[1]), paste0('Menn, N=', NHoved[2])), bty='n',
+    legend('topright', c(paste0('Menn, N=', NHoved[1]), paste0('Kvinner, N=', NHoved[2])), bty='n',
            fill=farger[c(1,2)], border=NA, ncol=1, cex=1)
     # mtext(at=colMeans(pos), grtxt2, side=1, las=1, cex=cexgr, adj=0.5, line=1.5)
   }

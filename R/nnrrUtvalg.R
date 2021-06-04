@@ -8,21 +8,26 @@
 #'
 #' @export
 #'
-nnrrUtvalg <- function(RegData, datoFra, datoTil, minald, maxald, erMann, fargepalett='BlaaRapp')
+nnrrUtvalg <- function(RegData, datoFra, datoTil, minald, maxald, erMann, datovar = "Besoksdato", fargepalett='BlaaRapp')
 {
   # Definerer intersect-operator
   "%i%" <- intersect
 
+  RegData$Dato <- RegData[, datovar]
+  datotxt <- switch(datovar,
+                    "Besoksdato"="Besoksdato: ",
+                    "dato_oppfolg"="Oppfølgingsdato: ")
+
   Ninn <- dim(RegData)[1]
 
   indAld <- which(RegData$PatientAge >= minald & RegData$PatientAge <= maxald)
-  indDato <- which(RegData$Besoksdato >= datoFra & RegData$Besoksdato <= datoTil)
+  indDato <- which(RegData$Dato >= datoFra & RegData$Dato <= datoTil)
   indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1:Ninn}
   indMed <- indAld %i% indDato %i% indKj
   RegData <- RegData[indMed,]
 
-  utvalgTxt <- c(paste('Besøksdato: ',
-                       min(RegData$Besoksdato, na.rm=T), ' til ', max(RegData$Besoksdato, na.rm=T), sep='' ),
+  utvalgTxt <- c(paste(datotxt,
+                       min(RegData$Dato, na.rm=T), ' til ', max(RegData$Dato, na.rm=T), sep='' ),
                  if ((minald>0) | (maxald<120)) {
                    paste('Pasienter fra ', min(RegData$PatientAge, na.rm=T), ' til ', max(RegData$PatientAge, na.rm=T), ' år', sep='')},
                  if (erMann %in% 0:1) {paste('Kjønn: ', c('Kvinner', 'Menn')[erMann+1], sep='')}

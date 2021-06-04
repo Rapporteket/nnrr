@@ -125,7 +125,7 @@ nnrrFigGjsnGrVarTid <- function(RegData, valgtVar='PatientAge', tittel='', datoF
   vmarg <- max(0, strwidth(gj.sn$Gr_var, units='figure', cex=cexgr)*0.75)
   # par('fig'=c(vmarg, 1, 0, 1))
   # x11()
-  par('mar'=c(5.1, 6.1, 5.1, 9.1))
+  par('mar'=c(5.1, 8.1, 5.1, 9.1))
   # par('oma'=c(0,1,0,0))
 
   if (inkl_konf) {

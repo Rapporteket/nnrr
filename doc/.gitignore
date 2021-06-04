@@ -84,8 +84,14 @@ Tall som kan være aktuell for kvartalsrapport.pdf
 datakvalNNRR_v2.synctex.gz
 datakvalNNRR_v2.tex
 Kvartalsrapport.docx
+<<<<<<< HEAD
 TallTilAarsrapport2020_v2 hentet ut 20.04.21- med ønsker til ny datadump.pdf
 smertebilde.PNG
+=======
+smertebilde.PNG
+~$artalsrapport.docx
+TallTilAarsrapport2020_v2 hentet ut 20.04.21- med ønsker til ny datadump.pdf
+>>>>>>> rel
 tab19_arb_forstekonsult.csv
 tab23_behandling_spestjeneste.csv
 tab23_odi_prepost_tverrfaglig.csv
