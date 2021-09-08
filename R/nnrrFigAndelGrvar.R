@@ -17,6 +17,7 @@ nnrrFigAndelGrvar <- function(RegData, valgtVar="opplevd_nytte_beh", datoFra='20
   # minald=0; maxald=130; erMann=99; outfile=''; inkl_konf=0; grvar="beh_spes"
 
   RegData <- RegData[!is.na(RegData[, grvar]), ] # Forkast registreringer hvor grupperingsvariabel ikke finnes
+  RegData$grvar <- RegData[, grvar]
 
   # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
   if (enhetsUtvalg == 2) {RegData <- RegData[which(RegData$UnitId == reshID), ]}
@@ -45,17 +46,17 @@ nnrrFigAndelGrvar <- function(RegData, valgtVar="opplevd_nytte_beh", datoFra='20
   ind <- list(Hoved=which(RegData$UnitId == reshID), Rest=which(RegData$UnitId != reshID))
 
   if (enhetsUtvalg==1) {
-    tabell_hoved <- RegData[ind$Hoved, ] %>% group_by(beh_spes, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
+    tabell_hoved <- RegData[ind$Hoved, ] %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
                                                  N = n(),
                                                  Andel = Antall/N*100)
-    tabell_rest <- RegData[ind$Rest, ] %>% group_by(beh_spes, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
+    tabell_rest <- RegData[ind$Rest, ] %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
                                                               N = n(),
                                                               Andel = Antall/N*100)
     tabell_hoved$Andel[tabell_hoved$N == 0] <- 0
     tabell_rest$Andel[tabell_rest$N == 0] <- 0
     plottab <- tibble(hoved=tabell_hoved$Andel, rest=tabell_rest$Andel)
   } else {
-    tabell_hoved <- RegData %>% group_by(beh_spes, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
+    tabell_hoved <- RegData %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
                                                               N = n(),
                                                               Andel = Antall/N*100)
   }

@@ -44,7 +44,7 @@ library(lubridate)
 # 114174 <- 'Kristiansand'
 # 4211588 <- 'Stavanger'
 # 4212982 <- 'Helse Møre og Romsdal'
-reshID <- 4212982
+reshID <- 601032
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
@@ -55,10 +55,10 @@ datoFra <- as.character(datoFra)
 
 ## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-03-03_1014_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-03-03_1012.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-03-03_1018.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post_12 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2021-03-03_1020.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-08-31_1415.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-08-31_1415.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-08-31_1415.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post_12 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2021-08-31_1415.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -307,21 +307,21 @@ nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, en
                                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
                 tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg")
 
-outfile <- paste0(figfolder, "misfornoyd.pdf")
-valgtVar <- "misfornoyd"
+outfile <- paste0(figfolder, "fornoyd.pdf")
+valgtVar <- "fornoyd"
 nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
                                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
                 tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg")
 
-outfile <- paste0(figfolder, "misfornoyd_gruppert.pdf")
-valgtVar <- "misfornoyd"
+outfile <- paste0(figfolder, "fornoyd_gruppert.pdf")
+valgtVar <- "fornoyd"
 nnrrFigAndelGrvar(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
-                            minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes",
+                            minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
                             grtittel="Behandling i spesialisthelsetjenesten")
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert.pdf")
 nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh", datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
-                            minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes",
+                            minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
                             grtittel="Behandling i spesialisthelsetjenesten")
 @
 
@@ -379,7 +379,7 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/odi_klinisk_viktig.pdf}
-\caption{Andel pasienter som har hatt klinisk bedring i funksjon (ODI) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som har hatt klinisk bedring i funksjon (ODI) (30 \% eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \clearpage
@@ -389,29 +389,29 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/bedring_smerte_hvile.pdf}
-\caption{Andel pasienter som har hatt klinisk bedring av smerte (20 \% eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/bedring_smerte_aktiv.pdf}
-\caption{Andel pasienter som har hatt klinisk bedring av smerte (20 \% eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \clearpage
 
-\subsection{Misfornøydhet}
+\subsection{Tilfredshet med behandlingen}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/misfornoyd.pdf}
-\caption{Prosentandel som er misfornøyd med behandling sammenlignet med landet for øvrig siste 4 kvartal.}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/fornoyd.pdf}
+\caption{Andel pasienter som angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/misfornoyd_gruppert.pdf}
-\caption{Prosentandel som er misfornøyd med behandling sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/fornoyd_gruppert.pdf}
+\caption{Andel pasienter som angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
 \end{figure}
 
 % \clearpage

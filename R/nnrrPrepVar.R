@@ -73,6 +73,15 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
 
+  if (valgtVar=='odi_klinisk_viktig_v2') {
+    tittel <- "Funksjonsbedring"
+    RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
+    RegData$Variabel <- 0
+    RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post)/RegData$OdiScore >= .3] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
   if (valgtVar=='bedring_smerte_hvile') {
     tittel <- "Klinisk bedring av smerte i hvile"
     RegData <- RegData %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
@@ -80,7 +89,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$pstEndringSmerteHvile <- (RegData$PainExperiencesNoActivity -
                                                    RegData$PainExperiencesNoActivity_post)/RegData$PainExperiencesNoActivity*100
     RegData$Variabel <- 0
-    RegData$Variabel[RegData$pstEndringSmerteHvile >= 20 ] <- 1
+    RegData$Variabel[RegData$pstEndringSmerteHvile >= 30 ] <- 1
     grtxt <- c("Nei", "Ja")
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
@@ -92,7 +101,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
                                                    RegData$PainExperiencesActivity_post)/RegData$PainExperiencesActivity*100
     RegData$Variabel <- 0
-    RegData$Variabel[RegData$pstEndringSmerteAktiv >= 20 ] <- 1
+    RegData$Variabel[RegData$pstEndringSmerteAktiv >= 30 ] <- 1
     grtxt <- c("Nei", "Ja")
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
@@ -106,6 +115,14 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
 
+  if (valgtVar=='fornoyd') {
+    tittel <- "Fornøyd med behandling"
+    RegData <- RegData[which(RegData$regstatus==1 & RegData$regstatus_post==1 & RegData$TreatmentSatisfaction != 0 & !is.na(RegData$TreatmentSatisfaction)), ]
+    RegData$Variabel <- 0
+    RegData$Variabel[which(RegData$TreatmentSatisfaction %in% 1:3)] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
 
   if (valgtVar=='PatientAge') {
     RegData$Variabel <- RegData[, valgtVar]

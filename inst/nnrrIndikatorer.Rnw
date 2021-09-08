@@ -515,8 +515,9 @@ nokkeltall_pr_pas <-  regdata_unik_pr_aar %>% group_by(Aar) %>%
 Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
 names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
 Indikatorer$context <- "caregiver"
+Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
 
-write.csv2(Indikatorer, 'I:/nnrr/nnrr_ind_2021_06_04.csv', row.names = F, fileEncoding = "UTF-8")
+write.csv2(Indikatorer, 'I:/nnrr/nnrr_ind_2021_06_21.csv', row.names = F, fileEncoding = "UTF-8")
 
 dg <- read.csv2("I:/nnrr/dg_nnrr_raa.csv", header = T)
 dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
