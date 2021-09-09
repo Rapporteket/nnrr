@@ -81,8 +81,8 @@ nnrrFigAndelGrvar <- function(RegData, valgtVar="opplevd_nytte_beh", datoFra='20
     pos <- barplot(t(as.matrix(plottab)), beside = T, horiz = T, col = farger[c(3,4)], border = NA, ylim = c(0, ymax),
                    xlab = "Andel (%)")
 
-    legend('top', c(paste0(shtxt, ", N=", sum(tabell_hoved$N)), paste0("Landet for øvrig", ", N=", sum(tabell_rest$N))), bty='n',
-           fill=farger[c(3,4)], border=NA, ncol=1, cex=1, xpd = T)
+    legend('top', rev(c(paste0(shtxt, ", N=", sum(tabell_hoved$N)), paste0("Landet for øvrig", ", N=", sum(tabell_rest$N)))), bty='n',
+           fill=rev(farger[c(3,4)]), border=NA, ncol=1, cex=1, xpd = T)
   }
 
   paste0(tabell_hoved$Antall, " av ", tabell_hoved$N)

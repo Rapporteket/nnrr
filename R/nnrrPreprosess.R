@@ -102,6 +102,7 @@ nnrrPreprosess <- function(RegData)
   RegData$SykehusNavn[RegData$UnitId == 114174] <- 'Kristiansand'
   RegData$SykehusNavn[RegData$UnitId == 4211588] <- 'Stavanger'
   RegData$SykehusNavn[RegData$UnitId == 4212982] <- 'Helse Møre og Romsdal'
+  RegData$SykehusNavn[RegData$UnitId == 105821] <- 'Levanger'
   # 102169 Sandnessjøen
   # 114174 Kristiansand
   # 4211588 Stavanger

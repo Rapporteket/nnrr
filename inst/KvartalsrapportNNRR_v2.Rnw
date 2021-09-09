@@ -44,7 +44,10 @@ library(lubridate)
 # 114174 <- 'Kristiansand'
 # 4211588 <- 'Stavanger'
 # 4212982 <- 'Helse Møre og Romsdal'
-reshID <- 601032
+# 105821 <- 'Levanger'
+# setdiff(RegData$UnitId, c(102959,104293,109834,601032,700735,102169,114174,4211588,4212982))
+
+reshID <- 105821
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
