@@ -35,15 +35,15 @@ rm(list=ls())
 library(nnrr)
 library(tidyverse)
 
-rap_aar <- 2020
+rap_aar <- 2021
 
 # pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_1a_Spørreskjema+før+behandling_2020-08-04_red.csv', sep=';', header=T, stringsAsFactors = F)
 # legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_1b_Registreringsskjema+poliklinikk_2020-08-04.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 # pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_2_Spørreskjema+etter+behandling_2020-08-04.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-04-13_1049_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-04-13_1110.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-04-13_1106.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-10-28_1430_red.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-10-28_1418.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-10-28_1433.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -75,8 +75,11 @@ rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
 kobling_resh_shusnavn <- RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
 #write.csv2(kobling_resh_shusnavn, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/kobling_resh_shusnavn.csv', row.names = F)
 
-map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025, 974557746, 974795787, 974795639, 974703300, 974795477),
-                             resh = c(109834, 104293, 102959, 601032, 700735, 4211588, 102169))
+map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025, 974557746, 974795787, 974795639, 974703300, 974795477, 974733013, 974754118),
+                             resh = c(109834, 104293, 102959, 601032, 700735, 4211588, 102169, 114174, 105821))
+
+##!!!!!!!!!!!!!!!!! Spør Maja om tvilsavdelinger !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
 format_ut <- ".wmf"
@@ -334,6 +337,7 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% e
 
 Oppf_data$arbeid_ikke_besvart <- !(Oppf_data$Working | Oppf_data$SickLeave | Oppf_data$Stay_at_home | Oppf_data$Student |
   Oppf_data$Unemployed | Oppf_data$NAV | Oppf_data$Pension | Oppf_data$RetirementPension)
+
 aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 
 # aux <- aux[which(aux$SickLeave | aux$NAV), ]

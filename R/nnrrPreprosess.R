@@ -14,6 +14,7 @@ nnrrPreprosess <- function(RegData)
   boolske_var1b <- as.character(varnavn_1b$Variabelnavn)[which(as.character(varnavn_1b$Felttype) == 'Avkrysning')]
   boolske_var1a <- as.character(varnavn_1a$Variabelnavn)[which(as.character(varnavn_1a$Felttype) == 'Avkrysning')]
   boolske_var2 <- as.character(varnavn_2$Variabelnavn)[which(as.character(varnavn_2$Felttype) == 'Avkrysning')]
+  boolske_var2 <- c(boolske_var2, paste0(as.character(varnavn_2$Variabelnavn)[which(as.character(varnavn_2$Felttype) == 'Avkrysning')], "_post"))
   boolske_var <- intersect(c(boolske_var1b, boolske_var1a, boolske_var2), names(RegData))
   RegData[, boolske_var] <-
     apply(RegData[, boolske_var], 2, as.logical)
