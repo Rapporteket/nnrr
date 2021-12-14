@@ -43,11 +43,13 @@ library(lubridate)
 # 102169 <- 'Sandnessjøen'
 # 114174 <- 'Kristiansand'
 # 4211588 <- 'Stavanger'
-# 4212982 <- 'Helse Møre og Romsdal'
+# 4212982 <- 'Ålesund'
 # 105821 <- 'Levanger'
-# setdiff(RegData$UnitId, c(102959,104293,109834,601032,700735,102169,114174,4211588,4212982))
+# 103736 <- 'Drammen'
 
-reshID <- 105821
+# setdiff(RegData$UnitId, c(102959,104293,109834,601032,700735,102169,114174,4211588,4212982,105821,103736))
+
+reshID <- 103736
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
@@ -58,15 +60,15 @@ datoFra <- as.character(datoFra)
 
 ## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-08-31_1415.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-08-31_1415.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-08-31_1415.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post_12 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2021-08-31_1415.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-11-25_1352.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-11-25_1347.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-11-25_1354.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post_12 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2021-11-25_1357.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
 
-icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+# icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 
 legeskjema$regstatus <- 1
 pasientsvar_pre$regstatus <- 1
@@ -164,7 +166,7 @@ Templatversjon I, 2020
 
 \section{Bakgrunn}
 
-Norsk nakke- og ryggregister (NNRR) er et tjenesteregister som inkluderer pasienter med smerter i nakke eller rygg som behandles ved de spesialiserte tverrfaglige nakke- og ryggpoliklinikkene ved sykehusene. Totalt er det 15 potensielle poliklinikker. Når alle disse er tilknyttet vil registeret vil ha en komplett oversikt over slik utredning og behandling i Norge. I 2019 var 4 poliklinikker tilknyttet, mens i 2020 er ytterlig 5 poliklinikker blitt med. Andre tverrfaglige nakke- og ryggpoliklinikker vil knyttes til registeret fortløpende. \\ \\
+Norsk nakke- og ryggregister (NNRR) er et tjenesteregister som inkluderer pasienter med smerter i nakke eller rygg som behandles ved de spesialiserte tverrfaglige nakke- og ryggpoliklinikkene ved sykehusene. Totalt er det 16 potensielle poliklinikker. Når alle disse er tilknyttet vil registeret vil ha en komplett oversikt over slik utredning og behandling i Norge. I 2019 leverte kun fire poliklinikker til registeret, mens i 2021 er totalt 11 poliklinikker tilknyttet. Resterende tverrfaglige nakke- og ryggpoliklinikker vil knyttes til fortløpende. \\ \\
 
 Svarene pasientene fyller ut er tilgjengelig for utreder ved første utredende konsultasjon og kan dermed bedre møtet med den enkelte pasient. Videre er formålet med registeret å bedre kvaliteten på pasienttilbudet ved de spesialiserte tverrfaglige nakke- og ryggpoliklinikkene. Dette innebærer å:
 \begin{itemize}
