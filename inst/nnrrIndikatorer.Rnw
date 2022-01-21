@@ -383,8 +383,27 @@ aux$tilbake_i_arbeid[which((aux$WorkingPercent_post - aux$WorkingPercent) >= 0 &
 
 tabell2 <- nnrrIndikatorTabell(aux, indikator = 'tilbake_i_arbeid')
 print(xtable::xtable(tabell2, digits=c(0,0,0,0,0,1), caption='Andel delvis/fullt tilbake i arbeid. Utvalget består av alle som det finnes oppfølgingsdata på og er registrert som sykemeldt ved inklusjon. Hvis de i tillegg er registrert som i 100 \\% arbeid ved inklusjon fjernes de fra utvalget. For å regnes som tilbake i arbeid skal de ha registrert arbeidsstatus som Inntektsgivende arbeid, samt ha en prosentvis stilling ved oppfølging som er større eller lik den ved inklusjon.'), include.rownames=FALSE)
+@
 
 
+<<'Indikator 10 v2: andel tilbake i arbeid', results='asis', echo=FALSE>>=
+
+aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
+
+# table(aux$IsEmployed, useNA = 'ifany')
+# table(aux$SickLeave, useNA = 'ifany')
+# table(aux$S2_SickLeave, useNA = 'ifany')
+#
+# aux$S2_SickLeave[is.na(aux$S2_SickLeave)] <- aux$SickLeave[is.na(aux$S2_SickLeave)]
+
+aux <- aux[!is.na(aux$S2_SickLeave) & !is.na(aux$S2_SickLeave_post), ]
+aux <- aux[aux$IsEmployed == 1 & aux$S2_SickLeave == 1, ]
+
+aux$indikator <- 0
+aux$indikator[aux$S2_Working_post & (!aux$S2_SickLeave_post & !aux$S2_NAV_post)] <- 1
+aux$indikator[which(aux$S2_SickLeave_Percent_post < aux$S2_SickLeave_Percent)] <- 1
+
+tmp <- aux[which(aux$S2_SickLeave_Percent_post < aux$S2_SickLeave_Percent), ]
 @
 
 

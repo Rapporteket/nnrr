@@ -36,7 +36,7 @@ nnrrPreprosess <- function(RegData)
               "S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")] <-
     mutate_all(RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
                            "S1b_DateOfCompletion_pre","S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")],
-               funs(as.POSIXct(., format="%d.%m.%Y")))
+               funs(as.Date(., format="%d.%m.%Y")))
   RegData$Besoksdato <- RegData$S1b_DateOfCompletion
 
   RegData <- RegData[order(RegData$DateOfCompletion, decreasing = T, na.last = T), ] # Hvis flere pasientskjema, bruk nyeste
