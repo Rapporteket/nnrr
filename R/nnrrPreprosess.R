@@ -85,7 +85,7 @@ nnrrPreprosess <- function(RegData)
   RegData$DagligRoyk <- factor(RegData$Smoking,
                                levels = c(1,2,0), labels = c('Ja', 'Nei', 'Ikke Reg.'))
 
-  RegData$HSCL10.Score <- as.numeric(sapply(as.character(RegData$HSCL10.Score), gsub, pattern = ",", replacement= "."))
+  RegData$HSCL10.Score <- as.numeric(sapply(as.character(RegData$HSCL10Score), gsub, pattern = ",", replacement= "."))
   RegData$OdiScore <- as.numeric(sapply(as.character(RegData$OdiScore), gsub, pattern = ",", replacement= "."))
   RegData$OdiScore_post <- as.numeric(sapply(as.character(RegData$OdiScore_post), gsub, pattern = ",", replacement= "."))
   RegData$NdiScore <- as.numeric(sapply(as.character(RegData$NdiScore), gsub, pattern = ",", replacement= "."))
@@ -105,10 +105,6 @@ nnrrPreprosess <- function(RegData)
   RegData$SykehusNavn[RegData$UnitId == 4212982] <- 'Ålesund'
   RegData$SykehusNavn[RegData$UnitId == 105821] <- 'Levanger'
   RegData$SykehusNavn[RegData$UnitId == 103736] <- 'Drammen'
-  # 102169 Sandnessjøen
-  # 114174 Kristiansand
-  # 4211588 Stavanger
-  # 4212982 Helse Møre og Romsdal
 
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel')] <- 'EQ5D.VAS'
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel_post')] <- 'EQ5D.VAS_post'

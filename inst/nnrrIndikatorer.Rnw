@@ -41,9 +41,9 @@ rap_aar <- 2021
 # legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_1b_Registreringsskjema+poliklinikk_2020-08-04.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 # pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_2_Spørreskjema+etter+behandling_2020-08-04.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-10-28_1430_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-10-28_1418.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-10-28_1433.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-01-18_1507_red.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Behandlerskjema_2022-01-18_1504.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-01-18_1510.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -75,14 +75,15 @@ rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
 kobling_resh_shusnavn <- RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
 #write.csv2(kobling_resh_shusnavn, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/kobling_resh_shusnavn.csv', row.names = F)
 
-map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025, 974557746, 974795787, 974795639, 974703300, 974795477, 974733013, 974754118),
-                             resh = c(109834, 104293, 102959, 601032, 700735, 4211588, 102169, 114174, 105821))
+map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025, 974557746, 974795787, 974795639, 974703300, 974795477, 974733013, 974754118, 974747138, 974631326),
+                             resh = c(109834, 104293, 102959, 601032, 700735, 4211588, 102169, 114174, 105821, 4212982, 103736))
 
 ##!!!!!!!!!!!!!!!!! Spør Maja om tvilsavdelinger !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
 format_ut <- ".wmf"
+figfolder <- "figfolder/"
 
 figstr <- 0.61
 tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")

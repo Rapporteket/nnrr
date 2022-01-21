@@ -49,7 +49,7 @@ library(lubridate)
 
 # setdiff(RegData$UnitId, c(102959,104293,109834,601032,700735,102169,114174,4211588,4212982,105821,103736))
 
-reshID <- 103736
+reshID <- 105821
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
@@ -60,10 +60,10 @@ datoFra <- as.character(datoFra)
 
 ## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-11-25_1352.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-11-25_1347.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-11-25_1354.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post_12 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2021-11-25_1357.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-01-18_1507_red.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Behandlerskjema_2022-01-18_1504.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-01-18_1510.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post_12 <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-01-18_1513.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
