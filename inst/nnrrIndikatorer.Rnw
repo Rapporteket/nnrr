@@ -387,23 +387,22 @@ print(xtable::xtable(tabell2, digits=c(0,0,0,0,0,1), caption='Andel delvis/fullt
 
 
 <<'Indikator 10 v2: andel tilbake i arbeid', results='asis', echo=FALSE>>=
-
+# Fullført basis- og oppfølgingsskjema:
 aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 
-# table(aux$IsEmployed, useNA = 'ifany')
-# table(aux$SickLeave, useNA = 'ifany')
-# table(aux$S2_SickLeave, useNA = 'ifany')
-#
-# aux$S2_SickLeave[is.na(aux$S2_SickLeave)] <- aux$SickLeave[is.na(aux$S2_SickLeave)]
-
-aux <- aux[!is.na(aux$S2_SickLeave) & !is.na(aux$S2_SickLeave_post), ]
-aux <- aux[aux$IsEmployed == 1 & aux$S2_SickLeave == 1, ]
+# aux <- aux[!is.na(aux$S2_SickLeave) & !is.na(aux$S2_SickLeave_post), ]
+# I et arbeidsforhold og sykemeldt ved konsultasjon utgjør aktuelle:
+aux <- aux[which(aux$IsEmployed == 1 & aux$S2_SickLeave), ]
 
 aux$indikator <- 0
 aux$indikator[aux$S2_Working_post & (!aux$S2_SickLeave_post & !aux$S2_NAV_post)] <- 1
 aux$indikator[which(aux$S2_SickLeave_Percent_post < aux$S2_SickLeave_Percent)] <- 1
 
-tmp <- aux[which(aux$S2_SickLeave_Percent_post < aux$S2_SickLeave_Percent), ]
+tmp <- aux[, c("Besoksdato", "IsEmployed", "S2_Working", "S2_Unemployed", "S2_SickLeave",
+               "S2_SickLeave_Percent", "S2_StayAtHome", "S2_Student", "S2_NAV",
+              "IsEmployed_post",  "S2_Working_post", "S2_Unemployed_post",
+               "S2_SickLeave_post", "S2_SickLeave_Percent_post", "S2_StayAtHome_post",
+               "S2_Student_post", "S2_NAV_post")]
 @
 
 
