@@ -37,13 +37,13 @@ library(tidyverse)
 
 rap_aar <- 2021
 
-# pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_1a_Spørreskjema+før+behandling_2020-08-04_red.csv', sep=';', header=T, stringsAsFactors = F)
-# legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_1b_Registreringsskjema+poliklinikk_2020-08-04.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-# pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_2_Spørreskjema+etter+behandling_2020-08-04.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-02-25_1423.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-02-25_1407.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-02-25_1423.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
-pasientsvar_pre <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-01-18_1507_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Behandlerskjema_2022-01-18_1504.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-01-18_1510.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+# pasientsvar_pre <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-01-18_1507_red.csv', sep=';', header=T, stringsAsFactors = F)
+# legeskjema <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Behandlerskjema_2022-01-18_1504.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+# pasientsvar_post <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-01-18_1510.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]

@@ -40,9 +40,9 @@ rap_aar <- 2021
 
 ## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2021-10-28_1430_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2021-10-28_1418.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2021-10-28_1433.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-02-25_1423.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-02-25_1407.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-02-25_1423.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -194,23 +194,23 @@ write.csv2(samlet[29:39,], "C:/GIT/nnrr/doc/tab5_tidligere_op.csv", row.names = 
 
 <<'Tab 2', results='asis', echo=FALSE>>=
 
-tab2 <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQ.Score1",
-                    "FABQ.Score2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>% group_by (SykehusNavn) %>%
+tab2 <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
+                    "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>% group_by (SykehusNavn) %>%
   summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
             Gj.snitt.ndi = mean(NdiScore, na.rm = T),
             Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
-            Gj.snitt.fabq.fysisk = mean(FABQ.Score1, na.rm = T),
-            Gj.snitt.fabq.arbeid = mean(FABQ.Score2, na.rm = T),
+            Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
+            Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
             Gj.snitt.eq5d = mean(Eq5dScore, na.rm = T),
             Gj.snitt.eq5d.vas = mean(EQ5D.VAS, na.rm = T))
 
-tot <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQ.Score1",
-                   "FABQ.Score2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>%
+tot <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
+                   "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>%
   summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
             Gj.snitt.ndi = mean(NdiScore, na.rm = T),
             Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
-            Gj.snitt.fabq.fysisk = mean(FABQ.Score1, na.rm = T),
-            Gj.snitt.fabq.arbeid = mean(FABQ.Score2, na.rm = T),
+            Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
+            Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
             Gj.snitt.eq5d = mean(Eq5dScore, na.rm = T),
             Gj.snitt.eq5d.vas = mean(EQ5D.VAS, na.rm = T))
 
