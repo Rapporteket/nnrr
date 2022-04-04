@@ -1,6 +1,20 @@
 rm(list=ls())
 library(nnrr)
 
+########## Utlevering Bjørneboe 31.03.2022 #######################################
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-03-31_1351.csv',
+                              sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8-BOM')
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-03-31_1351.csv',
+                         sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+legeskjema <- legeskjema[lubridate::year(as.Date(legeskjema$S1b_DateOfCompletion, format="%d.%m.%Y")) %in% 2021, ]
+pasientsvar_pre <- pasientsvar_pre[pasientsvar_pre$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+legeskjema <- legeskjema[legeskjema$SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID, ]
+
+write.csv2(legeskjema, "I:/nnrr/skjema1b_2021.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(pasientsvar_pre, "I:/nnrr/skjema1a_2021.csv", row.names = F, fileEncoding = "Latin1")
+
+
 ########## Utlevering 02.12.2020 #######################################
 pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_1a_Spørreskjema+før+behandling_2020-10-27_red.csv',
                               sep=';', header=T, stringsAsFactors = F)
