@@ -46,10 +46,11 @@ library(lubridate)
 # 4212982 <- 'Ålesund'
 # 105821 <- 'Levanger'
 # 103736 <- 'Drammen'
+# 700138 <- 'Stavern???'
 
 # setdiff(RegData$UnitId, c(102959,104293,109834,601032,700735,102169,114174,4211588,4212982,105821,103736))
 
-reshID <- 105821
+reshID <- 700138
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
@@ -60,10 +61,10 @@ datoFra <- as.character(datoFra)
 
 ## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
 
-pasientsvar_pre <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-01-18_1507_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Behandlerskjema_2022-01-18_1504.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-01-18_1510.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post_12 <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-01-18_1513.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-04-07_1123.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post_12 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -166,7 +167,7 @@ Templatversjon I, 2020
 
 \section{Bakgrunn}
 
-Norsk nakke- og ryggregister (NNRR) er et tjenesteregister som inkluderer pasienter med smerter i nakke eller rygg som behandles ved de spesialiserte tverrfaglige nakke- og ryggpoliklinikkene ved sykehusene. Totalt er det 16 potensielle poliklinikker. Når alle disse er tilknyttet vil registeret vil ha en komplett oversikt over slik utredning og behandling i Norge. I 2019 leverte kun fire poliklinikker til registeret, mens i 2021 er totalt 11 poliklinikker tilknyttet. Resterende tverrfaglige nakke- og ryggpoliklinikker vil knyttes til fortløpende. \\ \\
+Norsk nakke- og ryggregister (NNRR) er et tjenesteregister som inkluderer pasienter med smerter i nakke eller rygg som behandles ved de spesialiserte tverrfaglige nakke- og ryggpoliklinikkene ved sykehusene. Totalt er det 16 potensielle poliklinikker. Når alle disse er tilknyttet vil registeret vil ha en komplett oversikt over slik utredning og behandling i Norge. I 2019 leverte kun fire poliklinikker til registeret, mens i 2022 er totalt 12 poliklinikker tilknyttet. Resterende tverrfaglige nakke- og ryggpoliklinikker vil knyttes til fortløpende. \\ \\
 
 Svarene pasientene fyller ut er tilgjengelig for utreder ved første utredende konsultasjon og kan dermed bedre møtet med den enkelte pasient. Videre er formålet med registeret å bedre kvaliteten på pasienttilbudet ved de spesialiserte tverrfaglige nakke- og ryggpoliklinikkene. Dette innebærer å:
 \begin{itemize}
@@ -249,7 +250,7 @@ nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/alder.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}alder.pdf}
 \caption{Aldersfordelig i egen spesialisthelsetjeneste siste kvartal}
 \end{figure}
 
@@ -333,26 +334,26 @@ nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh", datoFra=datoFra, datoTi
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/andel_tverrfaglig.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}andel_tverrfaglig.pdf}
 \caption{Andel pasienter anbefalt tverrfaglig behandling (individuelt eller i gruppe) i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/individuell_oppfolging.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}individuell_oppfolging.pdf}
 \caption{Andel pasienter anbefalt individuell oppfølging i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
 \end{figure}
 
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/smerter_2aar.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}smerter_2aar.pdf}
 \caption{Andel pasienter med smerter over 2 år i egen spesialisthelsetjeneste sammenlignet med landet for øvrig.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/fabq11.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fabq11.pdf}
 \caption{Andel pasienter som er uenig (delvis eller helt) i følgende utsagn: Jeg tror ikke jeg vil være tilbake på det vanlige arbeidet mitt innen tre måneder i egen spesialisthelsetjeneste }
 \end{figure}
 
@@ -367,13 +368,13 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/opplevd_nytte_beh.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh.pdf}
 \caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) av utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/opplevd_nytte_beh_gruppert.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert.pdf}
 \caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) av utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
 \end{figure}
 
@@ -383,7 +384,7 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/odi_klinisk_viktig.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}odi_klinisk_viktig.pdf}
 \caption{Andel pasienter som har hatt klinisk bedring i funksjon (ODI) (30 \% eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
@@ -393,13 +394,13 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/bedring_smerte_hvile.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}bedring_smerte_hvile.pdf}
 \caption{Andel pasienter som har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/bedring_smerte_aktiv.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}bedring_smerte_aktiv.pdf}
 \caption{Andel pasienter som har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
@@ -409,13 +410,13 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/fornoyd.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd.pdf}
 \caption{Andel pasienter som angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{figfolder/fornoyd_gruppert.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_gruppert.pdf}
 \caption{Andel pasienter som angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
 \end{figure}
 
