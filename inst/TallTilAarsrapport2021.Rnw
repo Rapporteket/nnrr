@@ -40,9 +40,10 @@ rap_aar <- 2021
 
 ## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-02-25_1423.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-02-25_1407.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-02-25_1423.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-04-07_1123.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post2 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -52,22 +53,25 @@ icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFac
 legeskjema$regstatus <- 1
 pasientsvar_pre$regstatus <- 1
 pasientsvar_post$regstatus <- 1
+pasientsvar_post2$regstatus <- 1
 
 names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
 names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
+names(pasientsvar_post2)[names(pasientsvar_post2)=='SkjemaGUID'] <- 'SkjemaGUID_post2'
 
 RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
 RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'), all.x = TRUE)
 
 RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
 # RegData <- RegData[RegData$DiagnosticNumber1 != '', ]
 # RegData <- RegData[RegData$DiagnosticNumber1 != '.', ]
 
-RegData <- nnrrPreprosess(RegData = RegData)
+RegData <- nnrr::nnrrPreprosess(RegData = RegData)
 RegDataAll <- RegData
 RegData <- RegData[which(RegData$Aar >= rap_aar & RegData$Aar <= rap_aar), ]
 
-rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
+rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post', 'pasientsvar_post2'))
 
 figstr <- 0.61
 tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
@@ -121,8 +125,8 @@ print(xtable::xtable(tab_oppf, digits=0, align=c('l', 'l', 'l', rep('r', ncol(ta
 
 
 <<'Tab 1', results='asis', echo=FALSE>>=
-RegData <- RegData[RegData$SykehusNavn != "Sandnessjøen", ]
-RegDataAll <- RegDataAll[RegDataAll$SykehusNavn != "Sandnessjøen", ]
+# RegData <- RegData[RegData$SykehusNavn != "Sandnessjøen", ]
+# RegDataAll <- RegDataAll[RegDataAll$SykehusNavn != "Sandnessjøen", ]
 
 tabell1 <- RegData %>% group_by(SykehusNavn) %>%
   summarise("Menn" = paste0(sum(ErMann==1), " (", round(100*sum(ErMann==1)/n(), 1), "\\%)"),
@@ -599,31 +603,36 @@ print(xtable::xtable(tab10_2, align=c('l', 'l', 'r', rep('R{1.2in}', ncol(tab10)
 
 
 outfile <- "Smerte_i_ro.pdf"
-tmp <- nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# x11()
+# outfile <- ""
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+# x11()
+# outfile <- ""
+# tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
 }
 
 outfile <- "Smerte_i_aktivitet.pdf"
-tmp <- nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
 }
 
 outfile <- "ODI_PrePost.pdf"
-tmp <- nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
 }
 
 outfile <- "NDI_PrePost.pdf"
-tmp <- nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigGjsnPrePostGrVar(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
 }
 @
 

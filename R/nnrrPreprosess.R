@@ -19,18 +19,6 @@ nnrrPreprosess <- function(RegData)
   RegData[, boolske_var] <-
     apply(RegData[, boolske_var], 2, as.logical)
   RegData$TreatmentOperation <- as.logical(RegData$TreatmentOperation)
-  # RegData[, c(boolske_var1b, boolske_var1a, boolske_var2)] <-
-  #   apply(RegData[, c(boolske_var1b, boolske_var1a, boolske_var2)], 2, as.logical)
-  # dato_var <- c(as.character(varnavn_1b$Variabelnavn)[which(as.character(varnavn_1b$Felttype) == 'Dato/tid')],
-  #               as.character(varnavn_1a$Variabelnavn)[which(as.character(varnavn_1a$Felttype) == 'Dato/tid')],
-  #               as.character(varnavn_2$Variabelnavn)[which(as.character(varnavn_2$Felttype) == 'Dato/tid')])
-
-  # RegData$Besoksdato <- as.POSIXct(RegData$Besoksdato, format="%d.%m.%Y")
-  # RegData$Besoksdato_pre <- as.POSIXct(RegData$Besoksdato_pre, format="%d.%m.%Y")
-  # RegData$Besoksdato_post <- as.POSIXct(RegData$Besoksdato_post, format="%d.%m.%Y")
-  # RegData$FormDate <- as.POSIXct(RegData$FormDate, format="%d.%m.%Y")
-  # RegData$FormDate_pre <- as.POSIXct(RegData$FormDate_pre, format="%d.%m.%Y")
-  # RegData$FormDate_post <- as.POSIXct(RegData$FormDate_post, format="%d.%m.%Y")
 
   RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion", "S1b_DateOfCompletion_pre",
               "S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")] <-
@@ -44,6 +32,7 @@ nnrrPreprosess <- function(RegData)
 
   RegData$regstatus_pre[which(is.na(RegData$regstatus_pre))] <- 0
   RegData$regstatus_post[which(is.na(RegData$regstatus_post))] <- 0
+  RegData$regstatus_post2[which(is.na(RegData$regstatus_post2))] <- 0
   RegData$regstatus[which(is.na(RegData$regstatus))] <- 0
 
   # Ordne dato for pre og post
@@ -88,10 +77,13 @@ nnrrPreprosess <- function(RegData)
   RegData$HSCL10.Score <- as.numeric(sapply(as.character(RegData$HSCL10Score), gsub, pattern = ",", replacement= "."))
   RegData$OdiScore <- as.numeric(sapply(as.character(RegData$OdiScore), gsub, pattern = ",", replacement= "."))
   RegData$OdiScore_post <- as.numeric(sapply(as.character(RegData$OdiScore_post), gsub, pattern = ",", replacement= "."))
+  RegData$OdiScore_post2 <- as.numeric(sapply(as.character(RegData$OdiScore_post2), gsub, pattern = ",", replacement= "."))
   RegData$NdiScore <- as.numeric(sapply(as.character(RegData$NdiScore), gsub, pattern = ",", replacement= "."))
   RegData$NdiScore_post <- as.numeric(sapply(as.character(RegData$NdiScore_post), gsub, pattern = ",", replacement= "."))
+  RegData$NdiScore_post2 <- as.numeric(sapply(as.character(RegData$NdiScore_post2), gsub, pattern = ",", replacement= "."))
   RegData$Eq5dScore <- as.numeric(sapply(as.character(RegData$Eq5dScore), gsub, pattern = ",", replacement= "."))
   RegData$Eq5dScore_post <- as.numeric(sapply(as.character(RegData$Eq5dScore_post), gsub, pattern = ",", replacement= "."))
+  # RegData$Eq5dScore_post2 <- as.numeric(sapply(as.character(RegData$Eq5dScore_post2), gsub, pattern = ",", replacement= "."))
 
   RegData$SykehusNavn <- NA
   RegData$SykehusNavn[RegData$UnitId == 102959] <- 'Haukeland'
