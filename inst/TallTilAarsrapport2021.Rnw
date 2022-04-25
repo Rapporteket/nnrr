@@ -63,6 +63,9 @@ RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'Hoved
 RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
 RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'), all.x = TRUE)
 
+## Fjerne Stavern for nå:
+# RegData <- RegData[RegData$UnitId != 700138, ]
+
 RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
 # RegData <- RegData[RegData$DiagnosticNumber1 != '', ]
 # RegData <- RegData[RegData$DiagnosticNumber1 != '.', ]
@@ -83,8 +86,6 @@ tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 
 <<'Tab 0', results='asis', echo=FALSE, warning=F>>=
 
-### Ta bort oppfølging, lag egen tabell med antall/andel oppfølging av de med besøksdato 1.juli2018-30juni 2019
-
 tab0 <- RegData[, c("SykehusNavn", "regstatus", "regstatus_pre", "regstatus_post", "Aar")] %>%
   group_by (Aar, SykehusNavn) %>%
   summarise('Pasientskjema' = sum(regstatus_pre),
@@ -103,20 +104,41 @@ tab0$Aar[!as.logical(c(1, diff(tab0$Aar)))] <- NA
 names(tab0)[1:2] <- c('År', 'Sykehus')
 
 print(xtable::xtable(tab0[,-5], digits=0, align=c('l', 'l', 'l', rep('r', ncol(tab0)-3)), caption = 'Oversikt over registreringer. Kun pasientskjema som har et tilhørende behandlerskjema er inkludert'), include.rownames=FALSE, sanitize.text.function = identity)
+@
 
 
-###########
+<<'Tab oppfølgingsrate, 6 og 12 mnd', results='asis', echo=FALSE, warning=F>>=
+RegDataAll <- RegDataAll[RegDataAll$regstatus_pre == 1, ]
 
-Oppf_aktuell <- RegDataAll[RegDataAll$Besoksdato >= paste0(rap_aar-1, "-07-01") & RegDataAll$Besoksdato <= paste0(rap_aar, "-06-30"), ]
+tab_oppf_alle <- RegDataAll %>% group_by(SykehusNavn) %>%
+  summarise("Ant.aktuell.6mnd" = sum(regstatus[Besoksdato >= paste0(rap_aar-1, "-07-01") &
+                                                   Besoksdato <= paste0(rap_aar, "-06-30")]),
+            "Ant.aktuell.12mnd" = sum(regstatus[Besoksdato >= paste0(rap_aar-1, "-01-01") &
+                                                   Besoksdato <= paste0(rap_aar-1, "-12-31")]),
+            "Andel.6mnd" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-07-01") &
+                                                   Besoksdato <= paste0(rap_aar, "-06-30")])/Ant.aktuell.6mnd*100,
+            # "Andel.6mnd_v2" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-01-01") &
+            #                                        Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100,
+            "Andel.12mnd" = sum(regstatus_post2[Besoksdato >= paste0(rap_aar-1, "-01-01") &
+                                                   Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100,
+            "Andel.begge" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-01-01") &
+                                                   Besoksdato <= paste0(rap_aar-1, "-12-31")] &
+                                  regstatus_post2[Besoksdato >= paste0(rap_aar-1, "-01-01") &
+                                                   Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100
+            )
+tab_oppf_alle <- tab_oppf_alle[tab_oppf_alle$Ant.aktuell.6mnd>0 | tab_oppf_alle$Ant.aktuell.12mnd>0, ]
 
-tab_oppf <- Oppf_aktuell %>% group_by(SykehusNavn) %>%
-  summarise('Antall konsultasjoner' = sum(regstatus),
-            'Antall oppfølginger' = sum(regstatus_post),
-            'Oppfølgingsrate (\\%)' = sum(regstatus_post)/sum(regstatus)*100)
+tab_oppf_alle$Andel.6mnd <- paste0(round(tab_oppf_alle$Andel.6mnd, 1), "% (", tab_oppf_alle$Ant.aktuell.6mnd, ")")
+tab_oppf_alle$Andel.12mnd <- paste0(round(tab_oppf_alle$Andel.12mnd, 1), "% (", tab_oppf_alle$Ant.aktuell.12mnd, ")")
+tab_oppf_alle$Andel.begge <- paste0(round(tab_oppf_alle$Andel.begge, 1), "% (", tab_oppf_alle$Ant.aktuell.12mnd, ")")
+tab_oppf_alle <- tab_oppf_alle[, c("SykehusNavn", "Andel.6mnd", "Andel.12mnd", "Andel.begge")]
 
-print(xtable::xtable(tab_oppf, digits=0, align=c('l', 'l', 'l', rep('r', ncol(tab_oppf)-2)), caption = paste0('Oversikt over oppfølgingsprosent per enhet for konsultasjoner i perioden 1.juli ', rap_aar-1, ' til 30. juni ', rap_aar)), include.rownames=FALSE, sanitize.text.function = identity)
+print(xtable::xtable(tab_oppf_alle, digits=0, align=c('l', 'l', 'l', rep('r', ncol(tab_oppf_alle)-2)), caption = paste0('Oversikt over oppfølgingsprosent per enhet, antall aktuelle i parentes. 6mnd. oppf. gjelder konsultasjoner i perioden 1.juli ', rap_aar-1, ' til 30. juni ', rap_aar, ", mens 12mnd. oppf. gjelder konsultasjoner i ", (rap_aar-1)), include.rownames=FALSE, sanitize.text.function = identity))
 
 @
+
+
+
 
 % \addtolength{\hoffset}{-2.0cm}
 
@@ -125,8 +147,6 @@ print(xtable::xtable(tab_oppf, digits=0, align=c('l', 'l', 'l', rep('r', ncol(ta
 
 
 <<'Tab 1', results='asis', echo=FALSE>>=
-# RegData <- RegData[RegData$SykehusNavn != "Sandnessjøen", ]
-# RegDataAll <- RegDataAll[RegDataAll$SykehusNavn != "Sandnessjøen", ]
 
 tabell1 <- RegData %>% group_by(SykehusNavn) %>%
   summarise("Menn" = paste0(sum(ErMann==1), " (", round(100*sum(ErMann==1)/n(), 1), "\\%)"),
@@ -602,62 +622,174 @@ print(xtable::xtable(tab10_2, align=c('l', 'l', 'r', rep('R{1.2in}', ncol(tab10)
       include.rownames=FALSE)
 
 
-outfile <- "Smerte_i_ro.pdf"
-# x11()
-# outfile <- ""
+outfile <- "Smerte_i_ro_basis.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+}
+outfile <- "Smerte_i_ro_6mnd.pdf"
 tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
-# x11()
-# outfile <- ""
-# tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+}
+outfile <- "Smerte_i_ro_12mnd.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 }
 
-outfile <- "Smerte_i_aktivitet.pdf"
-tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# outfile <- "Smerte_i_aktivitet.pdf"
+# tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# if (!is.na(annetformat)) {
+#   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+#   nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# }
+outfile <- "Smerte_i_aktivitet_basis.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+}
+outfile <- "Smerte_i_aktivitet_6mnd.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+}
+outfile <- "Smerte_i_aktivitet_12mnd.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 }
 
-outfile <- "ODI_PrePost.pdf"
-tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# outfile <- "ODI_PrePost.pdf"
+# tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# if (!is.na(annetformat)) {
+#   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+#   nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# }
+outfile <- "ODI_basis.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+}
+outfile <- "ODI_6mnd.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+}
+outfile <- "ODI_12mnd.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 }
 
-outfile <- "NDI_PrePost.pdf"
-tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+
+# outfile <- "NDI_PrePost.pdf"
+# tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# if (!is.na(annetformat)) {
+#   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+#   nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+# }
+
+outfile <- "NDI_basis.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+}
+outfile <- "NDI_6mnd.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+}
+outfile <- "NDI_12mnd.pdf"
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'NDI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 }
 @
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{Smerte_i_ro.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{Smerte_i_ro_basis.pdf}
 \caption{Smerte i hvile, skala fra 0-10 hvor 10 er verst}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{Smerte_i_aktivitet.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{Smerte_i_ro_6mnd.pdf}
+\caption{Smerte i hvile, skala fra 0-10 hvor 10 er verst}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{Smerte_i_ro_12mnd.pdf}
+\caption{Smerte i hvile, skala fra 0-10 hvor 10 er verst}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{Smerte_i_aktivitet_basis.pdf}
 \caption{Smerte i aktivitet, skala fra 0-10 hvor 10 er verst}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{ODI_PrePost}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{Smerte_i_aktivitet_6mnd.pdf}
+\caption{Smerte i aktivitet, skala fra 0-10 hvor 10 er verst}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{Smerte_i_aktivitet_12mnd.pdf}
+\caption{Smerte i aktivitet, skala fra 0-10 hvor 10 er verst}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{ODI_basis.pdf}
+\caption{Ryggsmerte-relatert funksjon ved konsultasjon.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{ODI_6mnd.pdf}
 \caption{Ryggsmerte-relatert funksjon ved konsultasjon og etter 6 måneder.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{NDI_PrePost}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{ODI_12mnd.pdf}
+\caption{Ryggsmerte-relatert funksjon ved konsultasjon og etter 6 og 12 måneder.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{NDI_basis.pdf}
+\caption{Skår på NDI (nakke-relatert funksjon) ved konsultasjon.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{NDI_6mnd.pdf}
 \caption{Skår på NDI (nakke-relatert funksjon) ved konsultasjon og etter 6 måneder.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{NDI_12mnd.pdf}
+\caption{Skår på NDI (nakke-relatert funksjon) ved konsultasjon og etter 6 og 12 måneder.}
 \end{figure}
 
 % \addtolength{\hoffset}{-2.0cm}
@@ -1132,6 +1264,22 @@ if (!is.na(annetformat)) {
   nnrrFigIndikator(indikator, 'Andel HSCL-score >= 1.85', outfile=outfile)
 }
 
+Indikator <- RegDataAll[RegDataAll$Aar <= rap_aar,]
+Indikator <- Indikator[!is.na(Indikator$ErMann), ]
+Indikator$Teller <- 0
+Indikator$Teller[Indikator$ErMann == 0] <- 1
+
+indikator <- Indikator[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
+names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
+indikator$Nevner <- 1
+
+outfile <- "andel_kvinner.pdf"
+nnrrFigIndikator(indikator, 'Andel kvinner', outfile=outfile)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigIndikator(indikator, 'Andel kvinner', outfile=outfile)
+}
+
 @
 
 \begin{figure}[ht]
@@ -1146,374 +1294,11 @@ if (!is.na(annetformat)) {
 \caption{Andel med høy HSCL-score. Ikke-besvarte inngår ikke i nevneren.}
 \end{figure}
 
-
-%
-% \clearpage
-%
-%
-% \section{Tverrfaglig behandlet}
-%
-% <<'Tab 2 tverr', results='asis', echo=FALSE>>=
-%
-% RegData_alle <- RegData
-% RegData <- RegData[which(RegData$Treatment_InvidualInterdisciplinary %in% 1:3 |
-%                            RegData$Treatment_GroupInterdisciplinary2018 %in% 1:4 |
-%                            RegData$Treatment_GroupInterdisciplinary %in% 1:3), ]
-%
-% kjonn <- addmargins(table(RegData[, c("ErMann", "SykehusNavn")], useNA = 'ifany'), 2)
-% alder <- c(tapply(RegData$PatientAge, RegData$SykehusNavn, mean), Sum=mean(RegData$PatientAge))
-% alder_sd <- c(tapply(RegData$PatientAge, RegData$SykehusNavn, sd), Sum=sd(RegData$PatientAge))
-% alder <- paste0(round(alder, 1), ' (', round(alder_sd, 1),')')
-%
-% familiestatus <- addmargins(table(RegData[, c("FamilyStatus", "SykehusNavn")]), 2)
-% utdanning <- addmargins(table(RegData[, c("EducationLevel", "SykehusNavn")]), 2)
-% smertevarighet <- addmargins(table(RegData[, c("PainDurationNow", "SykehusNavn")]), 2)
-% tidligereOpRygg <- addmargins(table(RegData[, c("BackSurgery", "SykehusNavn")]), 2)
-% tidligereOpNakke <- addmargins(table(RegData[, c("NeckSurgery", "SykehusNavn")]), 2)
-%
-% samlet <- rbind(rep(NA, dim(kjonn)[2]), kjonn, rep(NA, dim(kjonn)[2]), alder, rep(NA, dim(kjonn)[2]),
-%                 rep(NA, dim(kjonn)[2]), familiestatus, rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]),
-%                 utdanning, rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]), smertevarighet,
-%                 rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]), tidligereOpRygg, rep(NA, dim(kjonn)[2]),
-%                 rep(NA, dim(kjonn)[2]), tidligereOpNakke)
-% rownames(samlet) <- 1:dim(samlet)[1]
-% samlet <- as.data.frame(samlet)
-% samlet$radnavn <- c('\\textbf{Kjønn}', '\\quad Kvinner', '\\quad Menn', '', '\\textbf{Alder, gj.snitt (SD)}', '',
-%                     '\\textbf{Sivilstatus}', '\\quad Gift/Reg. partner', '\\quad Samboende', '\\quad Enslig',
-%                     '\\quad Ikke svart', '', '\\textbf{Utdanning}', '\\quad Grunnskole (7-10 år)', '\\quad Vgs. yrkesfaglig',
-%                     '\\quad Vgs. allmennfaglig', '\\quad Høyskole/univ\\textless 4år',
-%                     '\\quad Høyskole/univ\\textgreater 4 år',
-%                     '\\quad Ikke svart', '', '\\textbf{Varighet av smerter}', '\\quad Ingen smerter',
-%                     '\\quad Mindre enn 3 måneder', '\\quad 3 til 12 måneder', '\\quad 1-2 år', '\\quad Mer enn 2',
-%                     '\\quad Ikke svart', '', '\\textbf{Tidligere operert rygg}', '\\quad Ja', '\\quad Nei',
-%                     '\\quad Ukjent', '\\quad Ikke utfylt', '', '\\textbf{Tidligere operert nakke}', '\\quad Ja',
-%                     '\\quad Nei', '\\quad Ukjent', '\\quad Ikke utfylt')
-% samlet <- samlet[, c(dim(samlet)[2],1:(dim(samlet)[2]-1))]
-% names(samlet)[1] <- ''
-% names(samlet)[dim(samlet)[2]] <- 'Totalt'
-%
-% print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
-%                      caption = 'Demografiske data og smertevarighet fordelt på sykehusene'), include.rownames=FALSE,
-%       sanitize.text.function = function(x){x}, sanitize.colnames.function=function(x) {paste0('{\\textbf{',x,'}}')})
-%
-%
-% tab4 <- as.data.frame(sort(table(paste0(RegData$Diagnose1Formatert, ': ', RegData$Diagnose1navn), useNA = 'ifany'), decreasing = T))
-% tab4 <- tab4[1:20, ]
-% names(tab4) <- c('Diagnose', 'Antall')
-%
-% print(xtable::xtable(tab4, align=c('l', 'l', rep('r', ncol(tab4)-1)), caption = 'De vanligste diagnosene i registeret (diagnose 1).'), include.rownames=FALSE)
-%
-%
-% tab8 <- addmargins(table(RegData$UseOfTreatmentLabel, RegData$SykehusNavn, useNA = 'no'), 1)
-%
-% print(xtable::xtable(tab8, digits=c(0,rep(0, ncol(tab8))), align=c('l',rep('r', ncol(tab8))),
-%                      caption = ' Hvilken nytte/bedring mener du at du har hatt av behandlingen. Fordelt på sykehus.'))
-%
-%
-%
-% tab9 <- RegData %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
-%                              !is.na(PainExperiencesNoActivity_post)) %>% group_by(SykehusNavn) %>%
-%   summarise('N' = n(),
-%             'Smerte i hvile - konsultasjon' = mean(PainExperiencesNoActivity),
-%             'SD' = sd(PainExperiencesNoActivity),
-%             'Smerte i hvile - oppfølging' = mean(PainExperiencesNoActivity_post),
-%             'SD_2' = sd(PainExperiencesNoActivity_post))
-%
-% tab9$`Smerte i hvile - konsultasjon` <- paste0(round(tab9$`Smerte i hvile - konsultasjon`, 1), ' (', round(tab9$SD, 1), ')')
-% tab9$`Smerte i hvile - oppfølging` <- paste0(round(tab9$`Smerte i hvile - oppfølging`, 1), ' (', round(tab9$SD_2, 1), ')')
-% tab9 <- tab9[, -c(4,6)]
-% names(tab9)[1] <- ''
-%
-% tab10 <- RegData %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
-%                              !is.na(PainExperiencesActivity_post)) %>% group_by(SykehusNavn) %>%
-%   summarise('N' = n(),
-%             'Smerte i aktivitet - konsultasjon' = mean(PainExperiencesActivity),
-%             'SD' = sd(PainExperiencesActivity),
-%             'Smerte i aktivitet - oppfølging' = mean(PainExperiencesActivity_post),
-%             'SD_2' = sd(PainExperiencesActivity_post))
-%
-% tab10$`Smerte i aktivitet - konsultasjon` <- paste0(round(tab10$`Smerte i aktivitet - konsultasjon`, 1), ' (', round(tab10$SD, 1), ')')
-% tab10$`Smerte i aktivitet - oppfølging` <- paste0(round(tab10$`Smerte i aktivitet - oppfølging`, 1), ' (', round(tab10$SD_2, 1), ')')
-% tab10 <- tab10[, -c(4,6)]
-% names(tab10)[1] <- ''
-%
-% # print(xtable::xtable(tab9, align=c('l', 'l', rep('r', ncol(tab9)-1))), include.rownames=FALSE)
-% print(xtable::xtable(tab9, align=c('l', 'l', 'r', rep('R{0.9in}', ncol(tab9)-2)),
-%                      caption = 'Smerteintensitet i hvile ved konsultasjon og etter 6 måneder. Standardavvik i parentes.'),
-%       include.rownames=FALSE)
-% print(xtable::xtable(tab10, align=c('l', 'l', 'r', rep('R{1.2in}', ncol(tab10)-2)),
-%                      caption = 'Smerteintensitet i aktivitet ved konsultasjon og etter 6 måneder. Standardavvik i parentes.'),
-%       include.rownames=FALSE)
-%
-%
-%
-% tab11 <- RegData %>% group_by(SykehusNavn) %>% summarise('I arbeid' = sum(Working),
-%                                                  'Sykemeldt' = sum(SickLeave),
-%                                                  'Hjemmeværende (ulønnet)' = sum(Stay_at_home),
-%                                                  'Student' = sum(Student),
-%                                                  'Arbeidsledig' = sum(Unemployed),
-%                                                  'Arbeidsavklaringspenger' = sum(NAV),
-%                                                  'Permanent uførepensjon' = sum(Pension),
-%                                                  'Alderspensjonist' = sum(RetirementPension),
-%                                                  'Ikke besvart' = sum(arbeid_ikke_besvart),
-%                                                  'N' = n())
-% tab11 <- tr_summarize_output(tab11)
-% tab11$Totalt <- rowSums(tab11[,2:dim(tab11)[2]])
-%
-% print(xtable::xtable(tab11, digits=0, align=c('l', 'l', rep('r', ncol(tab11)-1)), caption = 'Arbeidsstatus ved første konsultasjon'),
-%       include.rownames=FALSE)
-%
-% ## Før og etter
-%
-% tab11 <- RegData[which(RegData$regstatus_post==1), ] %>% group_by(SykehusNavn) %>% summarise('I arbeid' = sum(Working),
-%                                                  'Sykemeldt' = sum(SickLeave),
-%                                                  'Hjemmeværende (ulønnet)' = sum(Stay_at_home),
-%                                                  'Student' = sum(Student),
-%                                                  'Arbeidsledig' = sum(Unemployed),
-%                                                  'Arbeidsavklaringspenger' = sum(NAV),
-%                                                  'Permanent uførepensjon' = sum(Pension),
-%                                                  'Alderspensjonist' = sum(RetirementPension),
-%                                                  'Ikke besvart' = sum(arbeid_ikke_besvart),
-%                                                  'N' = n())
-% tab11 <- tr_summarize_output(tab11)
-% tab11$Totalt <- rowSums(tab11[,2:dim(tab11)[2]])
-%
-% print(xtable::xtable(tab11, digits=0, align=c('l', 'l', rep('r', ncol(tab11)-1)), caption = 'Arbeidsstatus ved første konsultasjon blant de med 6-mnd oppfølging'),
-%       include.rownames=FALSE)
-%
-% tab <- addmargins(table(RegData[which(RegData$regstatus_post==1), c('WorkingStatus_label', "SykehusNavn")], useNA = 'no'))
-% tab <- tab %>% as.data.frame() %>% spread(key = SykehusNavn, value = Freq)
-% tab <- as_tibble(tab[c(2,7,6,3,4,8,9,5,1,10), ])
-%
-% print(xtable::xtable(tab, digits=0, align=c('l', 'l', rep('r', ncol(tab)-1)), caption = 'Arbeidsstatus ved 6-mnd oppfølging. Vær oppmerksom på at arbeidsstatus registreres forskjellig ved første konsultasjon og ved oppfølging.'),
-%       include.rownames=FALSE)
-%
-%
-% tmp <- RegData #[which(RegData$regstatus_post==1 & RegData$Aar==2016), ]
-% tmp <- tmp[!is.na(tmp$NdiScore) & !is.na(tmp$NdiScore_post), ]
-%
-% tab12 <- tmp %>% group_by(SykehusNavn) %>% summarise('N' = n(),
-%                                                    'NDI konsultasjon' = mean(NdiScore),
-%                                                    'SD' = sd(NdiScore),
-%                                                    'NDI 6 måneder' = mean(NdiScore_post),
-%                                                    'SD_2' = sd(NdiScore_post))
-%
-% tab12$`NDI konsultasjon` <- paste0(round(tab12$`NDI konsultasjon`, 1), ' (', round(tab12$SD, 1), ')')
-% tab12$`NDI 6 måneder` <- paste0(round(tab12$`NDI 6 måneder`, 1), ' (', round(tab12$SD_2, 1), ')')
-% tab12 <- tab12[, -c(4,6)]
-% names(tab12)[1] <- ''
-%
-% print(xtable::xtable(tab12, align=c('l', 'l', rep('r', ncol(tab12)-1)),
-%                      caption = 'Skår på NDI (nakke-relatert funksjon) ved konsultasjon og etter 6 måneder. Standardavvik i parentes.'),
-%       include.rownames=FALSE)
-%
-%
-% tmp <- RegData #[which(RegData$regstatus_post==1 & RegData$Aar==2016), ]
-% tmp <- tmp[!is.na(tmp$OdiScore) & !is.na(tmp$OdiScore_post), ]
-%
-% tab12 <- tmp %>% group_by(SykehusNavn) %>% summarise('N' = n(),
-%                                                    'ODI konsultasjon' = mean(OdiScore),
-%                                                    'SD' = sd(OdiScore),
-%                                                    'ODI 6 måneder' = mean(OdiScore_post),
-%                                                    'SD_2' = sd(OdiScore_post))
-%
-% tab12$`ODI konsultasjon` <- paste0(round(tab12$`ODI konsultasjon`, 1), ' (', round(tab12$SD, 1), ')')
-% tab12$`ODI 6 måneder` <- paste0(round(tab12$`ODI 6 måneder`, 1), ' (', round(tab12$SD_2, 1), ')')
-% tab12 <- tab12[, -c(4,6)]
-% names(tab12)[1] <- ''
-%
-% names(tab12)[1] <- ''
-%
-% print(xtable::xtable(tab12, align=c('l', 'l', rep('r', ncol(tab12)-1)),
-%                      caption = 'Ryggsmerte-relatert funksjon ved konsultasjon og etter 6 måneder. Standardavvik i parentes.'),
-%       include.rownames=FALSE)
-%
-% @
-%
-%
-% \clearpage
-%
-%
-% \section{Ikke tverrfaglig behandlet}
-%
-% <<'Tab 2 ikke tverr', results='asis', echo=FALSE>>=
-%
-% RegData <- RegData_alle
-% RegData <- RegData[-which(RegData$Treatment_InvidualInterdisciplinary %in% 1:3 |
-%                            RegData$Treatment_GroupInterdisciplinary2018 %in% 1:4 |
-%                            RegData$Treatment_GroupInterdisciplinary %in% 1:3), ]
-%
-% kjonn <- addmargins(table(RegData[, c("ErMann", "SykehusNavn")], useNA = 'ifany'), 2)
-% alder <- c(tapply(RegData$PatientAge, RegData$SykehusNavn, mean), Sum=mean(RegData$PatientAge))
-% alder_sd <- c(tapply(RegData$PatientAge, RegData$SykehusNavn, sd), Sum=sd(RegData$PatientAge))
-% alder <- paste0(round(alder, 1), ' (', round(alder_sd, 1),')')
-%
-% familiestatus <- addmargins(table(RegData[, c("FamilyStatus", "SykehusNavn")]), 2)
-% utdanning <- addmargins(table(RegData[, c("EducationLevel", "SykehusNavn")]), 2)
-% smertevarighet <- addmargins(table(RegData[, c("PainDurationNow", "SykehusNavn")]), 2)
-% tidligereOpRygg <- addmargins(table(RegData[, c("BackSurgery", "SykehusNavn")]), 2)
-% tidligereOpNakke <- addmargins(table(RegData[, c("NeckSurgery", "SykehusNavn")]), 2)
-%
-% samlet <- rbind(rep(NA, dim(kjonn)[2]), kjonn, rep(NA, dim(kjonn)[2]), alder, rep(NA, dim(kjonn)[2]),
-%                 rep(NA, dim(kjonn)[2]), familiestatus, rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]),
-%                 utdanning, rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]), smertevarighet,
-%                 rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]), tidligereOpRygg, rep(NA, dim(kjonn)[2]),
-%                 rep(NA, dim(kjonn)[2]), tidligereOpNakke)
-% rownames(samlet) <- 1:dim(samlet)[1]
-% samlet <- as.data.frame(samlet)
-% samlet$radnavn <- c('\\textbf{Kjønn}', '\\quad Kvinner', '\\quad Menn', '', '\\textbf{Alder, gj.snitt (SD)}', '',
-%                     '\\textbf{Sivilstatus}', '\\quad Gift/Reg. partner', '\\quad Samboende', '\\quad Enslig',
-%                     '\\quad Ikke svart', '', '\\textbf{Utdanning}', '\\quad Grunnskole (7-10 år)', '\\quad Vgs. yrkesfaglig',
-%                     '\\quad Vgs. allmennfaglig', '\\quad Høyskole/univ\\textless 4år',
-%                     '\\quad Høyskole/univ\\textgreater 4 år',
-%                     '\\quad Ikke svart', '', '\\textbf{Varighet av smerter}', '\\quad Ingen smerter',
-%                     '\\quad Mindre enn 3 måneder', '\\quad 3 til 12 måneder', '\\quad 1-2 år', '\\quad Mer enn 2',
-%                     '\\quad Ikke svart', '', '\\textbf{Tidligere operert rygg}', '\\quad Ja', '\\quad Nei',
-%                     '\\quad Ukjent', '\\quad Ikke utfylt', '', '\\textbf{Tidligere operert nakke}', '\\quad Ja',
-%                     '\\quad Nei', '\\quad Ukjent', '\\quad Ikke utfylt')
-% samlet <- samlet[, c(dim(samlet)[2],1:(dim(samlet)[2]-1))]
-% names(samlet)[1] <- ''
-% names(samlet)[dim(samlet)[2]] <- 'Totalt'
-%
-% print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
-%                      caption = 'Demografiske data og smertevarighet fordelt på sykehusene'), include.rownames=FALSE,
-%       sanitize.text.function = function(x){x}, sanitize.colnames.function=function(x) {paste0('{\\textbf{',x,'}}')})
-%
-%
-% tab4 <- as.data.frame(sort(table(paste0(RegData$Diagnose1Formatert, ': ', RegData$Diagnose1navn), useNA = 'ifany'), decreasing = T))
-% tab4 <- tab4[1:20, ]
-% names(tab4) <- c('Diagnose', 'Antall')
-%
-% print(xtable::xtable(tab4, align=c('l', 'l', rep('r', ncol(tab4)-1)), caption = 'De vanligste diagnosene i registeret (diagnose 1).'), include.rownames=FALSE)
-%
-%
-% tab8 <- addmargins(table(RegData$UseOfTreatmentLabel, RegData$SykehusNavn, useNA = 'no'), 1)
-%
-% print(xtable::xtable(tab8, digits=c(0,rep(0, ncol(tab8))), align=c('l',rep('r', ncol(tab8))),
-%                      caption = ' Hvilken nytte/bedring mener du at du har hatt av behandlingen. Fordelt på sykehus.'))
-%
-%
-%
-% tab9 <- RegData %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
-%                              !is.na(PainExperiencesNoActivity_post)) %>% group_by(SykehusNavn) %>%
-%   summarise('N' = n(),
-%             'Smerte i hvile - konsultasjon' = mean(PainExperiencesNoActivity),
-%             'SD' = sd(PainExperiencesNoActivity),
-%             'Smerte i hvile - oppfølging' = mean(PainExperiencesNoActivity_post),
-%             'SD_2' = sd(PainExperiencesNoActivity_post))
-%
-% tab9$`Smerte i hvile - konsultasjon` <- paste0(round(tab9$`Smerte i hvile - konsultasjon`, 1), ' (', round(tab9$SD, 1), ')')
-% tab9$`Smerte i hvile - oppfølging` <- paste0(round(tab9$`Smerte i hvile - oppfølging`, 1), ' (', round(tab9$SD_2, 1), ')')
-% tab9 <- tab9[, -c(4,6)]
-% names(tab9)[1] <- ''
-%
-% tab10 <- RegData %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
-%                              !is.na(PainExperiencesActivity_post)) %>% group_by(SykehusNavn) %>%
-%   summarise('N' = n(),
-%             'Smerte i aktivitet - konsultasjon' = mean(PainExperiencesActivity),
-%             'SD' = sd(PainExperiencesActivity),
-%             'Smerte i aktivitet - oppfølging' = mean(PainExperiencesActivity_post),
-%             'SD_2' = sd(PainExperiencesActivity_post))
-%
-% tab10$`Smerte i aktivitet - konsultasjon` <- paste0(round(tab10$`Smerte i aktivitet - konsultasjon`, 1), ' (', round(tab10$SD, 1), ')')
-% tab10$`Smerte i aktivitet - oppfølging` <- paste0(round(tab10$`Smerte i aktivitet - oppfølging`, 1), ' (', round(tab10$SD_2, 1), ')')
-% tab10 <- tab10[, -c(4,6)]
-% names(tab10)[1] <- ''
-%
-% # print(xtable::xtable(tab9, align=c('l', 'l', rep('r', ncol(tab9)-1))), include.rownames=FALSE)
-% print(xtable::xtable(tab9, align=c('l', 'l', 'r', rep('R{0.9in}', ncol(tab9)-2)),
-%                      caption = 'Smerteintensitet i hvile ved konsultasjon og etter 6 måneder. Standardavvik i parentes.'),
-%       include.rownames=FALSE)
-% print(xtable::xtable(tab10, align=c('l', 'l', 'r', rep('R{1.2in}', ncol(tab10)-2)),
-%                      caption = 'Smerteintensitet i aktivitet ved konsultasjon og etter 6 måneder. Standardavvik i parentes.'),
-%       include.rownames=FALSE)
-%
-%
-%
-% tab11 <- RegData %>% group_by(SykehusNavn) %>% summarise('I arbeid' = sum(Working),
-%                                                  'Sykemeldt' = sum(SickLeave),
-%                                                  'Hjemmeværende (ulønnet)' = sum(Stay_at_home),
-%                                                  'Student' = sum(Student),
-%                                                  'Arbeidsledig' = sum(Unemployed),
-%                                                  'Arbeidsavklaringspenger' = sum(NAV),
-%                                                  'Permanent uførepensjon' = sum(Pension),
-%                                                  'Alderspensjonist' = sum(RetirementPension),
-%                                                  'Ikke besvart' = sum(arbeid_ikke_besvart),
-%                                                  'N' = n())
-% tab11 <- tr_summarize_output(tab11)
-% tab11$Totalt <- rowSums(tab11[,2:dim(tab11)[2]])
-%
-% print(xtable::xtable(tab11, digits=0, align=c('l', 'l', rep('r', ncol(tab11)-1)), caption = 'Arbeidsstatus ved første konsultasjon'),
-%       include.rownames=FALSE)
-%
-% ## Før og etter
-%
-% tab11 <- RegData[which(RegData$regstatus_post==1), ] %>% group_by(SykehusNavn) %>% summarise('I arbeid' = sum(Working),
-%                                                  'Sykemeldt' = sum(SickLeave),
-%                                                  'Hjemmeværende (ulønnet)' = sum(Stay_at_home),
-%                                                  'Student' = sum(Student),
-%                                                  'Arbeidsledig' = sum(Unemployed),
-%                                                  'Arbeidsavklaringspenger' = sum(NAV),
-%                                                  'Permanent uførepensjon' = sum(Pension),
-%                                                  'Alderspensjonist' = sum(RetirementPension),
-%                                                  'Ikke besvart' = sum(arbeid_ikke_besvart),
-%                                                  'N' = n())
-% tab11 <- tr_summarize_output(tab11)
-% tab11$Totalt <- rowSums(tab11[,2:dim(tab11)[2]])
-%
-% print(xtable::xtable(tab11, digits=0, align=c('l', 'l', rep('r', ncol(tab11)-1)), caption = 'Arbeidsstatus ved første konsultasjon blant de med 6-mnd oppfølging'),
-%       include.rownames=FALSE)
-%
-% tab <- addmargins(table(RegData[which(RegData$regstatus_post==1), c('WorkingStatus_label', "SykehusNavn")], useNA = 'no'))
-% tab <- tab %>% as.data.frame() %>% spread(key = SykehusNavn, value = Freq)
-% tab <- as_tibble(tab[c(2,7,6,3,4,8,9,5,1,10), ])
-%
-% print(xtable::xtable(tab, digits=0, align=c('l', 'l', rep('r', ncol(tab)-1)), caption = 'Arbeidsstatus ved 6-mnd oppfølging. Vær oppmerksom på at arbeidsstatus registreres forskjellig ved første konsultasjon og ved oppfølging.'),
-%       include.rownames=FALSE)
-%
-%
-% tmp <- RegData #[which(RegData$regstatus_post==1 & RegData$Aar==2016), ]
-% tmp <- tmp[!is.na(tmp$NdiScore) & !is.na(tmp$NdiScore_post), ]
-%
-% tab12 <- tmp %>% group_by(SykehusNavn) %>% summarise('N' = n(),
-%                                                    'NDI konsultasjon' = mean(NdiScore),
-%                                                    'SD' = sd(NdiScore),
-%                                                    'NDI 6 måneder' = mean(NdiScore_post),
-%                                                    'SD_2' = sd(NdiScore_post))
-%
-% tab12$`NDI konsultasjon` <- paste0(round(tab12$`NDI konsultasjon`, 1), ' (', round(tab12$SD, 1), ')')
-% tab12$`NDI 6 måneder` <- paste0(round(tab12$`NDI 6 måneder`, 1), ' (', round(tab12$SD_2, 1), ')')
-% tab12 <- tab12[, -c(4,6)]
-% names(tab12)[1] <- ''
-%
-% print(xtable::xtable(tab12, align=c('l', 'l', rep('r', ncol(tab12)-1)),
-%                      caption = 'Skår på NDI (nakke-relatert funksjon) ved konsultasjon og etter 6 måneder. Standardavvik i parentes.'),
-%       include.rownames=FALSE)
-%
-%
-% tmp <- RegData #[which(RegData$regstatus_post==1 & RegData$Aar==2016), ]
-% tmp <- tmp[!is.na(tmp$OdiScore) & !is.na(tmp$OdiScore_post), ]
-%
-% tab12 <- tmp %>% group_by(SykehusNavn) %>% summarise('N' = n(),
-%                                                    'ODI konsultasjon' = mean(OdiScore),
-%                                                    'SD' = sd(OdiScore),
-%                                                    'ODI 6 måneder' = mean(OdiScore_post),
-%                                                    'SD_2' = sd(OdiScore_post))
-%
-% tab12$`ODI konsultasjon` <- paste0(round(tab12$`ODI konsultasjon`, 1), ' (', round(tab12$SD, 1), ')')
-% tab12$`ODI 6 måneder` <- paste0(round(tab12$`ODI 6 måneder`, 1), ' (', round(tab12$SD_2, 1), ')')
-% tab12 <- tab12[, -c(4,6)]
-% names(tab12)[1] <- ''
-%
-% names(tab12)[1] <- ''
-%
-% print(xtable::xtable(tab12, align=c('l', 'l', rep('r', ncol(tab12)-1)),
-%                      caption = 'Ryggsmerte-relatert funksjon ved konsultasjon og etter 6 måneder. Standardavvik i parentes.'),
-%       include.rownames=FALSE)
-%
-% @
-%
-
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{andel_kvinner.pdf}
+\caption{Andel kvinner.}
+\end{figure}
 
 
 \end{document}

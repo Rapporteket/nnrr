@@ -13,7 +13,7 @@
 #'
 nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', datoTil='2050-01-01', reshID,
                                     minald=0, maxald=120, erMann=99, outfile='', sammenlign = 1,
-                                    enhetsUtvalg=0, gr_var='SykehusNavn',  terskel = 5)
+                                    enhetsUtvalg=0, gr_var='SykehusNavn',  terskel = 5, inkl_konf = 1)
 
 {
 
@@ -65,23 +65,30 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', 
   kategorier <- as.character(Ngr$Group.1)
   Ngr <- as.matrix(t(Ngr[,-1]))
   PlotMatrise <- as.matrix(t(PrePost[,-1]))
-  PlotMatrise <- cbind(PlotMatrise, colMeans(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]]))
   PrePostSD <- as.matrix(t(PrePostSD[,-1]))
-  PrePostSD <- cbind(PrePostSD, apply(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]], 2, sd, na.rm = TRUE))
+  if (sammenlign == 0) {
+    PlotMatrise <- cbind(PlotMatrise, mean(RegData[, c('VarPre')]))
+    PrePostSD <- cbind(PrePostSD, sd(RegData[, c('VarPre')]))
+  } else {
+    PlotMatrise <- cbind(PlotMatrise, colMeans(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]]))
+    PrePostSD <- cbind(PrePostSD, apply(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]], 2, sd, na.rm = TRUE))
+    }
+
+  # PrePostSD <- cbind(PrePostSD, apply(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]], 2, sd, na.rm = TRUE))
   #   Ngr <- table(as.character(RegData$Gr_var))  ######## Må forsikre at rekkefølgen av sykehus blir lik som i PlotMatrise
   Ngr <- c(Ngr, sum(Ngr, na.rm = TRUE))
   names(Ngr) <- c(kategorier, 'Totalt')
 
   #   Hvis man vil utelate kategori fra figur pga. for få reg.:
 
-  if (gr_var=='SykehusNavn') {
-    utelat <- which(Ngr < terskel)
-    if (length(utelat)>0){
-      PlotMatrise <- PlotMatrise[,-utelat]
-      PrePostSD <- PrePostSD[,-utelat]
-      Ngr <- Ngr[-utelat]
-    }
-  }
+  # if (gr_var=='SykehusNavn') {
+  #   utelat <- which(Ngr < terskel)
+  #   if (length(utelat)>0){
+  #     PlotMatrise <- PlotMatrise[,-utelat]
+  #     PrePostSD <- PrePostSD[,-utelat]
+  #     Ngr <- Ngr[-utelat]
+  #   }
+  # }
 
   KINed <- PlotMatrise - 1.96*PrePostSD/t(matrix(Ngr, ncol = sammenlign+1, nrow = length(Ngr)))
   KIOpp <- PlotMatrise + 1.96*PrePostSD/t(matrix(Ngr, ncol = sammenlign+1, nrow = length(Ngr)))
@@ -93,13 +100,15 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', 
   grtxt <- c(names(Ngr)[1:(length(Ngr)-1)], 'Totalt')
 
   tittel <- switch(valgtVar,
-                   ODI_PrePost = 'ODI-score før og etter behandling',
-                   NDI_PrePost = 'NDI-score før og etter behandling',
-                   EQ5D_PrePost = 'EQ5D-Score før og etter behandling',
+                   ODI_PrePost = 'ODI-score',
+                   NDI_PrePost = 'NDI-score',
+                   EQ5D_PrePost = 'EQ5D-Score',
                    PainExperiencesNoActivity = 'Smerte i hvile',
                    PainExperiencesActivity = 'Smerte i aktivitet')
 
-  tittel <- c(tittel, 'med 95% konfidensintervall')
+  if (inkl_konf) {
+    tittel <- c(tittel, 'med 95% konfidensintervall')
+  }
 
   ytekst <- 'Gjennomsnittsscore'
 
@@ -119,7 +128,12 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', 
   KIOpp <- KIOpp[dim(KIOpp)[1]:1, rekkeflg]
 
   xmax <- max(PlotMatrise, na.rm=T)*1.25
-  ymax <- dim(PlotMatrise)[2]*(sammenlign + 2)*1.1
+  if (sammenlign == 0) {
+    ymax <- length(PlotMatrise)*(sammenlign + 1)*1.3
+  } else {
+    ymax <- dim(PlotMatrise)[2]*(sammenlign + 2)*1.1
+    }
+
 
   FigTypUt <- rapFigurer::figtype(outfile, fargepalett='BlaaOff')
   farger <- FigTypUt$farger
@@ -128,9 +142,16 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', 
   par('fig'=c(vmarg, 1, 0, 1-0.02*(NutvTxt-1+length(tittel)-1)))	#Har alltid datoutvalg med
 
 
-  pos <- barplot(PlotMatrise[dim(PlotMatrise)[1]:1, ], beside=TRUE, horiz=TRUE, main=tittel, las=1,
-                 col=farger[1:(sammenlign+1)], border='white', font.main=1,  xlim=c(0,xmax), ylim =c(0,ymax),
-                 names.arg=rev(grtxt), cex.names=cexgr, xlab="Gjsn.score")
+  if (sammenlign == 0) {
+    pos <- barplot(PlotMatrise, horiz=TRUE, main=tittel, las=1,
+                   col=farger[1:(sammenlign+1)], border='white', font.main=1,  xlim=c(0,xmax), ylim =c(0,ymax),
+                   names.arg=grtxt, cex.names=cexgr, xlab="Gjsn.score")
+  } else {
+    pos <- barplot(PlotMatrise[dim(PlotMatrise)[1]:1, ], beside=TRUE, horiz=TRUE, main=tittel, las=1,
+                   col=farger[1:(sammenlign+1)], border='white', font.main=1,  xlim=c(0,xmax), ylim =c(0,ymax),
+                   names.arg=grtxt, cex.names=cexgr, xlab="Gjsn.score")
+  }
+
 
   #Tekst som angir hvilket utvalg som er gjort
   mtext(utvalgTxt, side=3, las=1, cex=0.9, adj=0, col=farger[1], line=c(3+0.8*((NutvTxt-1):0)))
@@ -139,7 +160,6 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', 
          border=c(fargeHoved,NA), col=rev(farger[1:(sammenlign+1)]), bty='n', pch=c(15,15), pt.cex=2,
          lwd=3,	lty=NA, ncol=2, cex=cexleg)
 
-  inkl_konf <- 1
   if (inkl_konf == 1){
     arrows(y0=pos, x0=KINed, y1=pos, x1=KIOpp, code=3, angle=90, lwd=1, length=0.03, col=farger[4])
   }
