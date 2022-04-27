@@ -83,6 +83,7 @@ nnrrPreprosess <- function(RegData)
   RegData$NdiScore_post2 <- as.numeric(sapply(as.character(RegData$NdiScore_post2), gsub, pattern = ",", replacement= "."))
   RegData$Eq5dScore <- as.numeric(sapply(as.character(RegData$Eq5dScore), gsub, pattern = ",", replacement= "."))
   RegData$Eq5dScore_post <- as.numeric(sapply(as.character(RegData$Eq5dScore_post), gsub, pattern = ",", replacement= "."))
+  RegData$Score_EQ5DL <- as.numeric(sapply(as.character(RegData$Score_EQ5DL), gsub, pattern = ",", replacement= "."))
   # RegData$Eq5dScore_post2 <- as.numeric(sapply(as.character(RegData$Eq5dScore_post2), gsub, pattern = ",", replacement= "."))
 
   RegData$SykehusNavn <- NA

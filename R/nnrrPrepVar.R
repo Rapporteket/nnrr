@@ -16,6 +16,14 @@ nnrrPrepVar <- function(RegData, valgtVar)
   cexgr <- 1.0; grtxt <- ''; grtxt2 <- ''; subtxt <- ''; incl_N=F
 
   # endre
+  if (valgtVar=='FamilyStatus') {
+    tittel <- "Sivilstatus"
+    RegData <- RegData[RegData$regstatus==1, ]
+    RegData$Variabel <- RegData$FamilyStatus
+    grtxt <- levels(RegDataAll$FamilyStatus)
+    RegData$VariabelGr <- RegData$Variabel
+  }
+
   if (valgtVar=='tverrfaglig_behandlet') {
     tittel <- "Tverrfaglig behandlet"
     RegData <- RegData[RegData$regstatus==1, ]

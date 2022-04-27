@@ -1,0 +1,477 @@
+---
+title: "En enkel rapport om utfyllingsgrad av skjema i NNRR"
+author: "NNRR"
+date: "April 2022"
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## Bakgrunn/innledning
+
+Denne rapporten tar for seg datakvaliteten i NNRR. Den fokuserer på utfyllingsgrad og ser på følgende problemstillinger:
+
+* Andel besvart av spørsmålene
+* Forholdet mellom utfylte pasientskjema og behandlerskjema
+
+NNRR består av fire skjemaer:
+
+* Pasientskjema før behandling - 1a
+* Behandlerskjema - 1b
+* Pasientskjema 6 mnd etter behandling - 2
+* Pasientskjema 12 mnd etter behandling - 3
+
+Skjemaene har felter som i MRS-løsningen er delt inn i følgende datatyper:
+
+* Dato/Tid
+* Enkeltvalg
+* Tall
+* Text
+* Avkrysning
+* Id (Guid)
+
+De tre NNRR-skjemaene har (ifølge kodebok hentet fra MRS-løsningen) følgende fordeling av datatyper.
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+rm(list = ls())
+library(nnrr)
+# library(xtable)
+library(knitr)
+library(printr)
+library(tidyverse)
+# kodebok1a <- read.table('I:/nnrr/Kodebok1a_feb2019.csv', sep=';', header=T, stringsAsFactors=F)
+# kodebok1b <- read.table('I:/nnrr/Kodebok1b_feb2019.csv', sep=';', header=T, stringsAsFactors=F)
+# kodebok2 <- read.table('I:/nnrr/Kodebok2_feb2019.csv', sep=';', header=T, stringsAsFactors=F)
+
+kodebok1a <- xlsx::read.xlsx("I:/nnrr/kodebok_nnrr_25022022.xlsx", sheetIndex = 6, header = T)
+kodebok1b <- xlsx::read.xlsx("I:/nnrr/kodebok_nnrr_25022022.xlsx", sheetIndex = 7, header = T)
+kodebok2 <- xlsx::read.xlsx("I:/nnrr/kodebok_nnrr_25022022.xlsx", sheetIndex = 5, header = T)
+kodebok3 <- xlsx::read.xlsx("I:/nnrr/kodebok_nnrr_25022022.xlsx", sheetIndex = 4, header = T)
+
+felttyper <- sort(unique(c(kodebok1a$Felttype, kodebok1b$Felttype, kodebok2$Felttype, kodebok3$Felttype)))
+
+kodebok1a$Felttype <- factor(kodebok1a$Felttype, levels = felttyper)
+kodebok1b$Felttype <- factor(kodebok1b$Felttype, levels = felttyper)
+kodebok2$Felttype <- factor(kodebok2$Felttype, levels = felttyper)
+kodebok3$Felttype <- factor(kodebok3$Felttype, levels = felttyper)
+
+tab_1a <- table(kodebok1a$Felttype)#[-1]
+tab_1b <- table(kodebok1b$Felttype)#[-1]
+tab_2 <- table(kodebok2$Felttype)#[-1]
+tab_3 <- table(kodebok3$Felttype)#[-1]
+
+# Oppsum <- rbind(rbind(tab_1a, tab_2), tab_1b)
+# Oppsum <- tab_1a %>% dplyr::bind_rows(tab_1b) %>%
+#   dplyr::bind_rows(tab_2) %>% dplyr::bind_rows(tab_3)
+Oppsum <- tab_1a %>% rbind(tab_1b) %>% 
+  rbind(tab_2) %>% rbind(tab_3)
+Oppsum <- Oppsum[, -1]
+
+row.names(Oppsum) <- c('Skjema 1a', 'Skjema 1b', 'Skjema 2', 'Skjema 3')
+
+knitr::kable(Oppsum, caption = 'Antallet felter på NNRR sine skjema etter felttype')
+```
+
+Denne rapporten fokuserer på tre datatyper, Avkrysning, Enkeltvalg og Numerisk siden disse utgjør festeparten av feltene. Her følger en kort forklaring til datatypene.
+
+### Avkrysning
+
+Dette er boolske variabler (True/False) med default-verdi "False". Avkrysningsboksene er typisk organisert under overskrifter hvor én eller flere kryss forventes satt. Det finnes derfor ingen fasit på hvor mange bokser som skal være avkrysset ved en komplett utfylling.
+
+### Enkeltvalg
+
+Dette er kategoriske variabler hvor ett alternativ velges fra en liste. I de fleste tilfeller er manglende verdier kodet som -1 men i noen tilfeller kodes de med 0. I presentasjon av utfyllingsgrad brukes kun de Enkeltvalg-variablene som er kodet numerisk i datadumpen, hvilket gjør at en del variabler faller bort fra vurderingen. I tillegg må det presiseres at ikke alle registrerte nødvendigvis skal svare på alle spørsmål. F.eks. finnes det nakkespesifikke verktøy som ikke skal benyttes av de med utelukkende ryggsmerter.
+
+### Numerisk
+
+Disse variablene er som regel én av tre typer:
+
+* Velg et antall (f.eks. barn) eller tall på en skala (f.eks. smerter fra 0-10).
+* Koding for et svaralternativ som skal inngå i beregningen av en score.
+* En score eller prosent
+
+
+```{r, echo = FALSE, warning=FALSE}
+datoFra <- '2021-01-01'
+datoTil <- '2021-12-31'
+
+skjema1b <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-04-07_1123.csv', sep=';',
+                         header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+skjema1a <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-04-07_1123.csv', sep=';',
+                              header=T, stringsAsFactors = F)
+skjema2 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-04-07_1123.csv', sep=';',
+                               header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+skjema3 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';',
+                               header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+dato_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Dato/tid')]
+dato_var1a <- intersect(dato_var1a, names(skjema1a))
+dato_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Dato/tid')]
+dato_var1b <- intersect(dato_var1b, names(skjema1b))
+dato_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Dato/tid')]
+dato_var2 <- intersect(dato_var2, names(skjema2))
+skjema1a[, dato_var1a] <- mutate_all(skjema1a[, dato_var1a], funs(as.Date(., format="%d.%m.%Y")))
+skjema1b[, dato_var1b] <- mutate_all(skjema1b[, dato_var1b], funs(as.Date(., format="%d.%m.%Y")))
+skjema2[, dato_var2] <- mutate_all(skjema2[, dato_var2], funs(as.Date(., format="%d.%m.%Y")))
+
+skjema1b$Hoveddato <- skjema1b$S1b_DateOfCompletion
+skjema1b <- skjema1b[which(skjema1b$Hoveddato >= datoFra & skjema1b$Hoveddato <= datoTil), ]
+skjema1b <- skjema1b[order(skjema1b$Hoveddato), ]
+skjema1a$Hoveddato <- skjema1a$S1b_DateOfCompletion
+skjema1a <- skjema1a[which(skjema1a$Hoveddato >= datoFra & skjema1a$Hoveddato <= datoTil), ]
+skjema2$Hoveddato <- skjema2$DateOfCompletion
+skjema2 <- skjema2[which(skjema2$Hoveddato >= datoFra & skjema2$Hoveddato <= datoTil), ]
+
+
+boolske_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Avkrysning')]
+enum_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Enkeltvalg')]
+numerisk_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) %in% c('Tall'))]
+boolske_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Avkrysning')]
+enum_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Enkeltvalg')]
+# enum_var1b <- c('NeckSurgery', 'PelvisSurgery', 'PrevSickLeave', 'RadiologicalF_Spondylolisthesis', 'RadiologicalF_Scoliosis_Subcategory', 'Treatment_InvidualInterdisciplinary', 'Treatment_GroupInterdisciplinary')
+numerisk_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) %in% c('Tall'))]
+boolske_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Avkrysning')]
+boolske_var2 <- intersect(boolske_var2, names(skjema2))
+enum_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Enkeltvalg')]
+enum_var2 <- intersect(enum_var2, names(skjema2))
+numerisk_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) %in% c('Tall'))]
+numerisk_var2 <- intersect(numerisk_var2, names(skjema2))
+
+skjema1a[, boolske_var1a] <- apply(skjema1a[, boolske_var1a], 2, as.logical)
+skjema1b[, boolske_var1b] <- apply(skjema1b[, boolske_var1b], 2, as.logical)
+skjema2[, boolske_var2] <- apply(skjema2[, boolske_var2], 2, as.logical)
+
+skjema1a_bak <- skjema1a
+enum_var1a <- intersect(enum_var1a, names(skjema1a))
+enum_var1b <- intersect(enum_var1b, names(skjema1b))
+enum_var2 <- intersect(enum_var2, names(skjema2))
+
+enum_var1b <- enum_var1b[sapply((skjema1b[, enum_var1b]), class) != "character"]
+enum_var1a <- enum_var1a[sapply((skjema1a[, enum_var1a]), class) != "character"]
+enum_var2 <- enum_var2[sapply((skjema2[, enum_var2]), class) != "character"]
+
+skjema1a[, enum_var1a] <- apply(skjema1a[, enum_var1a], 2, function(x){as.numeric(!(x == min(x, na.rm = T) | is.na(x)))})
+skjema1b[, enum_var1b] <- apply(skjema1b[, enum_var1b], 2, function(x){as.numeric(!(x == min(x, na.rm = T) | is.na(x)))})
+skjema2[, enum_var2] <- apply(skjema2[, enum_var2], 2, function(x){as.numeric(!(x == min(x, na.rm = T) | is.na(x)))})
+
+ingen_avkrysninger1a <- which(rowSums(skjema1a[, boolske_var1a])==0)
+ingen_enum1a <- which(rowSums(skjema1a[, enum_var1a])<=1)
+ingen_avkrysninger1b <- which(rowSums(skjema1b[, boolske_var1b])==0)
+ingen_enum1b <- which(rowSums(skjema1b[, enum_var1b])<=1)
+ingen_avkrysninger2 <- which(rowSums(skjema2[, boolske_var2])==0)
+ingen_enum2 <- which(rowSums(skjema2[, enum_var2])<=1)
+
+skjema1a$SykehusNavn <- NA
+skjema1a$SykehusNavn[skjema1a$UnitId == 102959] <- 'Haukeland'
+skjema1a$SykehusNavn[skjema1a$UnitId == 104293] <- 'St. Olavs'
+skjema1a$SykehusNavn[skjema1a$UnitId == 109834] <- 'OUS'
+skjema1a$SykehusNavn[skjema1a$UnitId == 601032] <- 'UNN-Tromsø'
+skjema1a$SykehusNavn[skjema1a$UnitId == 700735] <- 'UNN-Harstad'
+skjema1a$SykehusNavn[skjema1a$UnitId == 102169] <- 'Sandnessjøen'
+skjema1a$SykehusNavn[skjema1a$UnitId == 114174] <- 'Kristiansand'
+skjema1a$SykehusNavn[skjema1a$UnitId == 4211588] <- 'Stavanger'
+skjema1a$SykehusNavn[skjema1a$UnitId == 4212982] <- 'Ålesund'
+skjema1a$SykehusNavn[skjema1a$UnitId == 105821] <- 'Levanger'
+skjema1a$SykehusNavn[skjema1a$UnitId == 103736] <- 'Drammen'
+
+skjema1b$SykehusNavn <- NA
+skjema1b$SykehusNavn[skjema1b$UnitId == 102959] <- 'Haukeland'
+skjema1b$SykehusNavn[skjema1b$UnitId == 104293] <- 'St. Olavs'
+skjema1b$SykehusNavn[skjema1b$UnitId == 109834] <- 'OUS'
+skjema1b$SykehusNavn[skjema1b$UnitId == 601032] <- 'UNN-Tromsø'
+skjema1b$SykehusNavn[skjema1b$UnitId == 700735] <- 'UNN-Harstad'
+skjema1b$SykehusNavn[skjema1b$UnitId == 102169] <- 'Sandnessjøen'
+skjema1b$SykehusNavn[skjema1b$UnitId == 114174] <- 'Kristiansand'
+skjema1b$SykehusNavn[skjema1b$UnitId == 4211588] <- 'Stavanger'
+skjema1b$SykehusNavn[skjema1b$UnitId == 4212982] <- 'Ålesund'
+skjema1b$SykehusNavn[skjema1b$UnitId == 105821] <- 'Levanger'
+skjema1b$SykehusNavn[skjema1b$UnitId == 103736] <- 'Drammen'
+
+
+# Kommenter inn hvis OUS skal ekskluderes:
+# skjema1a <- skjema1a[which(skjema1a$UnitId != 109834), ]
+# skjema1b <- skjema1b[which(skjema1b$UnitId != 109834), ]
+
+manglende1bPrShus <- tapply(skjema1b$SkjemaGUID[ingen_avkrysninger1b], as.factor(skjema1b$SykehusNavn)[ingen_avkrysninger1b], length)
+Totalt1bPrShus <- tapply(skjema1b$SkjemaGUID, as.factor(skjema1b$SykehusNavn), length) #[-3]
+manglende1bPrShus <- as.data.frame(cbind(manglende1bPrShus, Totalt1bPrShus))
+names(manglende1bPrShus) <- c('Tomme', 'Totalt')
+
+numerisk_var1a <- intersect(numerisk_var1a, names(skjema1a))
+numerisk_var1b <- intersect(numerisk_var1b, names(skjema1b))
+numerisk_var2 <- intersect(numerisk_var2, names(skjema2))
+
+skjema1a[, numerisk_var1a] <- apply(skjema1a[, numerisk_var1a], 2, function(x){as.numeric(sapply(as.character(x), gsub, pattern = ",", replacement= "."))})
+skjema1b[, numerisk_var1b] <- apply(skjema1b[, numerisk_var1b], 2, function(x){as.numeric(sapply(as.character(x), gsub, pattern = ",", replacement= "."))})
+skjema2[, numerisk_var2] <- apply(skjema2[, numerisk_var2], 2, function(x){as.numeric(sapply(as.character(x), gsub, pattern = ",", replacement= "."))})
+
+
+```
+
+## Forhold mellom skjema
+
+```{r, echo = FALSE, warning=FALSE}
+dobbel_1a <- names(sort(table(skjema1a$HovedskjemaGUID), decreasing = T)[sort(table(skjema1a$HovedskjemaGUID), 
+                                                                           decreasing = T)>1])
+dobbel_2 <- names(sort(table(skjema2$HovedskjemaGUID), decreasing = T)[sort(table(skjema2$HovedskjemaGUID), 
+                                                                           decreasing = T)>1])
+dobbel_1b <- names(sort(table(skjema1b$SkjemaGUID), decreasing = T)[sort(table(skjema1b$SkjemaGUID), 
+                                                                           decreasing = T)>1])
+
+mangler1b <- length(setdiff(skjema1a$HovedskjemaGUID, skjema1b$SkjemaGUID))
+mangler1a <- length(setdiff(skjema1b$SkjemaGUID, skjema1a$HovedskjemaGUID))
+potensiellOppf <- length(skjema1b$SkjemaGUID[skjema1b$Hoveddato <= '2018-06-01'])
+manglerOppf <- length(setdiff(skjema1b$SkjemaGUID[skjema1b$Hoveddato <= '2018-06-01'], skjema2$HovedskjemaGUID))
+
+```
+
+Denne rapporten benytter data fra pasienter med besøksdato mellom `r min(skjema1a$Hoveddato)` og `r max(skjema1a$Hoveddato)` samt oppfølginger registrert mellom `r min(skjema2$Hoveddato)` og `r max(skjema2$Hoveddato)`. 
+<!-- OUS er utelukket fra rapporten siden en kjent bug fra seneste oppdatering av registeret gjør at all data fra OUS fra mai 2018 og fremover i praksis er ubrukelige. -->
+
+Det er totalt `r dim(skjema1a)[1]` skjema 1a i utvalget og `r dim(skjema1b)[1]` skjema 1b. A disse er det `r mangler1b` pasientskjema som mangler klinikerskjema og `r mangler1a` klinikerskjema som mangler pasientskjema. Av de `r potensiellOppf` som hadde konsultasjon 7 eller flere måneder siden er det `r manglerOppf` som ikke har oppfølgingsdata.
+
+
+## Manglende utfyllinger
+### Numeriske variabler
+#### Skjema 1a
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_num <- data.frame(Antall_tom=apply(skjema1a[, numerisk_var1a], 2, function(x){sum(is.na(x))}), N=dim(skjema1a)[1])
+Andel_tom_num$Andel <- round(Andel_tom_num$Antall_tom/Andel_tom_num$N*100, 1)
+Andel_tom_num[,-2]
+# tmp <- skjema1a[, c(numerisk_var1a, "SykehusNavn")] %>%
+#   group_by(SykehusNavn) %>%
+#   summarise_all(funs(sum(is.na(.)))) %>% tr_summarize_output()
+
+```
+
+#### Skjema 1b
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_num <- data.frame(Antall_tom=apply(skjema1b[, numerisk_var1b], 2, function(x){sum(is.na(x))}), N=dim(skjema1b)[1])
+Andel_tom_num$Andel <- round(Andel_tom_num$Antall_tom/Andel_tom_num$N*100, 1)
+Andel_tom_num[,-2]
+# tmp <- skjema1a[, c(numerisk_var1a, "SykehusNavn")] %>%
+#   group_by(SykehusNavn) %>%
+#   summarise_all(funs(sum(is.na(.)))) %>% tr_summarize_output()
+
+```
+
+#### Skjema 2
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_num <- data.frame(Antall_tom=apply(skjema2[, numerisk_var2], 2, function(x){sum(is.na(x))}), N=dim(skjema2)[1])
+Andel_tom_num$Andel <- round(Andel_tom_num$Antall_tom/Andel_tom_num$N*100, 1)
+Andel_tom_num[,-2]
+# tmp <- skjema1a[, c(numerisk_var1a, "SykehusNavn")] %>%
+#   group_by(SykehusNavn) %>%
+#   summarise_all(funs(sum(is.na(.)))) %>% tr_summarize_output()
+
+```
+
+### Kategoriske variabler
+
+#### Skjema 1a
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_kat <- data.frame(Antall_tom=apply(skjema1a[, enum_var1a], 2, function(x){sum(x==0)}), N=dim(skjema1a)[1])
+Andel_tom_kat$Andel <- round(Andel_tom_kat$Antall_tom/Andel_tom_kat$N*100, 1)
+Andel_tom_kat[,-2]
+
+```
+
+#### Skjema 1b
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_kat <- data.frame(Antall_tom=apply(skjema1b[, enum_var1b], 2, function(x){sum(x==0)}), N=dim(skjema1b)[1])
+Andel_tom_kat$Andel <- round(Andel_tom_kat$Antall_tom/Andel_tom_kat$N*100, 1)
+Andel_tom_kat[,-2]
+
+```
+
+#### Skjema 2
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_kat <- data.frame(Antall_tom=apply(skjema2[, enum_var2], 2, function(x){sum(x==0)}), N=dim(skjema2)[1])
+Andel_tom_kat$Andel <- round(Andel_tom_kat$Antall_tom/Andel_tom_kat$N*100, 1)
+Andel_tom_kat[,-2]
+
+```
+
+### Avkrysningsvariabler
+
+Denne variabeltypen kan per design ikke være tom så det er umulig å si hva det korrekte antallet avkrysninger er. Tabellen over andelen som ikke har krysset av for variablene under er derfor vanskelig å tolke. Tabellen over hvor mange avkrysninger det er per skjema er kanskje bedre egnet til å avsløre manglende registreringer. Skjema 1a har `r length(boolske_var1a)` avkrysningsbokser, mens skjema 1b og skjema 2 har henholdsvis `r length(boolske_var1b)` og `r length(boolske_var2)`. Hvis bare en svært liten andel er avkrysset på et skjema er det muligens grunn til å være skeptisk til datakvaliteten.
+
+#### Skjema 1a
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_boolsk <- data.frame(Antall_FALSE=apply(skjema1a[, boolske_var1a], 2, function(x){sum(!x)}), N=dim(skjema1a)[1])
+Andel_tom_boolsk$Andel <- round(Andel_tom_boolsk$Antall_FALSE/Andel_tom_boolsk$N*100, 1)
+Andel_tom_boolsk[,-2]
+```
+
+Antall avkrysninger per skjema
+```{r, echo = FALSE, warning=FALSE}
+table(rowSums(skjema1a[, boolske_var1a]))
+
+```
+
+#### Skjema 1b
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_boolsk <- data.frame(Antall_FALSE=apply(skjema1b[, boolske_var1b], 2, function(x){sum(!x)}), N=dim(skjema1b)[1])
+Andel_tom_boolsk$Andel <- round(Andel_tom_boolsk$Antall_FALSE/Andel_tom_boolsk$N*100, 1)
+Andel_tom_boolsk[,-2]
+```
+
+Antall avkrysninger per skjema
+```{r, echo = FALSE, warning=FALSE}
+table(rowSums(skjema1b[, boolske_var1b]))
+
+```
+
+#### Skjema 2
+```{r, echo = FALSE, warning=FALSE}
+Andel_tom_boolsk <- data.frame(Antall_FALSE=apply(skjema2[, boolske_var2], 2, function(x){sum(!x)}), N=dim(skjema2)[1])
+Andel_tom_boolsk$Andel <- round(Andel_tom_boolsk$Antall_FALSE/Andel_tom_boolsk$N*100, 1)
+Andel_tom_boolsk[,-2]
+```
+
+Antall avkrysninger per skjema
+```{r, echo = FALSE, warning=FALSE}
+table(rowSums(skjema2[, boolske_var2]))
+
+```
+
+
+
+
+
+
+
+<!-- ### Mangelfullt utfylte skjema  -->
+
+<!-- Vi ser på utfyllingsgraden totalt for Avkrysninger. Første rad angir antallet avkrysninger mens andre rad gir antallet skjema med gitt antall avkrysninger. Det finnes ingen fasit for hvor mange avkysninger som bør gjøres på et skjema så det blir en vurderingssak hvilket antall man anser som mistenkelig lavt og indikativt av manglende registreringer. Antallet avkrysningsbokser totalt på skjema 1b er `r Oppsum[3,1]`. -->
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- # Tabell1 <- as.data.frame(t(as.data.frame(table(rowSums(skjema1b[, boolske_var1b]))))) -->
+<!-- Tabell1 <- table(rowSums(skjema1b[, boolske_var1b])) -->
+<!-- Tabell1 -->
+
+<!-- ``` -->
+
+<!-- For skjema 1b finnes det `r Oppsum[3,3]` variabler av type Enkeltvalg og antall utfylte variabler fordeler seg som under. -->
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- # table(cut(rowSums(skjema1b[, enum_var1b]), breaks = c(0, 5, 10, 15, 20))) -->
+<!-- table(rowSums(skjema1b[, enum_var1b])) -->
+<!-- # table(rowSums(skjema1b[which(rowSums(skjema1b[, boolske_var1b])!=0), enum_var1b])) -->
+
+<!-- ``` -->
+
+<!-- På skjema 1b er det bare tre numeriske variabler ("WorkingPercent", "SickLeave_percent", "Pension_percent") og disse skal kun fylles ut ved avkrysnig av gitte felter. Det gir derfor ikke mening å se på utfyllingsgraden i denne sammenhengen. -->
+
+
+<!-- ## Skjema 1a -->
+
+<!-- ### Utfyllingsgrad -->
+
+<!-- Skjema 1a består for det meste av variabler av type Enkeltvalg, så vi begynner med å se på utfyllingsgraden av disse feltene. For skjema 1a er alle feltene av Enkeltvalg-type kodet numerisk hvilket gjør jobben overkommelig. Skjemaet har 91 variabler av denne typen og tabellen under oppsummerer utfyllingsgraden. Også på de pasientutfylte skjemaene er det stor variasjon i utfyllingsgrad og det kan stilles spørsmål om verdien til dataen når utfyllingsgraden er så lav som den er for svært mange registreringer. -->
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- table(cut(rowSums(skjema1a[, enum_var1a]), breaks = c(0,10,20,30,40,50,60,70,80,90))) -->
+<!-- ``` -->
+
+
+<!-- For Avkrysninger ser det ut som i tabellen under. Igjen er det vanskelig å vite hvor mange avkrysninger man skal forvente men det er tydelig at utfyllingsgraden er lav. -->
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- Tabell2 <- table(rowSums(skjema1a[, boolske_var1a])) -->
+<!-- Tabell2 -->
+<!-- ``` -->
+
+
+<!-- ## Skjema 2 -->
+
+<!-- Skjema 2 består i all hovedsak av variabler av typen Enkeltvalg og utfyllingsgraden til disse er oppsummert i tabellen under. Også her er utfyllingsgraden nokså varierende. -->
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- table(cut(rowSums(skjema2[, enum_var2]), breaks = c(0,10,20,30,40,50))) -->
+<!-- ``` -->
+
+<!-- ## Dobbelregistreringer -->
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- FinnDobbel <- sort(table(skjema1a$PasientGUID), decreasing = T) -->
+<!-- FinnDobbel <- FinnDobbel[FinnDobbel>1] -->
+<!-- Dobbel1a <- skjema1a[skjema1a$PasientGUID %in% names(FinnDobbel), ] -->
+
+<!-- ``` -->
+
+<!-- For Skjema 1a er det to pasienter som har to skjema tilknyttet sin pasientGUID. For begge pasientene peker skjemaene mot samme HovedskjemaGUID. -->
+
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- FinnDobbel <- sort(table(skjema1b$PasientGUID), decreasing = T) -->
+<!-- FinnDobbel <- FinnDobbel[FinnDobbel>1] -->
+<!-- Dobbel1b <- skjema1b[skjema1b$PasientGUID %in% names(FinnDobbel), ] -->
+<!-- # Dobbel1b$PasientGUID[which(Dobbel1b$SkjemaGUID %in% skjema1b$SkjemaGUID[ingen_avkrysninger1b])] -->
+<!-- ``` -->
+
+<!-- For Skjema 1b er det 11 pasienter som har to skjemaer tilknyttet seg. Av disse er det en pasient med ett tomt skjema og to pasienter med to tomme skjemaer. Det er ingen pasienter med mer enn ett skjema 2. -->
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- FinnDobbel <- sort(table(skjema2$PasientGUID), decreasing = T) -->
+<!-- FinnDobbel <- FinnDobbel[FinnDobbel>1] -->
+<!-- Dobbel2 <- skjema2[skjema2$PasientGUID %in% names(FinnDobbel), ] -->
+
+<!-- ``` -->
+
+<!-- # Gjennomgang av pasientskjema -->
+
+<!-- Her følger en gjennomgang av avsnittsvis utfyllingsgrad for pasientskjemaet -->
+
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- 100-apply(skjema1a_bak[, kodebok1a$Variabelnavn[which(kodebok1a$Variabelnavn=='0 = Ikke svart')-1]], 2, -->
+<!--       function(x){round(length(which(x==0))/length(x)*100,1)}) -->
+
+<!-- ``` -->
+
+
+<!-- ```{r, echo = FALSE, warning=FALSE} -->
+<!-- TomErLik0Navn <- kodebok1a$Variabelnavn[which(kodebok1a$Variabelnavn=='0 = Ikke svart')-1] -->
+
+<!-- AntBesvODI <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Odi')]], 1, function(x){sum(x!=0)}) -->
+<!-- manglerODI <- sum(AntBesvODI < length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Odi')]))/dim(skjema1a)[1]*100 -->
+<!-- manglerODIPstil <- quantile(AntBesvODI, (1:5)/10) -->
+
+<!-- AntBesvNDI <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Ndi')]], 1, function(x){sum(x!=0)}) -->
+<!-- manglerNDI <- sum(AntBesvNDI<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 3) == 'Ndi')]))/dim(skjema1a_bak)[1]*100 -->
+
+<!-- AntBesvHSCL <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Hscl')]], 1, function(x){sum(x!=0)}) -->
+<!-- manglerHSCL <- sum(AntBesvHSCL<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Hscl')]))/dim(skjema1a_bak)[1]*100 -->
+
+<!-- AntBesvEQ5D <- apply(skjema1a_bak[, TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Eq5d')]], 1, function(x){sum(x!=0)}) -->
+<!-- manglerEQ5D <- sum(AntBesvEQ5D<length(TomErLik0Navn[which(substr(TomErLik0Navn, 1, 4) == 'Eq5d')]))/dim(skjema1a_bak)[1]*100 -->
+
+<!-- UHIvar <- kodebok1a$Variabelnavn[substr(kodebok1a$Variabelnavn,1,4)=='UhiQ'] -->
+<!-- AntBesvUHI <- apply(skjema1a_bak[, UHIvar], 1, function(x){sum(x!=-1)}) -->
+<!-- manglerUHI <- sum(AntBesvUHI < length(UHIvar), na.rm = T)/dim(skjema1a_bak)[1]*100 -->
+
+<!-- FabQvar <- kodebok1a$Variabelnavn[substr(kodebok1a$Variabelnavn,1,4)=='FabQ'] -->
+<!-- AntBesvFabQ <- apply(skjema1a_bak[, FabQvar], 1, function(x){sum(!is.na(x))}) -->
+<!-- manglerFabQ <- sum(AntBesvFabQ < length(FabQvar))/dim(skjema1a_bak)[1]*100 -->
+
+<!-- TidlBehVar <- kodebok1a$Variabelnavn[substr(kodebok1a$Variabelnavn,1,16)=='TreatmentEarlier'] -->
+<!-- AntBesvTidlBeh <- apply(skjema1a_bak[, TidlBehVar[-9]], 1, function(x){sum(x!=0)}) -->
+<!-- manglerTidlBeh <- sum(AntBesvTidlBeh < length(TidlBehVar[-9]), na.rm = T)/dim(skjema1a_bak)[1]*100 -->
+
+<!-- AntBesv <- data.frame(AntBesvODI, AntBesvNDI, AntBesvHSCL, AntBesvEQ5D, AntBesvUHI, AntBesvFabQ, AntBesvTidlBeh) -->
+<!-- apply(AntBesv, 2, table, useNA='ifany') -->
+
+<!-- IkkeAlleUtfylt <- data.frame(manglerODI,manglerNDI, manglerHSCL, manglerEQ5D, manglerUHI, manglerFabQ, manglerTidlBeh) -->
+
+<!-- round(IkkeAlleUtfylt, 1) -->
+
+
+<!-- ``` -->
+
