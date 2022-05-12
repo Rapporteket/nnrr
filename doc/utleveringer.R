@@ -1,6 +1,32 @@
 rm(list=ls())
 library(nnrr)
 
+########## Utlevering AID spine 10.05.2022 #######################################
+
+
+# pasientsvar_pre <- readr::read_csv2('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-05-09_1545_red.csv',
+#                                     locale = readr::locale(encoding = "latin1"))
+pasientsvar_6mnd <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-05-09_1545.csv',
+                         sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+# pasientsvar_12mnd <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-05-09_1545.csv',
+#                                sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-05-09_1544.csv',
+                         sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+var_behandler <- readxl::read_xlsx('I:/nnrr/AID-Spine­_kodebok_nnrr.xlsx', sheet = 7)
+var_6mnd <- readxl::read_xlsx('I:/nnrr/AID-Spine­_kodebok_nnrr.xlsx', sheet = 5)
+
+legeskjema$S1b_DateOfCompletion <- as.Date(legeskjema$S1b_DateOfCompletion, format="%d.%m.%Y")
+pasientsvar_pre$S1b_DateOfCompletion <- as.Date(pasientsvar_pre$S1b_DateOfCompletion, format="%d.%m.%Y")
+legeskjema <- legeskjema[which(legeskjema$S1b_DateOfCompletion < "2017-01-01"), ]
+legeskjema <- legeskjema[which(legeskjema$S1b_DateOfCompletion >= "2015-01-01" |
+                                 legeskjema$S1b_DateOfCompletion >= "2007-01-01" &
+                                 legeskjema$S1b_DateOfCompletion < "2009-01-01"), ]
+pasientsvar_6mnd <- pasientsvar_6mnd[pasientsvar_6mnd$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+
+var_behandler <- intersect(var_behandler$Variabelnavn, names(legeskjema))
+var_6mnd <- intersect(var_6mnd$Variabelnavn, names(pasientsvar_6mnd))
+
 ########## Utlevering Bjørneboe 31.03.2022 #######################################
 pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-03-31_1351.csv',
                               sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8-BOM')
