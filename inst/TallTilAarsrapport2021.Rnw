@@ -59,9 +59,12 @@ names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
 names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
 names(pasientsvar_post2)[names(pasientsvar_post2)=='SkjemaGUID'] <- 'SkjemaGUID_post2'
 
-RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
-RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
-RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'), all.x = TRUE)
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'), all.x = TRUE)
 
 ## Fjerne Stavern for nå:
 # RegData <- RegData[RegData$UnitId != 700138, ]
@@ -112,20 +115,20 @@ print(xtable::xtable(tab0[,-5], digits=0, align=c('l', 'l', 'l', rep('r', ncol(t
 
 tab_oppf_alle <- RegDataAll[RegDataAll$regstatus_pre == 1, ] %>% group_by(SykehusNavn) %>%
   summarise("Ant.aktuell.6mnd" = sum(regstatus[Besoksdato >= paste0(rap_aar-1, "-07-01") &
-                                                   Besoksdato <= paste0(rap_aar, "-06-30")]),
+                                                 Besoksdato <= paste0(rap_aar, "-06-30")]),
             "Ant.aktuell.12mnd" = sum(regstatus[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-                                                   Besoksdato <= paste0(rap_aar-1, "-12-31")]),
+                                                  Besoksdato <= paste0(rap_aar-1, "-12-31")]),
             "Andel.6mnd" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-07-01") &
-                                                   Besoksdato <= paste0(rap_aar, "-06-30")])/Ant.aktuell.6mnd*100,
+                                                Besoksdato <= paste0(rap_aar, "-06-30")])/Ant.aktuell.6mnd*100,
             # "Andel.6mnd_v2" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-01-01") &
             #                                        Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100,
             "Andel.12mnd" = sum(regstatus_post2[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-                                                   Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100,
+                                                  Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100,
             "Andel.begge" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-                                                   Besoksdato <= paste0(rap_aar-1, "-12-31")] &
+                                                 Besoksdato <= paste0(rap_aar-1, "-12-31")] &
                                   regstatus_post2[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-                                                   Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100
-            )
+                                                    Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100
+  )
 tab_oppf_alle <- tab_oppf_alle[tab_oppf_alle$Ant.aktuell.6mnd>0 | tab_oppf_alle$Ant.aktuell.12mnd>0, ]
 
 tab_oppf_alle$Andel.6mnd <- paste0(round(tab_oppf_alle$Andel.6mnd, 1), "% (", tab_oppf_alle$Ant.aktuell.6mnd, ")")
@@ -146,9 +149,9 @@ print(xtable::xtable(tab_oppf_alle, digits=0, align=c('l', 'l', 'l', rep('r', nc
 utdanning <- as.data.frame.matrix(addmargins(table(RegData[RegData$regstatus_pre==1, c("SykehusNavn", "EducationLevel")], useNA = 'ifany'), 2))
 
 names(utdanning) <- c('Grunnskole (7-10 år)', 'Vgs. yrkesfaglig',
-                    'Vgs. allmennfaglig', 'Høyskole/univ < 4år',
-                    'Høyskole/univ >= 4 år',
-                    'Ikke svart', 'N')
+                      'Vgs. allmennfaglig', 'Høyskole/univ < 4år',
+                      'Høyskole/univ >= 4 år',
+                      'Ikke svart', 'N')
 
 tmp <- round(utdanning[, -dim(utdanning)[2]]/utdanning[, dim(utdanning)[2]]*100, 1)
 utdanning[, -dim(utdanning)[2]] <- apply(tmp, 2, function(x){paste0(x, "%")})
@@ -168,7 +171,7 @@ reshID <- 0
 enhetsUtvalg <- 0
 preprosess <- F
 hentData <- F
-annetformat = ".wmf"
+annetformat = NA #".wmf"
 figfolder <- "C:/GIT/nnrr/inst/figurer_aarsrapp_2021/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
@@ -206,37 +209,37 @@ tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "Nd
   dplyr::filter(Aar == rap_aar) %>%
   dplyr::group_by (SykehusNavn) %>%
   dplyr::summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
-            N.odi = sum(!is.na(OdiScore)),
-            Gj.snitt.ndi = mean(NdiScore, na.rm = T),
-            N.ndi = sum(!is.na(NdiScore)),
-            Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
-            N.hscl10 = sum(!is.na(HSCL10.Score)),
-            Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
-            N.FABQScore1 = sum(!is.na(FABQScore1)),
-            Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
-            N.FABQScore2 = sum(!is.na(FABQScore2)),
-            Gj.snitt.eq5d = mean(Score_EQ5DL, na.rm = T),
-            N.eq5d = sum(!is.na(Score_EQ5DL)),
-            Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
-            N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
+                   N.odi = sum(!is.na(OdiScore)),
+                   Gj.snitt.ndi = mean(NdiScore, na.rm = T),
+                   N.ndi = sum(!is.na(NdiScore)),
+                   Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+                   N.hscl10 = sum(!is.na(HSCL10.Score)),
+                   Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
+                   N.FABQScore1 = sum(!is.na(FABQScore1)),
+                   Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
+                   N.FABQScore2 = sum(!is.na(FABQScore2)),
+                   Gj.snitt.eq5d = mean(Score_EQ5DL, na.rm = T),
+                   N.eq5d = sum(!is.na(Score_EQ5DL)),
+                   Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
+                   N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
 
 tot <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
                    "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
   dplyr::filter(Aar == rap_aar) %>%
   dplyr::summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
-            N.odi = sum(!is.na(OdiScore)),
-            Gj.snitt.ndi = mean(NdiScore, na.rm = T),
-            N.ndi = sum(!is.na(NdiScore)),
-            Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
-            N.hscl10 = sum(!is.na(HSCL10.Score)),
-            Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
-            N.FABQScore1 = sum(!is.na(FABQScore1)),
-            Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
-            N.FABQScore2 = sum(!is.na(FABQScore2)),
-            Gj.snitt.eq5d = mean(Score_EQ5DL, na.rm = T),
-            N.eq5d = sum(!is.na(Score_EQ5DL)),
-            Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
-            N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
+                   N.odi = sum(!is.na(OdiScore)),
+                   Gj.snitt.ndi = mean(NdiScore, na.rm = T),
+                   N.ndi = sum(!is.na(NdiScore)),
+                   Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+                   N.hscl10 = sum(!is.na(HSCL10.Score)),
+                   Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
+                   N.FABQScore1 = sum(!is.na(FABQScore1)),
+                   Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
+                   N.FABQScore2 = sum(!is.na(FABQScore2)),
+                   Gj.snitt.eq5d = mean(Score_EQ5DL, na.rm = T),
+                   N.eq5d = sum(!is.na(Score_EQ5DL)),
+                   Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
+                   N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
 
 tab2 <- dplyr::bind_rows(tab2, data.frame(SykehusNavn='Totalt', tot))
 tab2$Gj.snitt.odi <- paste0(round(tab2$Gj.snitt.odi, 1), ' (', tab2$N.odi, ')')
@@ -416,14 +419,20 @@ print(xtable::xtable(tab8_1, align=c('l', 'l', rep('r', ncol(tab8_1)-1)), captio
       include.rownames=FALSE, sanitize.text.function = function(x){x})
 
 
-BehSpeshelsetj <- data.frame(label = c('Henvist til vurdering av operasjon', 'Anbefaler henvisning til annet opptrenings /rehabiliteringssenter',
-                                       'Behandling som settes i verk i egen spesialisthelsetjeneste', 'Kontroll etter vurdering eller behandling',
-                                       'Individuell oppfølging 1-2 ganger', 'Individuell tverrfaglig behandling (antall ganger)',
-                                       'Tverrfaglig behandling i gruppe (antall ganger)'), varnavn =
-                               varnavn_1b$Variabelnavn[match(c('Henvist til vurdering av operasjon', 'Anbefaler henvisning til annet opptrenings /rehabiliteringssenter',
-                                                               'Behandling som settes i verk i egen spesialisthelsetjeneste', 'Kontroll etter vurdering eller behandling',
-                                                               'Individuell oppfølging 1-2 ganger', 'Individuell tverrfaglig behandling (antall ganger)',
-                                                               'Tverrfaglig behandling i gruppe (antall ganger)'), varnavn_1b$Feltnavn)])
+BehSpeshelsetj <- data.frame(label = c('Henvist til vurdering av operasjon',
+                                       'Anbefaler henvisning til annet opptrenings /rehabiliteringssenter',
+                                       'Behandling som settes i verk i egen spesialisthelsetjeneste',
+                                       'Kontroll etter vurdering eller behandling',
+                                       'Individuell oppfølging 1-2 ganger',
+                                       'Individuell tverrfaglig behandling (antall ganger)',
+                                       'Tverrfaglig behandling i gruppe (antall ganger)'),
+                             varnavn = varnavn_1b$Variabelnavn[match(c('Henvist til vurdering av operasjon',
+                                                                       'Anbefaler henvisning til annet opptrenings /rehabiliteringssenter',
+                                                                       'Behandling som settes i verk i egen spesialisthelsetjeneste',
+                                                                       'Kontroll etter vurdering eller behandling',
+                                                                       'Individuell oppfølging 1-2 ganger',
+                                                                       'Individuell tverrfaglig behandling (antall ganger)',
+                                                                       'Tverrfaglig behandling i gruppe (antall ganger)'), varnavn_1b$Feltnavn)])
 
 tab7 <- RegData[, c(as.character(BehSpeshelsetj$varnavn), "Treatment_GroupInterdisciplinary", "Aar",
                     "Treatment_TreatmentInSpecialistServices")] %>% group_by (Aar) %>%
@@ -552,11 +561,14 @@ tab9$`Smerte i hvile - oppfølging` <- paste0(round(tab9$`Smerte i hvile - oppf�
 tab9 <- tab9[, -c(4,6)]
 names(tab9)[1] <- ''
 
-tab9_2 <- RegDataAll %>% filter(Besoksdato>=paste0(rap_aar-1, "-07-01") & Besoksdato<=paste0(rap_aar, "-06-30") & regstatus_pre == 1 &
+tab9_2 <- RegDataAll %>% filter(Besoksdato>=paste0(rap_aar-1, "-07-01") &
+                                  Besoksdato<=paste0(rap_aar, "-06-30") & regstatus_pre == 1 &
                                   regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
-                                  !is.na(PainExperiencesNoActivity_post) & (Treatment_GroupInterdisciplinary2018 %in% 1:4 |
-                                                                              Treatment_GroupInterdisciplinary %in% 1:3 |
-                                                                              Treatment_InvidualInterdisciplinary %in% 1:4))  %>% group_by(SykehusNavn) %>%
+                                  !is.na(PainExperiencesNoActivity_post) &
+                                  (Treatment_GroupInterdisciplinary2018 %in% 1:4 |
+                                     Treatment_GroupInterdisciplinary %in% 1:3 |
+                                     Treatment_InvidualInterdisciplinary %in% 1:4))  %>%
+  group_by(SykehusNavn) %>%
   summarise('N' = n(),
             'Smerte i hvile - konsultasjon' = mean(PainExperiencesNoActivity),
             'SD' = sd(PainExperiencesNoActivity),
@@ -632,6 +644,27 @@ if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
   nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 }
+RegDataTverrfaglig <- RegDataAll[which(RegDataAll$Treatment_GroupInterdisciplinary2018 %in% 1:4 |
+                                     RegDataAll$Treatment_GroupInterdisciplinary %in% 1:3 |
+                                     RegDataAll$Treatment_InvidualInterdisciplinary %in% 1:4), ]
+outfile <- paste0(figfolder, "Smerte_i_ro_basis_tverrfaglig.pdf")
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+}
+outfile <- paste0(figfolder, "Smerte_i_ro_6mnd_tverrfaglig.pdf")
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+}
+outfile <- paste0(figfolder, "Smerte_i_ro_12mnd_tverrfaglig.pdf")
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesNoActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
+}
 
 # outfile <- paste0(figfolder, "Smerte_i_aktivitet.pdf")
 # tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
@@ -658,6 +691,25 @@ if (!is.na(annetformat)) {
   nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 }
 
+outfile <- paste0(figfolder, "Smerte_i_aktivitet_basis_tverrfaglig.pdf")
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"), sammenlign = 0)
+}
+outfile <- paste0(figfolder, "Smerte_i_aktivitet_6mnd_tverrfaglig.pdf")
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+}
+outfile <- paste0(figfolder, "Smerte_i_aktivitet_12mnd_tverrfaglig.pdf")
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'PainExperiencesActivity', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
+}
+
 # outfile <- paste0(figfolder, "ODI_PrePost.pdf")
 # tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"))
 # if (!is.na(annetformat)) {
@@ -676,6 +728,14 @@ if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
   nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
 }
+
+outfile <- paste0(figfolder, "ODI_6mnd_tverrfaglig.pdf")
+tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataTverrfaglig, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-07-01"), datoTil = paste0(rap_aar, "-06-30"), sammenlign = 1)
+}
+
 outfile <- paste0(figfolder, "ODI_12mnd.pdf")
 tmp <- nnrrFigGjsnPrePostGrVar_v2(RegData = RegDataAll, valgtVar = 'ODI_PrePost', outfile = outfile, datoFra = paste0(rap_aar-1, "-01-01"), datoTil = paste0(rap_aar-1, "-12-31"), sammenlign = 2)
 if (!is.na(annetformat)) {
@@ -731,6 +791,24 @@ if (!is.na(annetformat)) {
 
 \begin{figure}[ht]
 \centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}Smerte_i_ro_basis_tverrfaglig.pdf}
+\caption{Smerte i hvile, skala fra 0-10 hvor 10 er verst. Gjelder de tverrfaglig behandlede.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}Smerte_i_ro_6mnd_tverrfaglig.pdf}
+\caption{Smerte i hvile, skala fra 0-10 hvor 10 er verst. Gjelder de tverrfaglig behandlede.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}Smerte_i_ro_12mnd_tverrfaglig.pdf}
+\caption{Smerte i hvile, skala fra 0-10 hvor 10 er verst. Gjelder de tverrfaglig behandlede.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}Smerte_i_aktivitet_basis.pdf}
 \caption{Smerte i aktivitet, skala fra 0-10 hvor 10 er verst}
 \end{figure}
@@ -750,6 +828,25 @@ if (!is.na(annetformat)) {
 
 \begin{figure}[ht]
 \centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}Smerte_i_aktivitet_basis_tverrfaglig.pdf}
+\caption{Smerte i aktivitet, skala fra 0-10 hvor 10 er verst. Gjelder de tverrfaglig behandlede.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}Smerte_i_aktivitet_6mnd_tverrfaglig.pdf}
+\caption{Smerte i aktivitet, skala fra 0-10 hvor 10 er verst. Gjelder de tverrfaglig behandlede.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}Smerte_i_aktivitet_12mnd_tverrfaglig.pdf}
+\caption{Smerte i aktivitet, skala fra 0-10 hvor 10 er verst. Gjelder de tverrfaglig behandlede.}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}ODI_basis.pdf}
 \caption{Ryggsmerte-relatert funksjon ved konsultasjon.}
 \end{figure}
@@ -758,6 +855,12 @@ if (!is.na(annetformat)) {
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}ODI_6mnd.pdf}
 \caption{Ryggsmerte-relatert funksjon ved konsultasjon og etter 6 måneder.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}ODI_6mnd_tverrfaglig.pdf}
+\caption{Ryggsmerte-relatert funksjon ved konsultasjon og etter 6 måneder. Gjelder de tverrfaglig behandlede.}
 \end{figure}
 
 \begin{figure}[ht]
@@ -784,8 +887,9 @@ if (!is.na(annetformat)) {
 \caption{Skår på NDI (nakke-relatert funksjon) ved konsultasjon og etter 6 og 12 måneder.}
 \end{figure}
 
-% \addtolength{\hoffset}{-2.0cm}
+\clearpage
 
+% \addtolength{\hoffset}{-2.0cm}
 
 
 <<'Tab 11: arbeidsstatus', results='asis', echo=FALSE, warning=F>>=
@@ -842,7 +946,7 @@ print(xtable::xtable(tab11, digits=0, align=c('l', 'l', rep('R{0.4in}', ncol(tab
 
 
 RegData$arbeid_ikke_besvart_post <- !(RegData$S2_Working_post | RegData$S2_SickLeave_post | RegData$S2_StayAtHome_post | RegData$S2_Student_post |
-                                      RegData$S2_Unemployed_post | RegData$S2_NAV_post | RegData$S2_Pension_post | RegData$S2_RetirementPension_post)
+                                        RegData$S2_Unemployed_post | RegData$S2_NAV_post | RegData$S2_Pension_post | RegData$S2_RetirementPension_post)
 
 tab <- RegData[which(RegData$regstatus_post==1), ] %>%
   group_by(SykehusNavn) %>%
@@ -1042,7 +1146,7 @@ print(xtable::xtable(tab16, digits=0, align=c('l', 'l', rep('R{0.5in}', ncol(tab
 
 
 etiketter <- c('Fornøyd', 'Litt fornøyd', 'Hverken fornøyd eller misfornøyd',
-                                  'Litt misfornøyd', 'Misfornøyd', 'Ikke utfylt')
+               'Litt misfornøyd', 'Misfornøyd', 'Ikke utfylt')
 RegData$FornoydBehandling <- factor(RegData$TreatmentSatisfaction, levels = c(1:5, 0), labels = etiketter)
 # tab17 <- as.data.frame.matrix(table(RegData[, c("SykehusNavn", "FornoydBehandling")]) )
 tab17 <- table(RegData$SykehusNavn, RegData$FornoydBehandling) %>%
@@ -1220,6 +1324,82 @@ if (!is.na(annetformat)) {
   nnrrFigIndikator(indikator, 'Andel kvinner', outfile=outfile)
 }
 
+
+#### Andel med 3 eller flere helseplager som er «en del plaget» eller «alvorlig plaget». Ser bort ifra
+#### nakkesmerte, smerte øverst i ryggen og smerter i korsryggen
+aux <- RegDataAll[which(RegDataAll$Aar <= rap_aar), ]
+aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+         "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+         "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+         "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+         "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")] <-
+  sapply(aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+                  "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+                  "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+                  "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+                  "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")], as.numeric)
+aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+         "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+         "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+         "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+         "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")][
+           aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+                    "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+                    "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+                    "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+                    "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")] == -1] <- NA
+
+aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+         "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+         "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+         "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+         "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")][
+           aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+                    "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+                    "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+                    "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+                    "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")] < 2 ] <- 0
+aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+         "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+         "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+         "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+         "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")][
+           aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+                    "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+                    "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+                    "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+                    "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")] >= 2 ] <- 1
+
+aux$ant_hoy_uhi <- rowSums(aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+                                    "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+                                    "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+                                    "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+                                    "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")], na.rm = T)
+aux$ant_besvart_uhi <- rowSums(is.na(aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+                                              "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+                                              "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+                                              "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+                                              "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")]))
+
+aux <- aux[aux$ant_besvart_uhi >= 3, ]
+aux$Teller <- 0
+aux$Teller[aux$ant_hoy_uhi >=3] <- 1
+
+table(aux$indikator, useNA = 'ifany')
+
+indikator <- aux[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
+names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
+indikator$Nevner <- 1
+
+outfile <- paste0(figfolder, "flereEnn3plager.pdf")
+nnrrFigIndikator(indikator, c('Andel pasienter med 3 eller flere helseplager',
+                              'besvart med en del eller alvorlig plaget'), outfile=outfile)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigIndikator(indikator, 'Andel kvinner', outfile=outfile)
+}
+
+
 @
 
 \begin{figure}[ht]
@@ -1239,6 +1419,13 @@ if (!is.na(annetformat)) {
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}andel_kvinner.pdf}
 \caption{Andel kvinner.}
 \end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}flereEnn3plager.pdf}
+\caption{Andel pasienter med 3 eller flere helseplager besvart som \emph{En del plaget} eller \emph{Alvorlig plaget}. I nevneren inngår kun pasienter som har besvart minst 3 av de 33 UHI spørsmålene.}
+\end{figure}
+
 
 
 \end{document}

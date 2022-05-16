@@ -34,16 +34,14 @@ knitr::opts_knit$set(root.dir = './')
 rm(list=ls())
 library(nnrr)
 library(tidyverse)
+options(dplyr.summarise.inform = FALSE)
 
 rap_aar <- 2021
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-02-25_1423.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-02-25_1407.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-02-25_1423.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-
-# pasientsvar_pre <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-01-18_1507_red.csv', sep=';', header=T, stringsAsFactors = F)
-# legeskjema <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Behandlerskjema_2022-01-18_1504.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-# pasientsvar_post <- read.table('C:/GIT/tmpdata/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-01-18_1510.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-05-09_1545_red.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-05-09_1544.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-05-09_1545.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post2 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -53,16 +51,24 @@ icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFac
 legeskjema$regstatus <- 1
 pasientsvar_pre$regstatus <- 1
 pasientsvar_post$regstatus <- 1
+pasientsvar_post2$regstatus <- 1
 
 names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
 names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
+names(pasientsvar_post2)[names(pasientsvar_post2)=='SkjemaGUID'] <- 'SkjemaGUID_post2'
 
-RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
-RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'), all.x = TRUE)
 
 RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
-# RegData <- RegData[RegData$DiagnosticNumber1 != '', ]
-# RegData <- RegData[RegData$DiagnosticNumber1 != '.', ]
+
+# RegData <- nnrr::nnrrPreprosess(RegData = RegData)
+# RegDataAll <- RegData
+# RegData <- RegData[which(RegData$Aar >= rap_aar & RegData$Aar <= rap_aar), ]
 
 RegData <- nnrrPreprosess(RegData = RegData)
 RegDataAll <- RegData
@@ -78,12 +84,13 @@ kobling_resh_shusnavn <- RegData[match(unique(RegData$UnitId), RegData$UnitId), 
 map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025, 974557746, 974795787, 974795639, 974703300, 974795477, 974733013, 974754118, 974747138, 974631326),
                              resh = c(109834, 104293, 102959, 601032, 700735, 4211588, 102169, 114174, 105821, 4212982, 103736))
 
-##!!!!!!!!!!!!!!!!! Spør Maja om tvilsavdelinger !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
 format_ut <- ".wmf"
-figfolder <- "figfolder/"
+figfolder <- "C:/GIT/nnrr/inst/indikatorer_2021/"
+if (!dir.exists(figfolder)) {
+  dir.create(figfolder)
+}
 
 figstr <- 0.61
 tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
@@ -99,6 +106,10 @@ skjema1b$tverrfaglig_behandlet <- 0
 skjema1b$tverrfaglig_behandlet[skjema1b$Treatment_GroupInterdisciplinary2018 != 0 | skjema1b$Treatment_GroupInterdisciplinary != 0] <- 1
 skjema1b$tverrfaglig_behandlet[skjema1b$Treatment_InvidualInterdisciplinary != 0] <- 1
 
+tabell1 <- nnrrIndikatorTabell(skjema1b, indikator = 'tverrfaglig_behandlet')
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel tverrfaglig behandlet'), include.rownames=FALSE)
+
+
 ######### Indikator #####################################################################
 indikator <- skjema1b[, c("UnitId", "Aar", "tverrfaglig_behandlet", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
@@ -111,29 +122,28 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_tverrfaglig_behandling"
 Indikatorer <- indikator
 
-#########################################################################################
+@
+
+<<'Fig. tverrfaglig', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "tverrfagligbeh.pdf"
-nnrrFigIndikator(indikator, 'Andel tverrfaglig behandlet', outfile=outfile, maal = 30, graaUt = 'OUS')
+outfile <- paste0(figfolder, outfile)
+nnrrFigIndikator(indikator, 'Andel tverrfaglig behandlet', outfile=outfile, maal = 30)
 
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel tverrfaglig behandlet', outfile=outfile, maal = 30, graaUt = 'OUS')
+  nnrrFigIndikator(indikator, 'Andel tverrfaglig behandlet', outfile=outfile, maal = 30)
 }
-
-
-tabell1 <- nnrrIndikatorTabell(skjema1b, indikator = 'tverrfaglig_behandlet')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel tverrfaglig behandlet'), include.rownames=FALSE)
 
 @
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{tverrfagligbeh.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tverrfagligbeh.pdf}
 % \caption{Andel tverrfaglig behandlet}
 \end{figure}
 
 
-<<'Indikator 7 & 8: andel med klinisk viktig endring i ODI/NDI, ', results='asis', echo=FALSE>>=
+<<'Indikator 7 & 8: andel med klinisk viktig endring i ODI/NDI', results='asis', echo=FALSE>>=
 # aux <- aux[aux$Aar >= 2018, ]
 aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 aux <- aux[!is.na(aux$OdiScore) & !is.na(aux$OdiScore_post), ]
@@ -155,20 +165,23 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_bedret_funksjon"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
+tabell1 <- nnrrIndikatorTabell(aux, indikator = 'odidiff_klin_viktig')
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i ODI (reduksjon $\\geq$ 30 \\%)'), include.rownames=FALSE)
 #########################################################################################
+@
 
+<<'Fig. Klinisk viktig endring i ODI', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "ODI_KliniskViktig.pdf"
+outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, 'Klinisk viktig endring i ODI', outfile=outfile, maal = 30, minstekrav = 25)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
   nnrrFigIndikator(indikator, 'Klinisk viktig endring i ODI', outfile=outfile, maal = 30, minstekrav = 25)
 }
 
+@
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'odidiff_klin_viktig')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i ODI (reduksjon $\\geq$ 30 \\%)'), include.rownames=FALSE)
-
-
+<<'Indikator 7 & 8: andel med klinisk viktig endring i ODI/NDI, videre', results='asis', echo=FALSE>>=
 aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 aux <- aux[!is.na(aux$NdiScore) & !is.na(aux$NdiScore_post), ]
 aux$ndidiff_klin_viktig <- 0
@@ -206,9 +219,11 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_funksjons_nedsettelse"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 #########################################################################################
+@
 
-
+<<'Fig. min. funk. nedsettelse', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "minimal_funksjonsnedsettelse.pdf"
+outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 30, minstekrav = 25)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
@@ -216,12 +231,15 @@ if (format_ut != "pdf") {
 }
 
 outfile <- "minimal_funksjonsnedsettelse_v2.pdf"
+outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 50, minstekrav = 40)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
   nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 50, minstekrav = 40)
 }
+@
 
+<<'Indikator 7 & 8: andel med klinisk viktig endring i ODI/NDI, forts', results='asis', echo=FALSE>>=
 aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 aux <- aux[!is.na(aux$NdiScore) & !is.na(aux$NdiScore_post), ]
 aux$minimal_funksjonsnedsettelse <- 0
@@ -238,19 +256,19 @@ datasett_indikator8minimal_funksjonsnedsettelseNDI <- aux[, c("UnitId", "Sykehus
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{ODI_KliniskViktig.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}ODI_KliniskViktig.pdf}
 % \caption{Andel tverrfaglig behandlet}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{minimal_funksjonsnedsettelse.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}minimal_funksjonsnedsettelse.pdf}
 % \caption{Andel tverrfaglig behandlet}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{minimal_funksjonsnedsettelse_v2.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}minimal_funksjonsnedsettelse_v2.pdf}
 \caption{Minimal funksjonsnedsettelse, versjon 2}
 \end{figure}
 
@@ -275,18 +293,23 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_bedring_smerte_hvile"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
-#########################################################################################
+tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% eller mer reduksjon i smerte i hvile. Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget.'), include.rownames=FALSE)
 
+#########################################################################################
+@
+
+<<'Fig. Klinisk viktig bedring av smerte i hvil', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "klin_vikt_endr_smerte_passiv.pdf"
+outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i hvile', outfile=outfile, maal = 30, minstekrav = 25)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
   nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i hvile', outfile=outfile, maal = 30, minstekrav = 25)
 }
+@
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% eller mer reduksjon i smerte i hvile. Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget.'), include.rownames=FALSE)
-
+<<'Indikator 9: andel med klinisk viktig endring smerte forts', results='asis', echo=FALSE>>=
 #### Smerte i aktivitet
 
 aux <- Oppf_data %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
@@ -309,28 +332,30 @@ indikator$ind_id <- "nnrr_bedring_smerte_aktiv"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 #########################################################################################
 
+tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% eller mer reduksjon i smerte i aktivitet.  Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget'), include.rownames=FALSE)
+@
 
+<<'Fig. Klinisk viktig bedring av smerte aktiv', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "klin_vikt_endr_smerte_aktiv.pdf"
+outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i aktivitet', outfile=outfile, maal = 30, minstekrav = 25)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
   nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i aktivitet', outfile=outfile, maal = 30, minstekrav = 25)
 }
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% eller mer reduksjon i smerte i aktivitet.  Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget'), include.rownames=FALSE)
-
 @
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{klin_vikt_endr_smerte_passiv.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}klin_vikt_endr_smerte_passiv.pdf}
 % \caption{Andel tverrfaglig behandlet}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{klin_vikt_endr_smerte_aktiv.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}klin_vikt_endr_smerte_aktiv.pdf}
 % \caption{Andel tverrfaglig behandlet}
 \end{figure}
 
@@ -361,18 +386,22 @@ Indikatorer <- bind_rows(Indikatorer, indikator)
 
 #########################################################################################
 
+tabell1 <- nnrrIndikatorTabell(aux, indikator = 'tilbake_i_arbeid')
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel tilbake i fullt arbeid. Utvalget består av alle som det finnes oppfølgingsdata på og er registrert som sykemeldt ved inklusjon. Hvis de i tillegg er registrert som i 100 \\% arbeid ved inklusjon fjernes de fra utvalget. For å regnes som tilbake i fullt arbeid skal de ha registrert å være i 100 \\% arbeid samt arbeidsstatus som Inntektsgivende arbeid.'), include.rownames=FALSE)
 
+@
+
+<<'Fig. Tilbake i arbeid gml', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "tilbake_i_arbeid.pdf"
+outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 30, minstekrav = 25)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
   nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 30, minstekrav = 25)
 }
+@
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'tilbake_i_arbeid')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel tilbake i fullt arbeid. Utvalget består av alle som det finnes oppfølgingsdata på og er registrert som sykemeldt ved inklusjon. Hvis de i tillegg er registrert som i 100 \\% arbeid ved inklusjon fjernes de fra utvalget. For å regnes som tilbake i fullt arbeid skal de ha registrert å være i 100 \\% arbeid samt arbeidsstatus som Inntektsgivende arbeid.'), include.rownames=FALSE)
-
-
+<<'Indikator 10: andel tilbake i arbeid, forts', results='asis', echo=FALSE>>=
 aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 
 # aux <- aux[which(aux$SickLeave | aux$NAV), ]
@@ -386,7 +415,7 @@ print(xtable::xtable(tabell2, digits=c(0,0,0,0,0,1), caption='Andel delvis/fullt
 @
 
 
-<<'Indikator 10 v2: andel tilbake i arbeid', results='asis', echo=FALSE>>=
+<<'Fig. Indikator 10 v2: andel tilbake i arbeid', include=FALSE, echo=FALSE, eval=T>>=
 # Fullført basis- og oppfølgingsskjema:
 aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 
@@ -396,20 +425,66 @@ aux <- aux[which(aux$IsEmployed == 1 & aux$S2_SickLeave), ]
 
 aux$indikator <- 0
 aux$indikator[aux$S2_Working_post & (!aux$S2_SickLeave_post & !aux$S2_NAV_post)] <- 1
+# aux$indikator[which(aux$S2_SickLeave_Percent_post < aux$S2_SickLeave_Percent)] <- 1
+
+indikator <- aux[, c("UnitId", "Aar", "indikator", "SykehusNavn")]
+names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
+indikator$Nevner <- 1
+indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
+indikator$ind_id <- "nnrr_jobb_ny"
+
+outfile <- "tilbake_i_arbeid_ny_v1.pdf"
+outfile <- paste0(figfolder, outfile)
+nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 30, minstekrav = 25)
+if (format_ut != "pdf") {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
+  nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 30, minstekrav = 25)
+}
+
+
+aux$indikator <- 0
+aux$indikator[aux$S2_Working_post & (!aux$S2_SickLeave_post & !aux$S2_NAV_post)] <- 1
 aux$indikator[which(aux$S2_SickLeave_Percent_post < aux$S2_SickLeave_Percent)] <- 1
 
-tmp <- aux[, c("Besoksdato", "IsEmployed", "S2_Working", "S2_Unemployed", "S2_SickLeave",
-               "S2_SickLeave_Percent", "S2_StayAtHome", "S2_Student", "S2_NAV",
-              "IsEmployed_post",  "S2_Working_post", "S2_Unemployed_post",
-               "S2_SickLeave_post", "S2_SickLeave_Percent_post", "S2_StayAtHome_post",
-               "S2_Student_post", "S2_NAV_post")]
+indikator <- aux[, c("UnitId", "Aar", "indikator", "SykehusNavn")]
+names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
+indikator$Nevner <- 1
+indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
+indikator$ind_id <- "nnrr_jobb_ny"
+
+outfile <- "tilbake_i_arbeid_ny_v2.pdf"
+outfile <- paste0(figfolder, outfile)
+nnrrFigIndikator(indikator, c('Andel tilbake i arbeid eller', 'med lavere andel sykemelding' ),
+                 outfile=outfile, maal = 30, minstekrav = 25)
+if (format_ut != "pdf") {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
+  nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 30, minstekrav = 25)
+}
+
+# tmp <- aux[, c("Besoksdato", "IsEmployed", "S2_Working", "S2_Unemployed", "S2_SickLeave",
+#                "S2_SickLeave_Percent", "S2_StayAtHome", "S2_Student", "S2_NAV",
+#               "IsEmployed_post",  "S2_Working_post", "S2_Unemployed_post",
+#                "S2_SickLeave_post", "S2_SickLeave_Percent_post", "S2_StayAtHome_post",
+#                "S2_Student_post", "S2_NAV_post")]
 @
 
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{tilbake_i_arbeid.pdf}
-% \caption{Andel tverrfaglig behandlet}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tilbake_i_arbeid.pdf}
+\caption{Andel tilbake i arbeid etter 6 mnd, gammel versjon}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tilbake_i_arbeid_ny_v1.pdf}
+\caption{Andel tilbake i arbeid etter 6 mnd, ny versjon.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tilbake_i_arbeid_ny_v2.pdf}
+\caption{Andel tilbake i arbeid, eller med lavere grad av sykemelding etter 6 mnd.}
 \end{figure}
 
 
@@ -436,9 +511,12 @@ Indikatorer <- bind_rows(Indikatorer, indikator)
 
 
 #########################################################################################
+@
 
 
+<<'Fig. Nytte av behandling', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "nytte_av_behandling.pdf"
+outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, 'Pasientopplevd bedring av behandling', outfile=outfile, maal = 30, minstekrav = 25)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
@@ -453,7 +531,7 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Pasientrapportert 
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{nytte_av_behandling.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}nytte_av_behandling.pdf}
 % \caption{Andel tverrfaglig behandlet}
 \end{figure}
 
@@ -474,10 +552,17 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_misfornoeyd"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
+
+tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Fornoyd')
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med eller nøytral til behandlingen'), include.rownames=FALSE)
+
 #########################################################################################
+@
 
 
+<<'Fig. Fornoyd med behandling', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "fornoyd_med_behandling.pdf"
+outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=80, maal = 90, maalretn = 'hoy')
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
@@ -485,14 +570,11 @@ if (format_ut != "pdf") {
 }
 
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Fornoyd')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med eller nøytral til behandlingen'), include.rownames=FALSE)
-
 @
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{fornoyd_med_behandling.pdf}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_med_behandling.pdf}
 % \caption{Andel tverrfaglig behandlet}
 \end{figure}
 
