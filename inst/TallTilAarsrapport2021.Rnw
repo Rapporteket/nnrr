@@ -40,10 +40,10 @@ rap_aar <- 2021
 
 ## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
 
-pasientsvar_pre <- read.table('C:/GIT/gmldata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-04-07_1123.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('C:/GIT/gmldata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('C:/GIT/gmldata/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post2 <- read.table('C:/GIT/gmldata/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-04-07_1123.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post2 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -81,6 +81,15 @@ rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post', 'pasientsvar_po
 
 figstr <- 0.61
 tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+
+figfolder <- "C:/GIT/nnrr/inst/figurer_aarsrapp_2021/"
+if (!dir.exists(figfolder)) {
+  dir.create(figfolder)
+}
+tabfolder <- "C:/GIT/nnrr/inst/tabeller_aarsrapp_2021/"
+if (!dir.exists(tabfolder)) {
+  dir.create(tabfolder)
+}
 @
 
 \begin{document}
@@ -161,6 +170,36 @@ print(xtable::xtable(utdanning, digits=0, align=c('l', rep('R{0.7in}', ncol(utda
 
 @
 
+<<'Tab:tidligere operert', results='asis', echo=FALSE>>=
+
+## Rygg
+tidligereOpRygg <- as.data.frame.matrix(addmargins(table(RegData[RegData$regstatus_pre==1, c("SykehusNavn", "BackSurgery")], useNA = 'ifany'), 2))
+names(tidligereOpRygg)[4] <- "N"
+
+tmp <- round(tidligereOpRygg[, -dim(tidligereOpRygg)[2]]/tidligereOpRygg[, dim(tidligereOpRygg)[2]]*100, 1)
+tidligereOpRygg[, -dim(tidligereOpRygg)[2]] <- apply(tmp, 2, function(x){paste0(x, "%")})
+
+print(xtable::xtable(tidligereOpRygg, digits=0, align=c('l', rep('R{0.7in}', ncol(tidligereOpRygg))), caption = paste0("Tidligere operert rygg, ", rap_aar), include.rownames=FALSE,
+                     sanitize.text.function = identity))
+write.csv2(tidligereOpRygg,
+           paste0(tabfolder, "tab_tidligere_op_rygg.csv"), row.names = T,
+           fileEncoding = "Latin1")
+
+## Nakke
+tidligereOpRygg <- as.data.frame.matrix(addmargins(table(RegData[RegData$regstatus_pre==1, c("SykehusNavn", "NeckSurgery")], useNA = 'ifany'), 2))
+names(tidligereOpRygg)[4] <- "N"
+
+tmp <- round(tidligereOpRygg[, -dim(tidligereOpRygg)[2]]/tidligereOpRygg[, dim(tidligereOpRygg)[2]]*100, 1)
+tidligereOpRygg[, -dim(tidligereOpRygg)[2]] <- apply(tmp, 2, function(x){paste0(x, "%")})
+
+print(xtable::xtable(tidligereOpRygg, digits=0, align=c('l', rep('R{0.7in}', ncol(tidligereOpRygg))), caption = paste0("Tidligere operert nakke, ", rap_aar), include.rownames=FALSE,
+                     sanitize.text.function = identity))
+
+write.csv2(tidligereOpRygg,
+           paste0(tabfolder, "tab_tidligere_op_nakke.csv"), row.names = T,
+           fileEncoding = "Latin1")
+@
+
 <<'Fig. sivilstatus', include=FALSE, echo=FALSE, eval=T>>=
 datoFra <- paste0(rap_aar, "-01-01")
 datoTil <- paste0(rap_aar, "-12-31")
@@ -172,14 +211,6 @@ enhetsUtvalg <- 0
 preprosess <- F
 hentData <- F
 annetformat = NA #".wmf"
-figfolder <- "C:/GIT/nnrr/inst/figurer_aarsrapp_2021/"
-if (!dir.exists(figfolder)) {
-  dir.create(figfolder)
-}
-tabfolder <- "C:/GIT/nnrr/inst/tabeller_aarsrapp_2021/"
-if (!dir.exists(figfolder)) {
-  dir.create(figfolder)
-}
 
 valgtVar <- "FamilyStatus"
 outfile <- paste0(figfolder, "Sivilstatus.pdf")
@@ -262,7 +293,11 @@ print(xtable::xtable(tab2[, c("SykehusNavn", "Gj.snitt.fabq.fysisk",
                      digits=0, align=c('l', 'l', rep('r', 4)),
                      caption = paste0('Unngåelsesadferd fysisk (fabq.fysisk) $<$14 ubetydelig, 14 -16 moderat, $\\geq$17 høy. Unngåelsesadferd arbeid (fabq.arbeid) $<$20 ubetydelig, 20-24 moderat, $\\geq$25 høy. Livskvalitet (eq5d) $>$0.75 normal, 0.6-0.74 moderat nedsatt, 0.4-0.59 betydelig nedsatt, $<$0.4 særlig uttalt nedsatt helse/helserelatert livskvalitet. Gradering egen helse (eq5d.vas) 100-90\\% god helse, 80-89 lett nedsatt, 60-79 moderat nedsatt, $<$60 betydelig nedsatt helse. Antall aktuelle i parentes. Gjelder ', rap_aar)), include.rownames=FALSE)
 
-# write.csv2(tab2[4:7, ], "C:/GIT/nnrr/doc/tab7_FABQ_EQ5D.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(tab2[, c("SykehusNavn", "Gj.snitt.fabq.fysisk",
+                    "Gj.snitt.fabq.arbeid", "Gj.snitt.eq5d",
+                    "Gj.snitt.eq5d.vas")],
+           paste0(tabfolder, "tab_FABQ_EQ5D.csv"), row.names = F,
+           fileEncoding = "Latin1")
 @
 
 % \end{landscape}
@@ -290,7 +325,7 @@ names(tab4) <- c('Diagnose', 'Antall')
 
 print(xtable::xtable(tab4, align=c('l', 'l', rep('r', ncol(tab4)-1)), caption = 'De vanligste diagnosene i registeret (diagnose 1).'), include.rownames=FALSE)
 
-write.csv2(tab4, "C:/GIT/nnrr/doc/tab8_diagnoser.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(tab4, paste0(tabfolder, "tab_diagnoser.csv"), row.names = F, fileEncoding = "Latin1")
 
 @
 
@@ -926,6 +961,9 @@ print(xtable::xtable(tab11, digits=0, align=c('l', 'l', rep('R{0.4in}', ncol(tab
                      caption = 'Arbeidsstatus ved første konsultasjon. Flere kryss er mulig.'),
       include.rownames=FALSE, size = "\\scriptsize")
 
+write.csv2(tab11, paste0(tabfolder, "tab_arbeidsstatus_1_konsult.csv"),
+           row.names = F, fileEncoding = "Latin1")
+
 ## Før og etter
 
 tab11 <- RegData[which(RegData$regstatus_post==1), ] %>%
@@ -947,6 +985,8 @@ tab11 <- tab11[tab11$N > 0, ]
 print(xtable::xtable(tab11, digits=0, align=c('l', 'l', rep('R{0.4in}', ncol(tab11)-1)),
                      caption = 'Arbeidsstatus ved første konsultasjon blant de med 6-mnd oppfølging. Flere kryss er mulig.'),
       include.rownames=FALSE, size = "\\scriptsize")
+write.csv2(tab11, paste0(tabfolder, "tab_arbeidsstatus_1_konsult_oppfulgte.csv"),
+           row.names = F, fileEncoding = "Latin1")
 
 
 RegData$arbeid_ikke_besvart_post <- !(RegData$S2_Working_post | RegData$S2_SickLeave_post | RegData$S2_StayAtHome_post | RegData$S2_Student_post |
@@ -972,6 +1012,9 @@ print(xtable::xtable(tab, digits=0, align=c('l', 'l', rep('R{0.4in}', ncol(tab)-
                      caption = 'Arbeidsstatus ved 6-mnd oppfølging. Registreringen av denne
                      variabelen er endret og samsvarer nå med registreringen på konsultasjon'),
       include.rownames=FALSE, size = "\\scriptsize")
+
+write.csv2(tab, paste0(tabfolder, "tab_arbeidsstatus_oppfolging.csv"),
+           row.names = F, fileEncoding = "Latin1")
 
 @
 
@@ -1038,7 +1081,8 @@ print(xtable::xtable(tab12_2, align=c('l', 'l', rep('r', ncol(tab12)-1)),
                      caption = 'Ryggsmerte-relatert funksjon ved konsultasjon og etter 6 måneder blant de tverrfaglig behandlede. Standardavvik i parentes.'),
       include.rownames=FALSE)
 
-write.csv2(tab12_2, "C:/GIT/nnrr/doc/tab23_odi_prepost_tverrfaglig.csv", row.names = F, fileEncoding = "Latin1")
+# write.csv2(tab12_2, paste0(tabfolder, "tab23_odi_prepost_tverrfaglig.csv"),
+#            row.names = F, fileEncoding = "Latin1")
 @
 
 <<'Fig:andeler', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
@@ -1101,6 +1145,9 @@ print(xtable::xtable(tab13, digits=0, align=c('l', 'l', rep('R{0.4in}', ncol(tab
                      caption = 'Behandlingsløype i kommunalhelsetjenesten'),
       include.rownames=FALSE, size = "\\scriptsize")
 
+write.csv2(tab13, paste0(tabfolder, "tab_behandling_kommtjeneste.csv"),
+           row.names = F, fileEncoding = "Latin1")
+
 
 tab15 <- RegData[, c(as.character(BehSpeshelsetj$varnavn), "Treatment_GroupInterdisciplinary", "SykehusNavn",
                      "Treatment_TreatmentInSpecialistServices")] %>% group_by (SykehusNavn) %>%
@@ -1125,7 +1172,8 @@ print(xtable::xtable(tab15, digits=0, align=c('l', 'l', rep('R{0.35in}', ncol(ta
                      caption = 'Behandlingsløype i spesialisthelsetjenesten'),
       include.rownames=FALSE, size = "\\scriptsize")
 
-# write.csv2(tab15, "C:/GIT/nnrr/doc/tab25_behandling_spestjeneste.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(tab15, paste0(tabfolder, "tab_behandling_spestjeneste.csv"),
+           row.names = F, fileEncoding = "Latin1")
 @
 
 
@@ -1148,6 +1196,8 @@ print(xtable::xtable(tab16, digits=0, align=c('l', 'l', rep('R{0.5in}', ncol(tab
                      caption = 'Type individuell eller tverrfaglig behandling'),
       include.rownames=FALSE, size = "\\small")
 
+write.csv2(tab16, paste0(tabfolder, "tab_type_behandling.csv"),
+           row.names = F, fileEncoding = "Latin1")
 
 etiketter <- c('Fornøyd', 'Litt fornøyd', 'Hverken fornøyd eller misfornøyd',
                'Litt misfornøyd', 'Misfornøyd', 'Ikke utfylt')
@@ -1177,7 +1227,7 @@ print(xtable::xtable(tab17, digits=0, align=c('l',rep('R{0.6in}', ncol(tab17))),
 Tabell_Tverrfaglig <- nnrrIndikatorTabell(RegData, indikator = 'Tverrfaglig_vurdering')
 print(xtable::xtable(Tabell_Tverrfaglig, digits=c(0,0,0,0,0,1), caption='Andel som har blitt vurdert av to eller flere yrkesgrupper ved konsultasjon.'), include.rownames=FALSE)
 
-write.csv2(Tabell_Tverrfaglig, "C:/GIT/nnrr/doc/tab28_tverrfagl_vurdert.csv", row.names = F, fileEncoding = "Latin1")
+# write.csv2(Tabell_Tverrfaglig, paste0(tabfolder, "tab_tverrfagl_vurdert.csv"), row.names = F, fileEncoding = "Latin1")
 
 Tabell_enfaglig <- RegData[, c("SykehusNavn", "FirstMedExamDoctor", "FirstMedExamNurse", "FirstMedExamPhys", "FirstMedExamOther",
                                "Tverrfaglig_vurdering", "Tverrfaglig_vurdering_antall")] %>%
@@ -1189,7 +1239,7 @@ Tabell_enfaglig <- RegData[, c("SykehusNavn", "FirstMedExamDoctor", "FirstMedExa
             "Antall vurdert av én faggruppe" = sum(Tverrfaglig_vurdering_antall==1),
             "N" = n())
 
-write.csv2(Tabell_enfaglig, "C:/GIT/nnrr/doc/tabny_enfaglig_vurdert.csv", row.names = F, fileEncoding = "Latin1")
+# write.csv2(Tabell_enfaglig, paste0(tabfolder, "tabny_enfaglig_vurdert.csv"), row.names = F, fileEncoding = "Latin1")
 
 @
 
@@ -1229,7 +1279,7 @@ names(aux)[1] <- ""
 
 print(xtable::xtable(aux, digits=0, align=c('l', 'l', rep('R{0.8in}', ncol(aux)-2), 'r'), caption='Pasientrapportert behandling på nakke - og ryggpoliklinikken.'), include.rownames=FALSE)
 
-write.csv2(aux, "C:/GIT/nnrr/doc/tab29_pasientrapp_beh_klin.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(aux, paste0(tabfolder, "tab_pasientrapp_beh_klin.csv"), row.names = F, fileEncoding = "Latin1")
 
 aux2 <- RegDataAll %>% filter(Besoksdato>=paste0(rap_aar-1, "-07-01") & Besoksdato<=paste0(rap_aar, "-06-30") &
                                 regstatus_post == 1) %>% group_by(SykehusNavn) %>%
@@ -1247,7 +1297,7 @@ print(xtable::xtable(aux2, digits=0, align=c('l', 'l', rep('R{0.8in}', ncol(aux2
 # aux2 <- tr_summarize_output(aux2)
 # print(xtable::xtable(aux2, digits=0, caption='Antall pasientrapportert oppfølging utenfor sykehus ved 6 mnd oppfølging.'), include.rownames=FALSE)
 
-write.csv2(aux2, "C:/GIT/nnrr/doc/tab30_pasientrapp_beh_ellers.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(aux2, paste0(tabfolder, "tab_pasientrapp_beh_ellers.csv"), row.names = F, fileEncoding = "Latin1")
 @
 
 

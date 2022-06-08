@@ -119,13 +119,13 @@ nnrrPreprosess <- function(RegData)
                                  labels = c('Ingen smerter', 'Mindre enn 3 måneder', '3 til 12 måneder',
                                             '1-2 år', 'Mer enn 2', 'Ikke svart'))
 
-  RegData$NeckSurgery[RegData$NeckSurgery==0] <- 99
-  RegData$NeckSurgery <- factor(RegData$NeckSurgery, levels = c(1:3,99),
-                                labels = c('Ja', 'Nei', 'Ukjent', 'Ikke utfylt'))
+  # RegData$NeckSurgery[RegData$NeckSurgery==0] <- 99
+  RegData$NeckSurgery <- factor(RegData$NeckSurgery, levels = c(1:3),
+                                labels = c('Ja', 'Nei', 'Ukjent'))
 
-  RegData$BackSurgery[RegData$BackSurgery==0] <- 99
-  RegData$BackSurgery <- factor(RegData$BackSurgery, levels = c(1:3,99),
-                                labels = c('Ja', 'Nei', 'Ukjent', 'Ikke utfylt'))
+  # RegData$BackSurgery[RegData$BackSurgery==0] <- 99
+  RegData$BackSurgery <- factor(RegData$BackSurgery, levels = c(1:3),
+                                labels = c('Ja', 'Nei', 'Ukjent'))
 
   navn2 <- varnavn_2$Variabelnavn[which(!is.na(varnavn_2$Variabelnavn))]
   indekser_kodebok <- which(varnavn_2$Variabelnavn == 'UseOfTreatment'):(which(varnavn_2$Variabelnavn == navn2[which(navn2=='UseOfTreatment')+1])-1)

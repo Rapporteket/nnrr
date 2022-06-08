@@ -81,8 +81,16 @@ rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
 kobling_resh_shusnavn <- RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
 #write.csv2(kobling_resh_shusnavn, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/kobling_resh_shusnavn.csv', row.names = F)
 
-map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025, 974557746, 974795787, 974795639, 974703300, 974795477, 974733013, 974754118, 974747138, 974631326),
-                             resh = c(109834, 104293, 102959, 601032, 700735, 4211588, 102169, 114174, 105821, 4212982, 103736))
+map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
+                                          974557746, 974795787,
+                                          974795639, 974703300,
+                                          974795477, 974733013,
+                                          974754118, 974747138,
+                                          974631326),
+                             resh = c(109834, 104293, 102959,
+                                      601032, 700735, 4211588,
+                                      102169, 114174, 105821,
+                                      4212982, 103736))
 
 kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
@@ -458,7 +466,7 @@ nnrrFigIndikator(indikator, c('Andel tilbake i arbeid eller', 'med lavere andel 
                  outfile=outfile, maal = 30, minstekrav = 25)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 30, minstekrav = 25)
+  nnrrFigIndikator(indikator, c('Andel tilbake i arbeid eller', 'med lavere andel sykemelding' ), outfile=outfile, maal = 30, minstekrav = 25)
 }
 
 # tmp <- aux[, c("Besoksdato", "IsEmployed", "S2_Working", "S2_Unemployed", "S2_SickLeave",
