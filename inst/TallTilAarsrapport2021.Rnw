@@ -40,10 +40,10 @@ rap_aar <- 2021
 
 ## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-04-07_1123.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post2 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('C:/GIT/gmldata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-04-07_1123.csv', sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('C:/GIT/gmldata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('C:/GIT/gmldata/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post2 <- read.table('C:/GIT/gmldata/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
@@ -173,6 +173,10 @@ preprosess <- F
 hentData <- F
 annetformat = NA #".wmf"
 figfolder <- "C:/GIT/nnrr/inst/figurer_aarsrapp_2021/"
+if (!dir.exists(figfolder)) {
+  dir.create(figfolder)
+}
+tabfolder <- "C:/GIT/nnrr/inst/tabeller_aarsrapp_2021/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
