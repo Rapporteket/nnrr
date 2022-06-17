@@ -1,6 +1,6 @@
-\documentclass[norsk,a4paper]{article} % ,twoside
+\documentclass[a4paper]{article} % ,twoside
 \usepackage[norsk]{babel}
-\usepackage[utf8x]{inputenc}
+% \usepackage[utf8x]{inputenc}
 \usepackage{subfig}
 \usepackage{pdfpages}
 \usepackage{booktabs}
@@ -9,6 +9,7 @@
 \usepackage[a4paper]{geometry}
 \usepackage[pdftex, colorlinks, linkcolor=lysblaa, urlcolor=lysblaa]{hyperref}
 \usepackage{array}
+% \usepackage{hyphsubst}
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -34,19 +35,24 @@ knitr::opts_knit$set(root.dir = './')
 rm(list=ls())
 library(nnrr)
 library(tidyverse)
+library(lubridate)
 options(dplyr.summarise.inform = FALSE)
 
 rap_aar <- 2021
 
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-05-09_1545_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-05-09_1544.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-05-09_1545.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post2 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-05-09_1545_red.csv',
+                              sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('~/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-05-09_1544.csv', sep=';',
+                         header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-05-09_1545.csv',
+                               sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post2 <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-05-09_1545.csv',
+                                  sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
 
-icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+icd10 <- read.table('~/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 
 legeskjema$regstatus <- 1
 pasientsvar_pre$regstatus <- 1
@@ -76,7 +82,7 @@ RegData <- RegData[which(RegData$Aar >= 2015 & RegData$Aar <= rap_aar), ]
 Oppf_data <- RegDataAll[which(RegDataAll$aar_oppfolg>= 2015 & RegDataAll$aar_oppfolg <= rap_aar), ]
 Oppf_data$Aar <- Oppf_data$aar_oppfolg
 
-rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
+rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post', 'pasientsvar_post2'))
 
 kobling_resh_shusnavn <- RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
 #write.csv2(kobling_resh_shusnavn, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/kobling_resh_shusnavn.csv', row.names = F)
@@ -92,16 +98,16 @@ map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
                                       102169, 114174, 105821,
                                       4212982, 103736))
 
-kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
+# kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
-format_ut <- ".wmf"
-figfolder <- "C:/GIT/nnrr/inst/indikatorer_2021/"
+format_ut <- ".pdf"
+figfolder <- "~/GIT/nnrr/inst/indikatorer_2021/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
 
 figstr <- 0.61
-tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+# tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 @
 
 \begin{document}
@@ -630,18 +636,18 @@ names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
 Indikatorer$context <- "caregiver"
 Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
 
-write.csv2(Indikatorer, 'I:/nnrr/nnrr_ind_2021_06_21.csv', row.names = F, fileEncoding = "UTF-8")
+# write.csv2(Indikatorer, paste0('~/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 
-dg <- read.csv2("I:/nnrr/dg_nnrr_raa.csv", header = T)
-dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
-dg$shus2 <- qmongrdata::SykehusNavnStruktur$SykehusNavn[match(dg$orgnr, qmongrdata::SykehusNavnStruktur$OrgNrShus)]
+# dg <- read.csv2("~/data/nnrr/dg_nnrr_raa.csv", header = T)
+# dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
+# dg$shus2 <- qmongrdata::SykehusNavnStruktur$SykehusNavn[match(dg$orgnr, qmongrdata::SykehusNavnStruktur$OrgNrShus)]
+#
+# dg <- dg[,c("orgnr", "aar", "teller", "nevner")]
+# names(dg) <- c("orgnr", "year", "var", "denominator")
+# dg$ind_id <- "nnrr_dg"
+# dg$context <- "caregiver"
 
-dg <- dg[,c("orgnr", "aar", "teller", "nevner")]
-names(dg) <- c("orgnr", "year", "var", "denominator")
-dg$ind_id <- "nnrr_dg"
-dg$context <- "caregiver"
-
-write.csv2(dg, 'I:/nnrr/dg_nnrr.csv', row.names = F, fileEncoding = "UTF-8")
+# write.csv2(dg, paste0('~/data/nnrr/dg_nnrr_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 @
 
 

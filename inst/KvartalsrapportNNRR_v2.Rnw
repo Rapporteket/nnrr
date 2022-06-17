@@ -1,6 +1,6 @@
-\documentclass[norsk,a4paper]{article} % ,twoside
+\documentclass[a4paper]{article} % ,twoside
 \usepackage[norsk]{babel}
-\usepackage[utf8x]{inputenc}
+% \usepackage[utf8x]{inputenc}
 \usepackage{subfig}
 \usepackage{pdfpages}
 \usepackage{booktabs}
@@ -9,6 +9,7 @@
 \usepackage[a4paper]{geometry}
 \usepackage[pdftex, colorlinks, linkcolor=lysblaa, urlcolor=lysblaa]{hyperref}
 \usepackage{array}
+\usepackage{hyphsubst}
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
 
 \title{Kvartalsrapport for NNRR}
@@ -47,10 +48,7 @@ library(lubridate)
 # 105821 <- 'Levanger'
 # 103736 <- 'Drammen'
 # 700138 <- 'Stavern???'
-
-# setdiff(RegData$UnitId, c(102959,104293,109834,601032,700735,102169,114174,4211588,4212982,105821,103736))
-
-reshID <- 700138
+reshID <- 102959
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
@@ -59,40 +57,50 @@ datoFra <- (datoTil + lubridate::days(1)) %m-% lubridate::years(1)
 datoTil <- as.character(datoTil)
 datoFra <- as.character(datoFra)
 
-## Oppfølgingsfigurer bør baseres på data fra 1.juli - 30. juni påfølgende år.
-
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-04-07_1123.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post_12 <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-04-07_1123.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_pre <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-05-09_1545_red.csv',
+                              sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('~/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-05-09_1544.csv', sep=';',
+                         header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-05-09_1545.csv',
+                               sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post2 <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-05-09_1545.csv',
+                                  sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
 
-# icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+icd10 <- read.table('~/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 
 legeskjema$regstatus <- 1
 pasientsvar_pre$regstatus <- 1
 pasientsvar_post$regstatus <- 1
+pasientsvar_post2$regstatus <- 1
 
 names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
 names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
+names(pasientsvar_post2)[names(pasientsvar_post2)=='SkjemaGUID'] <- 'SkjemaGUID_post2'
 
-RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
-RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'), all.x = TRUE)
 
 RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
-
-RegData <- nnrrPreprosess(RegData = RegData)
-# RegDataAll <- RegData
-# RegData <- RegData[which(RegData$Aar >= 2019 & RegData$Aar <= 2019), ]
+RegData <- nnrr::nnrrPreprosess(RegData = RegData)
 
 shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
 
-rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
+rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post', 'pasientsvar_post2'))
 
 figstr <- 0.61
 tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+
+figfolder <- "~/GIT/nnrr/inst/figfolder/"
+if (!dir.exists(figfolder)) {
+  dir.create(figfolder)
+}
 @
 
 \begin{document}
@@ -194,9 +202,6 @@ aux <- RegData[RegData$Besoksdato >= datoFra_sistkvartal & RegData$Besoksdato <=
 aux$avd <- aux$SykehusNavn
 aux$avd[aux$UnitId != reshID] <- "Landet for øvrig"
 
-# aux %>% group_by(avd) %>%
-#   summarise()
-
 kjonn <- addmargins(table(aux[, c("ErMann", "avd")], useNA = 'ifany'), 2)
 alder <- c(tapply(aux$PatientAge, aux$avd, mean), Sum=mean(aux$PatientAge))
 alder_sd <- c(tapply(aux$PatientAge, aux$avd, sd), Sum=sd(aux$PatientAge))
@@ -204,15 +209,10 @@ alder <- paste0(round(alder, 1), ' (', round(alder_sd, 1),')')
 
 familiestatus <- addmargins(table(aux[, c("FamilyStatus", "avd")]), 2)
 utdanning <- addmargins(table(aux[, c("EducationLevel", "avd")]), 2)
-smertevarighet <- addmargins(table(aux[, c("PainDurationNow", "avd")]), 2)
-tidligereOpRygg <- addmargins(table(aux[, c("BackSurgery", "avd")]), 2)
-tidligereOpNakke <- addmargins(table(aux[, c("NeckSurgery", "avd")]), 2)
 
 samlet <- rbind(rep(NA, dim(kjonn)[2]), kjonn, rep(NA, dim(kjonn)[2]), alder, rep(NA, dim(kjonn)[2]),
                 rep(NA, dim(kjonn)[2]), familiestatus, rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]),
-                utdanning, rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]), smertevarighet,
-                rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]), tidligereOpRygg, rep(NA, dim(kjonn)[2]),
-                rep(NA, dim(kjonn)[2]), tidligereOpNakke)
+                utdanning)
 rownames(samlet) <- 1:dim(samlet)[1]
 samlet <- as.data.frame(samlet)
 samlet$radnavn <- c('\\textbf{Kjønn}', '\\quad Kvinner', '\\quad Menn', '', '\\textbf{Alder, gj.snitt (SD)}', '',
@@ -220,15 +220,11 @@ samlet$radnavn <- c('\\textbf{Kjønn}', '\\quad Kvinner', '\\quad Menn', '', '\\
                     '\\quad Ikke svart', '', '\\textbf{Utdanning}', '\\quad Grunnskole (7-10 år)', '\\quad Vgs. yrkesfaglig',
                     '\\quad Vgs. allmennfaglig', '\\quad Høyskole/univ\\textless 4år',
                     '\\quad Høyskole/univ\\textgreater 4 år',
-                    '\\quad Ikke svart', '', '\\textbf{Varighet av smerter}', '\\quad Ingen smerter',
-                    '\\quad Mindre enn 3 måneder', '\\quad 3 til 12 måneder', '\\quad 1-2 år', '\\quad Mer enn 2',
-                    '\\quad Ikke svart', '', '\\textbf{Tidligere operert rygg}', '\\quad Ja', '\\quad Nei',
-                    '\\quad Ukjent', '\\quad Ikke utfylt', '', '\\textbf{Tidligere operert nakke}', '\\quad Ja',
-                    '\\quad Nei', '\\quad Ukjent', '\\quad Ikke utfylt')
+                    '\\quad Ikke svart')
 samlet <- samlet[, c(dim(samlet)[2],1:(dim(samlet)[2]-1))]
 names(samlet)[1] <- ''
 names(samlet)[dim(samlet)[2]] <- 'Totalt'
-samlet <- samlet[1:19, ]
+# samlet <- samlet[1:19, ]
 
 
 print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
@@ -240,12 +236,10 @@ print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
 
 
 <<'Figur:Aldersfordeling', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
-figfolder <- "figfolder/"
 outfile <- paste0(figfolder, "alder.pdf")
 valgtVar <- "PatientAge"
 nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=datoTil, enhetsUtvalg=1,
                         minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, preprosess=F, hentData=F)
-
 @
 
 \begin{figure}[ht]
