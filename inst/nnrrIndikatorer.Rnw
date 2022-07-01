@@ -40,13 +40,13 @@ options(dplyr.summarise.inform = FALSE)
 
 rap_aar <- 2021
 
-pasientsvar_pre <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-05-09_1545_red.csv',
-                              sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('~/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-05-09_1544.csv', sep=';',
+pasientsvar_pre <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-07-01_1313_redigert.csv',
+                              sep=';', header=T, stringsAsFactors = F, fileEncoding = "Latin1")
+legeskjema <- read.table('~/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-07-01_1313.csv', sep=';',
                          header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-05-09_1545.csv',
+pasientsvar_post <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-07-01_1313.csv',
                                sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post2 <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-05-09_1545.csv',
+pasientsvar_post2 <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-07-01_1313.csv',
                                   sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
@@ -635,6 +635,9 @@ Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
 names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
 Indikatorer$context <- "caregiver"
 Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
+Indikatorer <- Indikatorer[!(Indikatorer$ind_id == "nnrr_jobb" & Indikatorer$year > 2020 ), ] # Fjerner arbeidsind for nyere registrernger
+                                                                                              # Ny variant kommer
+
 
 # write.csv2(Indikatorer, paste0('~/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 
@@ -651,7 +654,7 @@ map_dg2 <- data.frame(enhet=c("Sandnessjøen", "St Olavs", "Harstad", "Tromsø",
 dg_ny <- readr::read_csv2("~/data/nnrr/Dekningsgrad 2021 NNRR.csv", locale = locale(encoding = "Latin1"))
 dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
 dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
-dg_ny <- dg_ny[!is.na(dg_ny$orgnr)]
+dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
 dg_ny$year <- 2021
 names(dg_ny)[2:3] <- c("denominator", "var")
 dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
@@ -665,7 +668,9 @@ dg <- dplyr::bind_rows(dg, dg_ny)
 dg$ind_id <- "nnrr_dg"
 dg$context <- "caregiver"
 
-# write.csv2(dg, paste0('~/data/nnrr/dg_nnrr_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
+Indikatorer <- dplyr::bind_rows(Indikatorer, dg)
+
+write.csv2(Indikatorer, paste0('~/data/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 @
 
 
