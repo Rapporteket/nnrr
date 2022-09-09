@@ -34,63 +34,63 @@ appUi <- function() {
         )
       ),
 
-      shiny::tabPanel(
-        "Eksempelrapport",
-        shiny::sidebarLayout(
-          shiny::sidebarPanel(
-            shiny::radioButtons("formatReport",
-                                "Format for nedlasting",
-                                list(PDF = "pdf", HTML = "html"),
-                                inline = FALSE),
-            shiny::downloadButton("downloadReport", "Last ned!")
-          ),
-          shiny::mainPanel(
-            shiny::htmlOutput("exReport", inline = TRUE)
-          )
-
-        )
-      ),
-
-      shiny::tabPanel(
-        "Abonnement",
-        shiny::sidebarLayout(
-          shiny::sidebarPanel(
-            rapbase::autoReportInput("nnrrSubscription")
-          ),
-          shiny::mainPanel(
-            rapbase::autoReportUI("nnrrSubscription")
-          )
-        )
-      ),
-
-      shiny::tabPanel(
-        "Administrative tabeller",
-        nnrr::admtab_ui("admtabell")
-      ),
-
-
-      shiny::tabPanel(
-        "Registeringer per enhet",
-        shiny::sidebarLayout(
-          shiny::sidebarPanel(
-            shiny::dateRangeInput(
-              inputId = "dato_id", label = "Dato intervall",
-              start = Sys.Date() %m-% months(12), end = Sys.Date()
-            ),
-
-            shiny::selectInput(inputId = "regstatus", label = "Skjemastatus",
-                               choices = c('Ferdigstilt'=1, 'I kladd'=0, 'Opprettet'=-1),
-                               multiple = TRUE,
-                               selected = 1),
-
-
-            shiny::uiOutput("forlopstype_ui"),
-          ),
-          shiny::mainPanel(
-            shiny::tableOutput("tabell_id")
-          )
-        )
-      ),
+      # shiny::tabPanel(
+      #   "Eksempelrapport",
+      #   shiny::sidebarLayout(
+      #     shiny::sidebarPanel(
+      #       shiny::radioButtons("formatReport",
+      #                           "Format for nedlasting",
+      #                           list(PDF = "pdf", HTML = "html"),
+      #                           inline = FALSE),
+      #       shiny::downloadButton("downloadReport", "Last ned!")
+      #     ),
+      #     shiny::mainPanel(
+      #       shiny::htmlOutput("exReport", inline = TRUE)
+      #     )
+      #
+      #   )
+      # ),
+      #
+      # shiny::tabPanel(
+      #   "Abonnement",
+      #   shiny::sidebarLayout(
+      #     shiny::sidebarPanel(
+      #       rapbase::autoReportInput("nnrrSubscription")
+      #     ),
+      #     shiny::mainPanel(
+      #       rapbase::autoReportUI("nnrrSubscription")
+      #     )
+      #   )
+      # ),
+#
+#       shiny::tabPanel(
+#         "Administrative tabeller",
+#         nnrr::admtab_ui("admtabell")
+#       ),
+#
+#
+#       shiny::tabPanel(
+#         "Registeringer per enhet",
+#         shiny::sidebarLayout(
+#           shiny::sidebarPanel(
+#             shiny::dateRangeInput(
+#               inputId = "dato_id", label = "Dato intervall",
+#               start = Sys.Date() %m-% months(12), end = Sys.Date()
+#             ),
+#
+#             shiny::selectInput(inputId = "regstatus", label = "Skjemastatus",
+#                                choices = c('Ferdigstilt'=1, 'I kladd'=0, 'Opprettet'=-1),
+#                                multiple = TRUE,
+#                                selected = 1),
+#
+#
+#             shiny::uiOutput("forlopstype_ui"),
+#           ),
+#           shiny::mainPanel(
+#             shiny::tableOutput("tabell_id")
+#           )
+#         )
+#       ),
 
       shiny::navbarMenu(
         "Verkt\u00f8y",
@@ -120,19 +120,19 @@ appUi <- function() {
               rapbase::statsUI("nnrrStats")
             )
           )
-        ),
+        )#,
 
-        shiny::tabPanel(
-          "Eksport",
-          shiny::sidebarLayout(
-            shiny::sidebarPanel(
-              rapbase::exportUCInput("nnrrExport")
-            ),
-            shiny::mainPanel(
-              rapbase::exportGuideUI("nnrrExport")
-            )
-          )
-        )
+        # shiny::tabPanel(
+        #   "Eksport",
+        #   shiny::sidebarLayout(
+        #     shiny::sidebarPanel(
+        #       rapbase::exportUCInput("nnrrExport")
+        #     ),
+        #     shiny::mainPanel(
+        #       rapbase::exportGuideUI("nnrrExport")
+        #     )
+        #   )
+        # )
       )
     )
   )

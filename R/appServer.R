@@ -16,95 +16,82 @@ appServer <- function(input, output, session) {
 
   registryName <- "nnrr"
 
-  if (rapbase::isRapContext()){
-    userFullName <- rapbase::getUserFullName(session)
-    userRole <- rapbase::getUserRole(session)
-    userReshId <- rapbase::getUserReshId(session)
-    hospitalName <- shusnavn$shortName[match(userReshId, shusnavn$reshId)]
-
-    rapbase::navbarWidgetServer("nnrrNavbarWidget", "nnrr",
-                                caller = "nnrr")
-  }
   userFullName <- rapbase::getUserFullName(session)
   userRole <- rapbase::getUserRole(session)
   userReshId <- rapbase::getUserReshId(session)
-  hospitalName <- shusnavn$shortName[match(userReshId, shusnavn$reshId)]
+  hospitalName <- RegData$SykehusNavn[match(userReshId, RegData$UnitId)]
 
   rapbase::navbarWidgetServer("nnrrNavbarWidget", "nnrr",
                               caller = "nnrr")
 
   # Administrative tabeller
-  nnrr::admtab_server("admtabell", SkjemaOversikt)
-
-  #forløpstype brukerkontroll
-  output$forlopstype_ui <- shiny::renderUI({
-
-    forlopstyper <- sort(unique(as.numeric(ForlopsOversikt$ForlopsType1Num)))
-    names(forlopstyper) <- ForlopsOversikt$ForlopsType1[match(forlopstyper, ForlopsOversikt$ForlopsType1Num)]
-    names(forlopstyper)[forlopstyper==0] <- "Ingen"
-    selectInput(inputId = "forlopstype", label = "Velg forløpstype(r)",
-                choices = forlopstyper, multiple = T, selected = c(3, 5, 7, 4, 6, 8))
-  })
-
-
-
-
-
-  #Registeringer per enhet----
-  output$tabell_id <- shiny::renderTable({
-    data <- ForlopsOversikt %>%
-      dplyr::filter(HovedDato >= input$dato_id[1] & HovedDato <= input$dato_id[2]) %>%
-      dplyr::filter(ForlopsType1Num %in% input$forlopstype) %>%
-      dplyr::filter(BasisRegStatus %in% input$regstatus) %>%
-      dplyr::select("SykehusNavn", "ForlopsType1") %>%
-      table() %>%
-      addmargins() %>%
-      as.data.frame.matrix() %>%
-      tidyr::as_tibble(rownames = "Enhet")
+  # nnrr::admtab_server("admtabell", SkjemaOversikt)
+  #
+  # #forløpstype brukerkontroll
+  # output$forlopstype_ui <- shiny::renderUI({
+  #
+  #   forlopstyper <- sort(unique(as.numeric(ForlopsOversikt$ForlopsType1Num)))
+  #   names(forlopstyper) <- ForlopsOversikt$ForlopsType1[match(forlopstyper, ForlopsOversikt$ForlopsType1Num)]
+  #   names(forlopstyper)[forlopstyper==0] <- "Ingen"
+  #   selectInput(inputId = "forlopstype", label = "Velg forløpstype(r)",
+  #               choices = forlopstyper, multiple = T, selected = c(3, 5, 7, 4, 6, 8))
+  # })
 
 
 
 
-  }, digits = 0)
+
+  # #Registeringer per enhet----
+  # output$tabell_id <- shiny::renderTable({
+  #   data <- ForlopsOversikt %>%
+  #     dplyr::filter(HovedDato >= input$dato_id[1] & HovedDato <= input$dato_id[2]) %>%
+  #     dplyr::filter(ForlopsType1Num %in% input$forlopstype) %>%
+  #     dplyr::filter(BasisRegStatus %in% input$regstatus) %>%
+  #     dplyr::select("SykehusNavn", "ForlopsType1") %>%
+  #     table() %>%
+  #     addmargins() %>%
+  #     as.data.frame.matrix() %>%
+  #     tidyr::as_tibble(rownames = "Enhet")
+  # }, digits = 0)
 
   # Eksempelrapport
-  output$exReport <- shiny::renderUI({
-    rapbase::renderRmd(
-      system.file("eksSamlerapport.Rmd", package = "nnrr"),
-      outputType = "html_fragment",
-      params = list(
-        author = userFullName,
-        hospitalName = hospitalName,
-        tableFormat = "html",
-        reshId = userReshId,
-        registryName = registryName,
-        userRole = userRole
-      )
-    )
-  })
-
-  output$downloadReport <- shiny::downloadHandler(
-    filename = function() {
-      basename(tempfile(pattern = "nnrr_eksRapport",
-                        fileext = paste0(".", input$formatReport)))
-    },
-    content = function(file) {
-      fn <- rapbase::renderRmd(
-        system.file("eksSamlerapport.Rmd", package = "nnrr"),
-        outputType = input$formatReport,
-        params = list(
-          author = userFullName,
-          hospitalName = hospitalName,
-          tableFormat = input$formatReport,
-          reshId = userReshId,
-          registryName = registryName,
-          userFullName = userFullName,
-          userRole = userRole
-        )
-      )
-      file.rename(fn, file)
-    }
-  )
+  # output$exReport <- shiny::renderUI({
+  #   rapbase::renderRmd(
+  #     system.file("eksSamlerapport.Rmd", package = "nnrr"),
+  #     outputType = "html_fragment",
+  #     params = list(
+  #       author = userFullName,
+  #       hospitalName = hospitalName,
+  #       tableFormat = "html",
+  #       reshId = userReshId,
+  #       registryName = registryName,
+  #       userRole = userRole
+  #     )
+  #   )
+  # })
+  #
+  # output$downloadReport <- shiny::downloadHandler(
+  #   filename = function() {
+  #     basename(tempfile(pattern = "nnrr_eksRapport",
+  #                       fileext = paste0(".", input$formatReport)))
+  #   },
+  #   content = function(file) {
+  #     fn <- rapbase::renderRmd(
+  #       system.file("eksSamlerapport.Rmd", package = "nnrr"),
+  #       outputType = input$formatReport,
+  #       params = list(
+  #         author = userFullName,
+  #         hospitalName = hospitalName,
+  #         tableFormat = input$formatReport,
+  #         reshId = userReshId,
+  #         registryName = registryName,
+  #         userFullName = userFullName,
+  #         userRole = userRole
+  #       )
+  #     )
+  #     file.rename(fn, file)
+  #   }
+  # )
 
 
 
@@ -118,13 +105,13 @@ appServer <- function(input, output, session) {
       fun = "reportProcessor",
       paramNames = c("report", "outputFormat", "title"),
       paramValues = c("veiledning", "pdf", "Testrapport")
-    ),
-    Eksempelrapport = list(
-      synopsis = "Eksempelrapport med data fra nnrr",
-      fun = "reportProcessor",
-      paramNames = c("report", "outputFormat", "title"),
-      paramValues = c("eksSamlerapport", "pdf", "Eksempelrapport")
-    )
+    )#,
+    # Eksempelrapport = list(
+    #   synopsis = "Eksempelrapport med data fra nnrr",
+    #   fun = "reportProcessor",
+    #   paramNames = c("report", "outputFormat", "title"),
+    #   paramValues = c("eksSamlerapport", "pdf", "Eksempelrapport")
+    # )
   )
 
   # subscribe
@@ -149,6 +136,6 @@ appServer <- function(input, output, session) {
   rapbase::statsServer("nnrrStats", registryName = registryName)
 
   # export
-  rapbase::exportGuideServer("nnrrExport", registryName)
-  rapbase::exportUCServer("nnrrExport", registryName)
+  # rapbase::exportGuideServer("nnrrExport", registryName)
+  # rapbase::exportUCServer("nnrrExport", registryName)
 }

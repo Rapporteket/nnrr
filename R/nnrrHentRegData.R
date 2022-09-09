@@ -18,19 +18,19 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   #                 WHERE HovedDato >= \'", datoFra, "\' AND HovedDato <= \'", datoTil, "\' ")
   # RegData <- rapbase::LoadRegData(registryName, query, dbType)
 
-  pasientsvar_pre <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-07-01_1313_redigert.csv',
+  pasientsvar_pre <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-07-01_1313_redigert.csv',
                                 sep=';', header=T, stringsAsFactors = F, fileEncoding = "Latin1")
-  legeskjema <- read.table('~/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-07-01_1313.csv', sep=';',
+  legeskjema <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-07-01_1313.csv', sep=';',
                            header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-  pasientsvar_post <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-07-01_1313.csv',
+  pasientsvar_post <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-07-01_1313.csv',
                                  sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-  pasientsvar_post2 <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-07-01_1313.csv',
+  pasientsvar_post2 <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-07-01_1313.csv',
                                   sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
   pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
 
-  icd10 <- read.table('~/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+  icd10 <- read.table('~/.ssh/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
   legeskjema$regstatus <- 1
   pasientsvar_pre$regstatus <- 1
   pasientsvar_post$regstatus <- 1

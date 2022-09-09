@@ -4,7 +4,7 @@
 \alias{nnrrHentRegData}
 \title{Provide global dataframe for NNRR}
 \usage{
-nnrrHentRegData(datoFra = "2014-01-01", datoTil = "2099-01-01")
+nnrrHentRegData(datoFra = "2017-01-01", datoTil = "2099-01-01")
 }
 \arguments{
 \item{datoFra}{<- '2014-01-01'    # min og max dato i utvalget vises alltid i figuren.}

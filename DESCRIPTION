@@ -9,7 +9,7 @@ Description: Pakke for generering av resultatrapporter for NNRR.
 License: GPL2
 LazyData: TRUE
 Encoding: UTF-8
-Depends: R (>= 4.2.0)
+Depends: R (>= 4.1.0)
 Imports:
   xtable,
   tidyverse,
