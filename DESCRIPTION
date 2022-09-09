@@ -13,7 +13,8 @@ Depends: R (>= 4.2.0)
 Imports:
   xtable,
   tidyverse,
-  lubridate
+  lubridate,
+  shinyjs
 Remotes:
   Rapporteket/rapbase@*release,
   Rapporteket/rapFigurer

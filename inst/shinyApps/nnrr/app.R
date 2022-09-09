@@ -3,8 +3,10 @@ library(kableExtra)
 library(DT)
 library(shiny)
 library(shinyjs)
-library(shinyBS)
+# library(shinyBS)
 library(shinyalert)
+library(tidyverse)
+library(lubridate)
 
 
 addResourcePath('rap', system.file('www', package='rapbase'))
@@ -17,34 +19,7 @@ logoCode <- paste0("var header = $('.navbar> .container-fluid');\n",
                    "console.log(header)")
 logoWidget <- tags$script(shiny::HTML(logoCode))
 
-# if (rapbase::isRapContext()) {
-#   RegData <- NNRRHentRegData()
-#   skjemaoversikt <- NNRRHentSkjemaOversikt()
-# } else {
-pasientsvar_pre <- read.table('I:/nnrr/DataDump_MRS-PROD_1a_Spørreskjema+før+behandling_2020-10-27_red.csv', sep=';', header=T, stringsAsFactors = F)
-legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_1b_Registreringsskjema+poliklinikk_2020-10-27.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('I:/nnrr/DataDump_MRS-PROD_2_Spørreskjema+etter+behandling_2020-10-27.csv', sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-
-flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
-pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
-
-icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
-
-legeskjema$regstatus <- 1
-pasientsvar_pre$regstatus <- 1
-pasientsvar_post$regstatus <- 1
-
-names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
-names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
-
-RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
-RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID', by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
-
-RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
-
-RegData <- nnrrPreprosess(RegData = RegData)
-rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post'))
-# }
+RegData <- nnrr::nnrrHentRegData()
 
 brvalg_fordeling <- c("tverrfaglig_behandlet", "PatientAge", "FABQ.Score1", "FABQ.Score2", "HSCL10.Score", "PainDurationNow",
                       "AarsakSmerte_PasRap", "beh_kommunalt", "beh_spesialist", "pasrapp_beh_klinikk", "Eq5dSatisfactionTreatment")
