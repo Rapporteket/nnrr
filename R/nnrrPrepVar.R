@@ -20,7 +20,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
     tittel <- "Sivilstatus"
     RegData <- RegData[RegData$regstatus==1, ]
     RegData$Variabel <- RegData$FamilyStatus
-    grtxt <- levels(RegDataAll$FamilyStatus)
+    grtxt <- levels(RegData$FamilyStatus)
     RegData$VariabelGr <- RegData$Variabel
   }
 
@@ -144,7 +144,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
     subtxt <- 'Aldersgrupper'
   }
 
-  if (valgtVar=='FABQ.Score1') {
+  if (valgtVar=='FABQScore1') {
     RegData$Variabel <- RegData[, valgtVar]
     RegData <- RegData[which(!is.na(RegData$Variabel)), ]
     tittel <- 'FABQ fysisk aktivitet'
@@ -154,7 +154,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
     subtxt <- 'Score'
   }
 
-  if (valgtVar=='FABQ.Score2') {
+  if (valgtVar=='FABQScore2') {
     RegData$Variabel <- RegData[, valgtVar]
     RegData <- RegData[which(!is.na(RegData$Variabel)), ]
     tittel <- 'FABQ arbeid'

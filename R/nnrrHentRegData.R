@@ -30,7 +30,7 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
   pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
 
-  icd10 <- read.table('~/.ssh/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+  # icd10 <- read.table('~/.ssh/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
   legeskjema$regstatus <- 1
   pasientsvar_pre$regstatus <- 1
   pasientsvar_post$regstatus <- 1
@@ -41,11 +41,14 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   names(pasientsvar_post2)[names(pasientsvar_post2)=='SkjemaGUID'] <- 'SkjemaGUID_post2'
 
   RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
-                   by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'), all.x = TRUE)
+                   by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'),
+                   all.x = TRUE)
   RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID',
-                   by.y = 'HovedskjemaGUID', suffixes = c('', '_post'), all.x = TRUE)
+                   by.y = 'HovedskjemaGUID', suffixes = c('', '_post'),
+                   all.x = TRUE)
   RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID',
-                   by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'), all.x = TRUE)
+                   by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'),
+                   all.x = TRUE)
 
   RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
   RegData <- nnrr::nnrrPreprosess(RegData = RegData)

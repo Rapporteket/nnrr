@@ -5,6 +5,8 @@
 
 appUi <- function() {
 
+  br_valg <- nnrrBrukerkontroller()
+
   shiny::addResourcePath("rap", system.file("www", package = "rapbase"))
   appTitle <- "NNRR"
 
@@ -32,6 +34,18 @@ appUi <- function() {
           ),
           rapbase::navbarWidgetInput("nnrrNavbarWidget")
         )
+      ),
+
+      shiny::tabPanel("Startside",
+                      shinyjs::useShinyjs(),
+                      rapbase::appNavbarUserWidget(user = uiOutput("appUserName"),
+                                                   organization = uiOutput("appOrgName"),
+                                                   addUserInfo = TRUE),
+                      tags$head(tags$link(rel="shortcut icon", href="rap/favicon.ico")),
+                      startside_UI("startside")
+      ),
+      shiny::tabPanel("Fordelinger",
+                      fordelingsfig_UI(id = "fordelingsfig_id", BrValg = br_valg)
       ),
 
       # shiny::tabPanel(

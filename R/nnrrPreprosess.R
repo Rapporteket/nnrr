@@ -22,9 +22,9 @@ nnrrPreprosess <- function(RegData)
 
   RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion", "S1b_DateOfCompletion_pre",
               "S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")] <-
-    mutate_all(RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
+    dplyr::mutate_all(RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
                            "S1b_DateOfCompletion_pre","S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")],
-               funs(as.Date(., format="%d.%m.%Y")))
+               dplyr::funs(as.Date(., format="%d.%m.%Y")))
   RegData$Besoksdato <- RegData$S1b_DateOfCompletion
 
   RegData <- RegData[order(RegData$DateOfCompletion, decreasing = T, na.last = T), ] # Hvis flere pasientskjema, bruk nyeste
@@ -84,6 +84,8 @@ nnrrPreprosess <- function(RegData)
   RegData$Eq5dScore <- as.numeric(sapply(as.character(RegData$Eq5dScore), gsub, pattern = ",", replacement= "."))
   RegData$Eq5dScore_post <- as.numeric(sapply(as.character(RegData$Eq5dScore_post), gsub, pattern = ",", replacement= "."))
   RegData$Score_EQ5DL <- as.numeric(sapply(as.character(RegData$Score_EQ5DL), gsub, pattern = ",", replacement= "."))
+  RegData$FABQScore1 <- as.numeric(sapply(as.character(RegData$FABQScore1), gsub, pattern = ",", replacement= "."))
+  RegData$FABQScore2 <- as.numeric(sapply(as.character(RegData$FABQScore2), gsub, pattern = ",", replacement= "."))
   # RegData$Eq5dScore_post2 <- as.numeric(sapply(as.character(RegData$Eq5dScore_post2), gsub, pattern = ",", replacement= "."))
 
   RegData$SykehusNavn <- NA

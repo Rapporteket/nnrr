@@ -24,6 +24,10 @@ appServer <- function(input, output, session) {
   rapbase::navbarWidgetServer("nnrrNavbarWidget", "nnrr",
                               caller = "nnrr")
 
+  shiny::callModule(fordelingsfig, "fordelingsfig_id", reshID = userReshId,
+                    RegData = RegData, userRole = userRole, hvd_session = session)
+
+
   # Administrative tabeller
   # nnrr::admtab_server("admtabell", SkjemaOversikt)
   #
@@ -36,11 +40,7 @@ appServer <- function(input, output, session) {
   #   selectInput(inputId = "forlopstype", label = "Velg forløpstype(r)",
   #               choices = forlopstyper, multiple = T, selected = c(3, 5, 7, 4, 6, 8))
   # })
-
-
-
-
-
+  #
   # #Registeringer per enhet----
   # output$tabell_id <- shiny::renderTable({
   #   data <- ForlopsOversikt %>%
