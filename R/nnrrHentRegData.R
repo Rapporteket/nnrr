@@ -18,13 +18,13 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   #                 WHERE HovedDato >= \'", datoFra, "\' AND HovedDato <= \'", datoTil, "\' ")
   # RegData <- rapbase::LoadRegData(registryName, query, dbType)
 
-  pasientsvar_pre <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-07-01_1313_redigert.csv',
-                                sep=';', header=T, stringsAsFactors = F, fileEncoding = "Latin1")
-  legeskjema <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-07-01_1313.csv', sep=';',
+  pasientsvar_pre <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-09-13_1020.csv',
+                                sep='\t', header=T, stringsAsFactors = F, fileEncoding = "Latin1")
+  legeskjema <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-09-13_1019.csv', sep=';',
                            header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-  pasientsvar_post <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-07-01_1313.csv',
+  pasientsvar_post <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-09-13_1020.csv',
                                  sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-  pasientsvar_post2 <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-07-01_1313.csv',
+  pasientsvar_post2 <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-09-13_1020.csv',
                                   sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]

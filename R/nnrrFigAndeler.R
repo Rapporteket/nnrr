@@ -20,22 +20,12 @@
 #' @export
 
 nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='2050-12-31', enhetsUtvalg=1,
-                        minald=0, maxald=130, erMann=99, outfile='', reshID, preprosess=F, hentData=F)
+                        minald=0, maxald=130, erMann=99, outfile='', reshID)
 {
 
   # valgtVar="tverrfaglig_behandlet"; datoFra='2016-01-01'; datoTil=Sys.Date();
   # minald=0; maxald=120; erMann=99; outfile=''; reshID=601032; enhetsUtvalg=0;
   # preprosess=F; hentData=F
-
-  ## Hvis spørring skjer fra R på server. ######################
-  if(hentData){
-    RegData <- nnrrHentRegData()
-  }
-
-  # Hvis RegData ikke har blitt preprosessert
-  if (preprosess){
-    RegData <- nnrrPreprosess(RegData=RegData)
-  }
 
   # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
   if (enhetsUtvalg == 2) {RegData <- RegData[which(RegData$UnitId == reshID), ]}
@@ -59,7 +49,8 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
   NRest <- 0
   NvarRest <- 0
 
-  if (valgtVar %in% c('AarsakSmerte_PasRap', 'beh_kommunalt', 'beh_spesialist', 'pasrapp_beh_klinikk', 'pasrapp_beh_klinikk_v2')) {
+  if (valgtVar %in% c('AarsakSmerte_PasRap', 'beh_kommunalt', 'beh_spesialist',
+                      'pasrapp_beh_klinikk', 'pasrapp_beh_klinikk_v2')) {
     flerevar <- 1
   } else {
     flerevar <- 0
@@ -202,11 +193,21 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
   AntallUt <- rbind(AntHoved, AntRest)
   rownames(AntallUt) <- c('Hoved', 'Rest')
 
+  # AndelerUt <- dplyr::bind_rows(Andeler$Hoved, Andeler$Rest)
+  # rownames(AndelerUt) <- c('Hoved', 'Rest')
+  # AntallUt <- dplyr::bind_rows(AntHoved, AntRest)
+  # rownames(AntallUt) <- c('Hoved', 'Rest')
+
   UtData <- list(paste(toString(tittel),'.', sep=''), AndelerUt, AntallUt, grtxt )
   names(UtData) <- c('Tittel', 'Andeler', 'Antall', 'GruppeTekst')
   UtData$utvalgTxt <- utvalgTxt
   UtData$N <- data.frame(NHoved = NvarHoved, NRest = NvarRest)
+  UtData$NHoved <- NHoved
+  UtData$NRest <- NRest
+  UtData$PlotParams <- PlotParams
+  UtData$FigTypUt <- FigTypUt
+  UtData$enhetsUtvalg <- enhetsUtvalg
+  UtData$shtxt <- shtxt
+
   return(invisible(UtData))
-
-
 }

@@ -48,7 +48,6 @@ nnrrBrukerkontroller <- function(RegData) {
                         "Pasientrapportert årsak til smerte" = "AarsakSmerte_PasRap",
                         "Behandling i kommunalhelsetjenesten" = "beh_kommunalt",
                         "Behandling i spesialisthelsetjenesten" = "beh_spesialist",
-                        # "Pasientrapportert behandling på nakke- og ryggpoliklinikk" = "pasrapp_beh_klinikk",
                         "Pasientrapportert behandling på nakke- og ryggpoliklinikk v2" = "pasrapp_beh_klinikk_v2",
                         "EQ5D tilfredshet med behandling" = "Eq5dSatisfactionTreatment",
                         "Smertevarighet > 2 år" = "smerter_2aar"

@@ -25,16 +25,16 @@ appUi <- function() {
       theme = "rap/bootstrap.css",
       id = "tabs",
 
-      shiny::tabPanel(
-        "Start",
-        shiny::mainPanel(
-          rapbase::renderRmd(
-            system.file("veiledning.Rmd", package = "nnrr"),
-            outputType = "html_fragment"
-          ),
-          rapbase::navbarWidgetInput("nnrrNavbarWidget")
-        )
-      ),
+      # shiny::tabPanel(
+      #   "Start",
+      #   shiny::mainPanel(
+      #     rapbase::renderRmd(
+      #       system.file("veiledning.Rmd", package = "nnrr"),
+      #       outputType = "html_fragment"
+      #     ),
+      #     rapbase::navbarWidgetInput("nnrrNavbarWidget")
+      #   )
+      # ),
 
       shiny::tabPanel("Startside",
                       shinyjs::useShinyjs(),

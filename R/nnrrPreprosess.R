@@ -11,10 +11,12 @@
 
 nnrrPreprosess <- function(RegData)
 {
-  boolske_var1b <- as.character(varnavn_1b$Variabelnavn)[which(as.character(varnavn_1b$Felttype) == 'Avkrysning')]
-  boolske_var1a <- as.character(varnavn_1a$Variabelnavn)[which(as.character(varnavn_1a$Felttype) == 'Avkrysning')]
-  boolske_var2 <- as.character(varnavn_2$Variabelnavn)[which(as.character(varnavn_2$Felttype) == 'Avkrysning')]
-  boolske_var2 <- c(boolske_var2, paste0(as.character(varnavn_2$Variabelnavn)[which(as.character(varnavn_2$Felttype) == 'Avkrysning')], "_post"))
+  boolske_var1b <- as.character(nnrr::varnavn_1b$Variabelnavn)[which(as.character(nnrr::varnavn_1b$Felttype) == 'Avkrysning')]
+  boolske_var1a <- as.character(nnrr::varnavn_1a$Variabelnavn)[which(as.character(nnrr::varnavn_1a$Felttype) == 'Avkrysning')]
+  boolske_var2 <- as.character(nnrr::varnavn_2$Variabelnavn)[which(as.character(nnrr::varnavn_2$Felttype) == 'Avkrysning')]
+  boolske_var2 <- c(boolske_var2,
+                    paste0(as.character(nnrr::varnavn_2$Variabelnavn)[which(as.character(nnrr::varnavn_2$Felttype) == 'Avkrysning')],
+                           "_post"))
   boolske_var <- intersect(c(boolske_var1b, boolske_var1a, boolske_var2), names(RegData))
   RegData[, boolske_var] <-
     apply(RegData[, boolske_var], 2, as.logical)
@@ -129,16 +131,16 @@ nnrrPreprosess <- function(RegData)
   RegData$BackSurgery <- factor(RegData$BackSurgery, levels = c(1:3),
                                 labels = c('Ja', 'Nei', 'Ukjent'))
 
-  navn2 <- varnavn_2$Variabelnavn[which(!is.na(varnavn_2$Variabelnavn))]
-  indekser_kodebok <- which(varnavn_2$Variabelnavn == 'UseOfTreatment'):(which(varnavn_2$Variabelnavn == navn2[which(navn2=='UseOfTreatment')+1])-1)
-  RegData$UseOfTreatmentLabel <- factor(RegData$UseOfTreatment, levels = varnavn_2$kode[c(indekser_kodebok[-1], indekser_kodebok[1])],
-                                          labels = varnavn_2$label[c(indekser_kodebok[-1], indekser_kodebok[1])])
+  navn2 <- nnrr::varnavn_2$Variabelnavn[which(!is.na(nnrr::varnavn_2$Variabelnavn))]
+  indekser_kodebok <- which(nnrr::varnavn_2$Variabelnavn == 'UseOfTreatment'):(which(nnrr::varnavn_2$Variabelnavn == navn2[which(navn2=='UseOfTreatment')+1])-1)
+  RegData$UseOfTreatmentLabel <- factor(RegData$UseOfTreatment, levels = nnrr::varnavn_2$kode[c(indekser_kodebok[-1], indekser_kodebok[1])],
+                                          labels = nnrr::varnavn_2$label[c(indekser_kodebok[-1], indekser_kodebok[1])])
 
-  navn1a <- varnavn_1a$Variabelnavn[which(!is.na(varnavn_1a$Variabelnavn))]
-  indekser_kodebok <- which(varnavn_1a$Variabelnavn == 'PhysicalActivity'):(which(varnavn_1a$Variabelnavn == navn1a[which(navn1a=='PhysicalActivity')+1])-1)
+  navn1a <- nnrr::varnavn_1a$Variabelnavn[which(!is.na(nnrr::varnavn_1a$Variabelnavn))]
+  indekser_kodebok <- which(nnrr::varnavn_1a$Variabelnavn == 'PhysicalActivity'):(which(nnrr::varnavn_1a$Variabelnavn == navn1a[which(navn1a=='PhysicalActivity')+1])-1)
 
-  RegData$PhysicalActivityLabel <- factor(RegData$PhysicalActivity, levels = varnavn_1a$kode[c(indekser_kodebok[-1], indekser_kodebok[1])],
-                                          labels = varnavn_1a$label[c(indekser_kodebok[-1], indekser_kodebok[1])])
+  RegData$PhysicalActivityLabel <- factor(RegData$PhysicalActivity, levels = nnrr::varnavn_1a$kode[c(indekser_kodebok[-1], indekser_kodebok[1])],
+                                          labels = nnrr::varnavn_1a$label[c(indekser_kodebok[-1], indekser_kodebok[1])])
 
   RegData$WorkingStatus_label <- factor(RegData$WorkingStatus, levels = 0:8, labels = c('Ikke utfylt', 'Inntektsgivende arbeid',
                                                                                         'Student/skoleelev', 'Arbeidsledig',

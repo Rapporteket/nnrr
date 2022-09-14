@@ -21,11 +21,11 @@ appServer <- function(input, output, session) {
   userReshId <- rapbase::getUserReshId(session)
   hospitalName <- RegData$SykehusNavn[match(userReshId, RegData$UnitId)]
 
-  rapbase::navbarWidgetServer("nnrrNavbarWidget", "nnrr",
-                              caller = "nnrr")
+  # rapbase::navbarWidgetServer("nnrrNavbarWidget", "nnrr",
+  #                             caller = "nnrr")
 
-  shiny::callModule(fordelingsfig, "fordelingsfig_id", reshID = userReshId,
-                    RegData = RegData, userRole = userRole, hvd_session = session)
+  fordelingsfigServer("fordelingsfig_id", reshID = userReshId,
+                      RegData = RegData, userRole = userRole, hvd_session = session)
 
 
   # Administrative tabeller
