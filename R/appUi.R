@@ -47,6 +47,10 @@ appUi <- function() {
       shiny::tabPanel("Fordelinger",
                       fordelingsfig_UI(id = "fordelingsfig_id", BrValg = br_valg)
       ),
+      shiny::tabPanel("Sykehusvisning",
+                      sykehusvisning_UI(id = "sykehusvisning_id")
+      ),
+
 
       # shiny::tabPanel(
       #   "Eksempelrapport",

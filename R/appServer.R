@@ -27,7 +27,8 @@ appServer <- function(input, output, session) {
   fordelingsfigServer("fordelingsfig_id", reshID = userReshId,
                       RegData = RegData, userRole = userRole, hvd_session = session)
 
-
+  sykehusvisningServer("sykehusvisning_id",
+                      RegData = RegData, userRole = userRole, hvd_session = session)
   # Administrative tabeller
   # nnrr::admtab_server("admtabell", SkjemaOversikt)
   #

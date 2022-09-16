@@ -32,8 +32,6 @@ nnrrBeregnAndeler(
 
 \item{erMann}{- kjønn, 1-menn, 0-kvinner, default 99, dvs. begge}
 
-\item{outfile}{- navn på fil figuren skrives til, default '' dvs. skriv til skjerm}
-
 \item{reshID}{- avdelingsid for egen avdeling, standard: 0-hele landet}
 
 \item{enhetsUtvalg:}{0: Hele landet
