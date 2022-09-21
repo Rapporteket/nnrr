@@ -92,7 +92,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
 
   if (valgtVar=='bedring_smerte_hvile') {
     tittel <- "Klinisk bedring av smerte i hvile"
-    RegData <- RegData %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
+    RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
                                     !is.na(PainExperiencesNoActivity_post) & PainExperiencesNoActivity != 0)
     RegData$pstEndringSmerteHvile <- (RegData$PainExperiencesNoActivity -
                                                    RegData$PainExperiencesNoActivity_post)/RegData$PainExperiencesNoActivity*100
@@ -104,7 +104,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
 
   if (valgtVar=='bedring_smerte_aktiv') {
     tittel <- "Klinisk bedring av smerte i aktivitet"
-    RegData <- RegData %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
+    RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
                                     !is.na(PainExperiencesActivity_post) & PainExperiencesActivity != 0)
     RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
                                                    RegData$PainExperiencesActivity_post)/RegData$PainExperiencesActivity*100

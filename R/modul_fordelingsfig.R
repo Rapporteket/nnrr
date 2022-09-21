@@ -1,10 +1,10 @@
-# Modul for fordelingsfigurer i NNRR sin shiny-app på Rapporteket
-#
-# Kun til bruk i Shiny
-#
-# @return Modul fordelingsfigur
-#
-fordelingsfig_UI <- function(id, BrValg){
+#' UI-modul for fordelingsfigurer i NNRR sin shiny-app på Rapporteket
+#'
+#' Kun til bruk i Shiny
+#'
+#' @export
+#'
+fordelingsfig_UI <- function(id){
   ns <- shiny::NS(id)
 
   shiny::sidebarLayout(
@@ -12,7 +12,30 @@ fordelingsfig_UI <- function(id, BrValg){
       id = ns("id_fordeling_panel"),
       selectInput(inputId = ns("valgtVar"),
                   label = "Velg variabel",
-                  choices = BrValg),
+                  choices =   c("Sivilstatus" = "FamilyStatus",
+                                "Alder ved registrering" = "PatientAge",
+                                "FABQ fysisk aktivitet" = "FABQScore1",
+                                "FABQ arbeid" = "FABQScore2",
+                                "Sammenhengende varighet av nåværende smerter" = "PainDurationNow",
+                                "Pasientrapportert årsak til smerte" = "AarsakSmerte_PasRap",
+                                "Behandling i kommunalhelsetjenesten" = "beh_kommunalt",
+                                "Behandling i spesialisthelsetjenesten" = "beh_spesialist",
+                                "Pasientrapportert behandling på nakke- og ryggpoliklinikk v2" = "pasrapp_beh_klinikk_v2",
+                                "EQ5D tilfredshet med behandling" = "Eq5dSatisfactionTreatment",
+                                "Tverrfaglig behandlet" = "tverrfaglig_behandlet",
+                                "Individuell oppfølging" = "individuell_oppfolging",
+                                "FABQ11" = "fabq11",
+                                "Utfylt oppfølging" = "Oppfolging_utfylt",
+                                "Opplevd nytte av behandling" = "opplevd_nytte_beh",
+                                "Funksjonsbedring" = "odi_klinisk_viktig",
+                                "Funksjonsbedring v2" = "odi_klinisk_viktig_v2",
+                                "Klinisk bedring av smerte i hvile" = "bedring_smerte_hvile",
+                                "Klinisk bedring av smerte i aktivitet" = "bedring_smerte_aktiv",
+                                "Misfornøyd med behandling" = "misfornoyd",
+                                "Fornøyd med behandling" = "fornoyd",
+                                "Hopkins symptom checklist" = "HSCL10.Score",
+                                "Smertevarighet > 2 år" = "smerter_2aar"
+                  )),
       dateRangeInput(inputId=ns("datovalg"),
                      label = "Dato fra og til",
                      min = '2014-01-01',
@@ -63,8 +86,12 @@ fordelingsfig_UI <- function(id, BrValg){
 }
 
 
-
-
+#' Server-modul for fordelingsfigurer i NNRR sin shiny-app på Rapporteket
+#'
+#' Kun til bruk i Shiny
+#'
+#' @export
+#'
 fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
   moduleServer(
     id,

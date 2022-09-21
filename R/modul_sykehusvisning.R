@@ -1,9 +1,9 @@
-# Modul for fordelingsfigurer i NNRR sin shiny-app på Rapporteket
-#
-# Kun til bruk i Shiny
-#
-# @return Modul fordelingsfigur
-#
+#' UI-modul for sykehusvise figurer i NNRR sin shiny-app på Rapporteket
+#'
+#' Kun til bruk i Shiny
+#'
+#' @export
+#'
 sykehusvisning_UI <- function(id){
   ns <- shiny::NS(id)
 
@@ -67,7 +67,12 @@ sykehusvisning_UI <- function(id){
 
 
 
-
+#' Server-modul for sykehusvise figurer i NNRR sin shiny-app på Rapporteket
+#'
+#' Kun til bruk i Shiny
+#'
+#' @export
+#'
 sykehusvisningServer <- function(id, RegData, userRole, hvd_session){
   moduleServer(
     id,
@@ -78,29 +83,21 @@ sykehusvisningServer <- function(id, RegData, userRole, hvd_session){
         shinyjs::reset("id_sykehusvisning_panel")
       })
 
-      # tabellReager <- reactive({
-      #   TabellData <- nnrr::nnrrFigAndeler(RegData = RegData,
-      #                                      valgtVar=input$valgtVar,
-      #                                      datoFra=input$datovalg[1],
-      #                                      datoTil=input$datovalg[2],
-      #                                      minald=as.numeric(input$alder[1]),
-      #                                      maxald=as.numeric(input$alder[2]),
-      #                                      erMann=as.numeric(input$erMann),
-      #                                      reshID=reshID,
-      #                                      enhetsUtvalg=input$enhetsUtvalg)
-      # })
-      #
+      tabellReager <- reactive({
+        TabellData <- nnrr::nnrrBeregnGjsnPrePostGrVar(RegData = RegData,
+                                                       valgtVar=input$valgtVar,
+                                                       datoFra=input$datovalg[1],
+                                                       datoTil=input$datovalg[2],
+                                                       minald=as.numeric(input$alder[1]),
+                                                       maxald=as.numeric(input$alder[2]),
+                                                       erMann=as.numeric(input$erMann),
+                                                       sammenlign = as.numeric(input$sammenlign),
+                                                       gr_var='SykehusNavn')
+      })
+
       output$Figur1 <- renderPlot({
-        nnrr::nnrrFigGjsnPrePostGrVar_v2(RegData = RegData,
-                                         valgtVar=input$valgtVar,
-                                         datoFra=input$datovalg[1],
-                                         datoTil=input$datovalg[2],
-                                         minald=as.numeric(input$alder[1]),
-                                         maxald=as.numeric(input$alder[2]),
-                                         erMann=as.numeric(input$erMann),
-                                         sammenlign = as.numeric(input$sammenlign),
-                                         gr_var='SykehusNavn',
-                                         inkl_konf = 1)
+        nnrr::nnrrPlotGjsnPrePostGrVar(plotparams = tabellReager(),
+                                       outfile='')
       }, width = 700, height = 700)
       #
       # output$utvalg <- renderUI({

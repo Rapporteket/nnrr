@@ -5,7 +5,7 @@
 
 appUi <- function() {
 
-  br_valg <- nnrrBrukerkontroller()
+  # br_valg <- nnrrBrukerkontroller()
 
   shiny::addResourcePath("rap", system.file("www", package = "rapbase"))
   appTitle <- "NNRR"
@@ -45,11 +45,24 @@ appUi <- function() {
                       startside_UI("startside")
       ),
       shiny::tabPanel("Fordelinger",
-                      fordelingsfig_UI(id = "fordelingsfig_id", BrValg = br_valg)
+                      fordelingsfig_UI(id = "fordelingsfig_id")
       ),
       shiny::tabPanel("Sykehusvisning",
                       sykehusvisning_UI(id = "sykehusvisning_id")
       ),
+      shiny::tabPanel("Indikatorer",
+                      indikatorfig_UI(id = "indikatorfig_id")
+      ),
+      shiny::tabPanel("Datadump",
+                      h2("Datadump", align='center')
+      ),
+      shiny::tabPanel("Administrative tabeller",
+                      h2("Administrative tabeller", align='center')
+      ),
+      shiny::tabPanel("Abonnement",
+                      h2("Kvartalsrapport", align='center')
+      ),
+
 
 
       # shiny::tabPanel(

@@ -12,7 +12,11 @@ appServer <- function(input, output, session) {
   rapbase::appLogger(session = session, msg = "Starting nnrr application")
 
   # Last data
-  RegData <- nnrr::nnrrHentRegData()
+  RegData <- rapbase::loadStagingData("nnrr", "RegData") #Benyttes i appen
+  if (isFALSE(RegData)) {
+    RegData <- nnrr::nnrrHentRegData()
+    rapbase::saveStagingData("nnrr", "RegData", RegData)
+  }
 
   registryName <- "nnrr"
 
@@ -29,6 +33,10 @@ appServer <- function(input, output, session) {
 
   sykehusvisningServer("sykehusvisning_id",
                       RegData = RegData, userRole = userRole, hvd_session = session)
+
+  indikatorfigServer("indikatorfig_id",
+                     RegData = RegData, userRole = userRole, hvd_session = session)
+
   # Administrative tabeller
   # nnrr::admtab_server("admtabell", SkjemaOversikt)
   #
