@@ -13,7 +13,13 @@ indikatorfig_UI <- function(id){
                  selectInput(inputId = ns("valgtVar"), label = "Velg indikator",
                              choices = c("Andel tverrfaglig behandlet" = "nnrr_tverrfaglig_behandling",
                                         "Klinisk viktig endring i ODI" = "nnrr_bedret_funksjon",
-                                        "Andel med minimal funksjonsnedsettelse" = "nnrr_funksjons_nedsettelse"
+                                        "Andel med minimal funksjonsnedsettelse" = "nnrr_funksjons_nedsettelse",
+                                        "Bedring av smerte i hvile" = "nnrr_bedring_smerte_hvile",
+                                        "Bedring av smerte i aktivitet" = "nnrr_bedring_smerte_aktiv",
+                                        "Andel tilbake i jobb" = "nnrr_jobb_ny_v1",
+                                        "Andel tilbake i jobb el. lavere grad sykemelding" = "nnrr_jobb_ny_v2",
+                                        "Pasientopplevd bedring av behandling" = "nnrr_bedring_av_behandling",
+                                        "Andel fornøyd med behandling" = "nnrr_misfornoeyd"
                              )
                  ),
                  uiOutput(outputId = ns('tilAar_ui')),

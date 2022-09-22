@@ -4,7 +4,7 @@
 \alias{fordelingsfig_UI}
 \title{UI-modul for fordelingsfigurer i NNRR sin shiny-app på Rapporteket}
 \usage{
-fordelingsfig_UI(id, BrValg)
+fordelingsfig_UI(id)
 }
 \description{
 Kun til bruk i Shiny

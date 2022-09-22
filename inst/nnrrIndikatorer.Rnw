@@ -641,7 +641,8 @@ Indikatorer <- Indikatorer[!(Indikatorer$ind_id == "nnrr_jobb" & Indikatorer$yea
 
 # write.csv2(Indikatorer, paste0('~/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 
-dg <- readr::read_csv2("~/data/nnrr/dg_nnrr_raa.csv", locale = locale(encoding = "Latin1"))
+dg <- readr::read_csv2("~/.ssh/data/nnrr/dg_nnrr_raa.csv",
+                       locale = readr::locale(encoding = "Latin1"))
 dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
 
 
@@ -651,7 +652,8 @@ map_dg2 <- data.frame(enhet=c("Sandnessjøen", "St Olavs", "Harstad", "Tromsø",
                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
                                   4212982, 114174, 102959, 103736, 105821))
 
-dg_ny <- readr::read_csv2("~/data/nnrr/Dekningsgrad 2021 NNRR.csv", locale = locale(encoding = "Latin1"))
+dg_ny <- readr::read_csv2("~/.ssh/data/nnrr/Dekningsgrad 2021 NNRR.csv",
+                          locale = readr::locale(encoding = "Latin1"))
 dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
 dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
 dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]

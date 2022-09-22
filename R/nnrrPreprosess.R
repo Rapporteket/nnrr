@@ -102,7 +102,7 @@ nnrrPreprosess <- function(RegData)
   RegData$SykehusNavn[RegData$UnitId == 4212982] <- 'Ålesund'
   RegData$SykehusNavn[RegData$UnitId == 105821] <- 'Levanger'
   RegData$SykehusNavn[RegData$UnitId == 103736] <- 'Drammen'
-  RegData$SykehusNavn[RegData$UnitId == 700138] <- 'Stavern???'
+  RegData$SykehusNavn[RegData$UnitId == 700138] <- 'Stavern'
 
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel')] <- 'EQ5D.VAS'
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel_post')] <- 'EQ5D.VAS_post'
