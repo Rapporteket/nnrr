@@ -15,7 +15,8 @@ Imports:
   tidyverse,
   lubridate,
   shinyjs,
-  janitor
+  janitor,
+  DT
 Remotes:
   Rapporteket/rapbase@*release,
   Rapporteket/rapFigurer

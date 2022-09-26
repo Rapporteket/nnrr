@@ -35,12 +35,12 @@ indikatorfig_UI <- function(id){
     mainPanel(
       tabsetPanel(id = ns("tab"),
                   tabPanel("Figur", value = "fig",
-                           plotOutput(ns("Figur1"), height="auto"), downloadButton(ns("lastNedBilde"), "Last ned figur"))#,
-                  # tabPanel("Tabell", value = "tab",
-                  #          uiOutput(ns("utvalg")),
-                  #          br(),
-                  #          DTOutput(ns("tabell"))
-                  # )
+                           plotOutput(ns("Figur1"), height="auto"), downloadButton(ns("lastNedBilde"), "Last ned figur")),
+                  tabPanel("Tabell", value = "tab",
+                           # uiOutput(ns("utvalg")),
+                           # br(),
+                           DT::DTOutput(ns("tabell"))
+                  )
       )
     )
   )
@@ -90,6 +90,24 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
                                 graaUt=NA, outfile = '',
                                 lavDG=NA, inkl_konf=F)
       }, width = 700, height = 700)
+
+      output$tabell <- DT::renderDT({
+        indikatordata = tabellReager()
+        tabell <- indikatordata$indikator %>%
+          dplyr::group_by(SykehusNavn, year) %>%
+          dplyr::summarise(Antall = sum(var),
+                           N = sum(denominator),
+                           Andel = Antall/N*100)
+        # antall <-
+        #
+        # %>%
+        #   janitor::adorn_totals()
+
+      })
+
+
+
+
 
     }
   )
