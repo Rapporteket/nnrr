@@ -58,6 +58,15 @@ fordelingsfig_UI <- function(id){
       selectInput(inputId = ns("erMann"),
                   label = "Kjønn",
                   choices = c('Begge'=99, 'Kvinne'=0, 'Mann'=1)),
+      selectInput(inputId = ns("tverrfaglig"),
+                  label = "Tverrfaglig behandlet",
+                  choices = c('--'=99, 'Nei'=0, 'Ja'=1)),
+      sliderInput(inputId=ns("HSCL"),
+                  label = "HSCL score",
+                  min = 1,
+                  max = 4,
+                  value = c(1, 4), step = 0.01,
+                  ),
       selectInput(inputId = ns("bildeformat"),
                   label = "Velg bildeformat",
                   choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
@@ -125,6 +134,9 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
                                            maxald=as.numeric(input$alder[2]),
                                            erMann=as.numeric(input$erMann),
                                            reshID=reshID,
+                                           tverrfaglig = as.numeric(input$tverrfaglig),
+                                           minHSCL = input$HSCL[1],
+                                           maxHSCL = input$HSCL[2],
                                            enhetsUtvalg=input$enhetsUtvalg)
       })
 

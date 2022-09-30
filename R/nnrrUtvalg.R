@@ -8,7 +8,17 @@
 #'
 #' @export
 #'
-nnrrUtvalg <- function(RegData, datoFra, datoTil, minald, maxald, erMann, datovar = "Besoksdato", fargepalett='BlaaRapp')
+nnrrUtvalg <- function(RegData,
+                       datoFra = "2000-01-01",
+                       datoTil = "2100-01-01",
+                       minald = 0,
+                       maxald = 120,
+                       erMann = 99,
+                       datovar = "Besoksdato",
+                       tverrfaglig = 99,
+                       minHSCL = 1,
+                       maxHSCL = 4,
+                       fargepalett='BlaaRapp')
 {
   # Definerer intersect-operator
   "%i%" <- intersect
@@ -19,18 +29,38 @@ nnrrUtvalg <- function(RegData, datoFra, datoTil, minald, maxald, erMann, datova
                     "dato_oppfolg"="Oppfølgingsdato: ")
 
   Ninn <- dim(RegData)[1]
+  indAlle <- 1:Ninn
 
-  indAld <- which(RegData$PatientAge >= minald & RegData$PatientAge <= maxald)
+  indAld <- if (minald > 0 | maxald < 120) {
+    which(RegData$PatientAge >= minald & RegData$PatientAge <= maxald)
+  } else indAlle
   indDato <- which(RegData$Dato >= datoFra & RegData$Dato <= datoTil)
-  indKj <- if (erMann %in% 0:1) {which(RegData$ErMann == erMann)} else {indKj <- 1:Ninn}
-  indMed <- indAld %i% indDato %i% indKj
+  indKj <- if (erMann %in% 0:1) {
+    which(RegData$ErMann == erMann)
+  } else indAlle
+  indTverr <- if (tverrfaglig %in% 0:1) {
+    which(RegData$Tverrfaglig_vurdering == tverrfaglig)
+  } else indAlle
+  indHSCL <- if (minHSCL > 1 | maxHSCL < 4) {
+    which(RegData$HSCL10.Score >= minHSCL & RegData$HSCL10.Score <= maxHSCL)
+  } else indAlle
+
+
+  indMed <- indAld %i% indDato %i% indKj %i% indTverr %i% indHSCL
   RegData <- RegData[indMed,]
 
-  utvalgTxt <- c(paste(datotxt,
-                       min(RegData$Dato, na.rm=T), ' til ', max(RegData$Dato, na.rm=T), sep='' ),
+  utvalgTxt <- c(paste0(datotxt,
+                       min(RegData$Dato, na.rm=T), ' til ',
+                       max(RegData$Dato, na.rm=T)),
                  if ((minald>0) | (maxald<120)) {
-                   paste('Pasienter fra ', min(RegData$PatientAge, na.rm=T), ' til ', max(RegData$PatientAge, na.rm=T), ' år', sep='')},
-                 if (erMann %in% 0:1) {paste('Kjønn: ', c('Kvinner', 'Menn')[erMann+1], sep='')}
+                   paste0('Pasienter fra ', min(RegData$PatientAge, na.rm=T), ' til ',
+                         max(RegData$PatientAge, na.rm=T), ' år')},
+                 if (erMann %in% 0:1) {paste0('Kjønn: ',
+                                             c('Kvinner', 'Menn')[erMann+1])},
+                 if (tverrfaglig %in% 0:1) {paste0("Tverrfaglig behandlet: ",
+                                                   c("Nei", "Ja")[tverrfaglig+1])},
+                 if (minHSCL > 1 | maxHSCL < 4) {paste0("HSCL fra ", minHSCL,
+                                                        " til ", maxHSCL)}
   )
 
 

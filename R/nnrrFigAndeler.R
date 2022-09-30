@@ -19,8 +19,19 @@
 #'
 #' @export
 
-nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='2050-12-31', enhetsUtvalg=1,
-                        minald=0, maxald=130, erMann=99, outfile='', reshID)
+nnrrFigAndeler  <- function(RegData,
+                            valgtVar,
+                            datoFra='2014-01-01',
+                            datoTil='2050-12-31',
+                            enhetsUtvalg=1,
+                            minald=0,
+                            maxald=120,
+                            erMann=99,
+                            tverrfaglig = 99,
+                            minHSCL = 1,
+                            maxHSCL = 4,
+                            outfile='',
+                            reshID)
 {
 
   # valgtVar="tverrfaglig_behandlet"; datoFra='2016-01-01'; datoTil=Sys.Date();
@@ -38,8 +49,11 @@ nnrrFigAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01', datoTil='20
   }
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
-  NNRRUtvalg <- nnrrUtvalg(RegData=RegData, datoFra=datoFra, datoTil=datoTil, minald=minald,
-                               maxald=maxald, erMann=erMann)
+  NNRRUtvalg <- nnrrUtvalg(RegData=RegData, datoFra=datoFra,
+                           datoTil=datoTil, minald=minald,
+                           maxald=maxald, erMann=erMann,
+                           tverrfaglig=tverrfaglig, minHSCL = minHSCL,
+                           maxHSCL = maxHSCL,)
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
 

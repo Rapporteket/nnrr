@@ -40,19 +40,19 @@ options(dplyr.summarise.inform = FALSE)
 
 rap_aar <- 2021
 
-pasientsvar_pre <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-07-01_1313_redigert.csv',
+pasientsvar_pre <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-07-01_1313_redigert.csv',
                               sep=';', header=T, stringsAsFactors = F, fileEncoding = "Latin1")
-legeskjema <- read.table('~/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-07-01_1313.csv', sep=';',
+legeskjema <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-07-01_1313.csv', sep=';',
                          header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-07-01_1313.csv',
+pasientsvar_post <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-07-01_1313.csv',
                                sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
-pasientsvar_post2 <- read.table('~/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-07-01_1313.csv',
+pasientsvar_post2 <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-07-01_1313.csv',
                                   sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 
 flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
 pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
 
-icd10 <- read.table('~/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+icd10 <- read.table('~/.ssh/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 
 legeskjema$regstatus <- 1
 pasientsvar_pre$regstatus <- 1
@@ -85,7 +85,6 @@ Oppf_data$Aar <- Oppf_data$aar_oppfolg
 rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post', 'pasientsvar_post2'))
 
 kobling_resh_shusnavn <- RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
-#write.csv2(kobling_resh_shusnavn, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/kobling_resh_shusnavn.csv', row.names = F)
 
 map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
                                           974557746, 974795787,
@@ -101,7 +100,7 @@ map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
 # kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
 format_ut <- ".pdf"
-figfolder <- "~/GIT/nnrr/inst/indikatorer_2021/"
+figfolder <- "~/nnrr/inst/indikatorer_2021/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
@@ -129,9 +128,6 @@ indikator <- skjema1b[, c("UnitId", "Aar", "tverrfaglig_behandlet", "SykehusNavn
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
-# indikator$SykehusNavn <- RegData$SykehusNavn[match(indikator$ReshId, RegData$UnitId)]
-
-#write.csv2(indikator, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/Indikatorer/Ind1_Tverrfaglig behandling_NNRR.csv', row.names = F)
 
 indikator$ind_id <- "nnrr_tverrfaglig_behandling"
 Indikatorer <- indikator
@@ -173,8 +169,6 @@ names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator <- indikator[indikator$Aar <= rap_aar, ]
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
-
-#write.csv2(indikator, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/Indikatorer/Ind2_Bedret funksjon_NNRR.csv', row.names = F)
 
 indikator$ind_id <- "nnrr_bedret_funksjon"
 Indikatorer <- bind_rows(Indikatorer, indikator)
@@ -227,8 +221,6 @@ names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator <- indikator[indikator$Aar <= rap_aar, ]
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
-
-#write.csv2(indikator, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/Indikatorer/Ind3_Funksjonsnedsettelse_NNRR.csv', row.names = F)
 
 indikator$ind_id <- "nnrr_funksjons_nedsettelse"
 Indikatorer <- bind_rows(Indikatorer, indikator)
@@ -302,8 +294,6 @@ names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
 
-#write.csv2(indikator, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/Indikatorer/Ind4_Bedring smerte_hvile_NNRR.csv', row.names = F)
-
 indikator$ind_id <- "nnrr_bedring_smerte_hvile"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
@@ -339,8 +329,6 @@ indikator <- aux[, c("UnitId", "Aar", "Indikator", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
-
-#write.csv2(indikator, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/Indikatorer/Ind4_Bedring smerte_aktiv_NNRR.csv', row.names = F)
 
 indikator$ind_id <- "nnrr_bedring_smerte_aktiv"
 Indikatorer <- bind_rows(Indikatorer, indikator)
@@ -392,8 +380,6 @@ indikator <- aux[, c("UnitId", "Aar", "tilbake_i_arbeid", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
-
-#write.csv2(indikator, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/Indikatorer/Ind5_Jobb_NNRR.csv', row.names = F)
 
 indikator$ind_id <- "nnrr_jobb"
 Indikatorer <- bind_rows(Indikatorer, indikator)
@@ -518,8 +504,6 @@ names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
 
-#write.csv2(indikator, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/Indikatorer/Ind6_Bedring av behandling_NNRR.csv', row.names = F)
-
 indikator$ind_id <- "nnrr_bedring_av_behandling"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
@@ -561,8 +545,6 @@ names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
 
-#write.csv2(indikator, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/Indikatorer/Ind7_Misfornøyd_NNRR.csv', row.names = F)
-
 indikator$ind_id <- "nnrr_misfornoeyd"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
@@ -601,7 +583,7 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel oppfølgings
 @
 
 
-<<'Nokkeltall NNRR', results='asis', echo=FALSE>>=
+<<'Nokkeltall NNRR', results='asis', echo=FALSE, message=FALSE>>=
 
 nokkeltall_pr_forlop <-  RegData %>% group_by(Aar) %>%
   summarise("Antall forløp" = n(),
@@ -625,24 +607,17 @@ nokkeltall_pr_pas <-  regdata_unik_pr_aar %>% group_by(Aar) %>%
             "Andel i arbeid ved utredning" = sum(Working)/n(),
             "Andel smertevarighet 3 mnd eller mer" = sum(as.numeric(PainDurationNow) %in% 3:5)/sum(as.numeric(PainDurationNow) %in% 1:5))
 
-
-#write.csv2(nokkeltall_pr_pas, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/nokkeltall_unik_pas_pr_aar.csv', row.names = F)
-
-#write.csv2(nokkeltall_pr_forlop, 'Q:/SKDE/Nasjonalt servicemiljø/Resultattjenester/Resultatportalen/6. NNRR/nokkeltall_alle.csv', row.names = F)
-
-
 Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
 names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
 Indikatorer$context <- "caregiver"
 Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
 Indikatorer <- Indikatorer[!(Indikatorer$ind_id == "nnrr_jobb" & Indikatorer$year > 2020 ), ] # Fjerner arbeidsind for nyere registrernger
                                                                                               # Ny variant kommer
-
-
-# write.csv2(Indikatorer, paste0('~/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
+# write.csv2(Indikatorer, paste0('~/.ssh/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 
 dg <- readr::read_csv2("~/.ssh/data/nnrr/dg_nnrr_raa.csv",
-                       locale = readr::locale(encoding = "Latin1"))
+                       locale = readr::locale(encoding = "Latin1"),
+                       show_col_types = FALSE)
 dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
 
 
@@ -672,7 +647,7 @@ dg$context <- "caregiver"
 
 Indikatorer <- dplyr::bind_rows(Indikatorer, dg)
 
-write.csv2(Indikatorer, paste0('~/data/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
+# write.csv2(Indikatorer, paste0('~/.ssh/data/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 @
 
 
