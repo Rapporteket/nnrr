@@ -67,6 +67,7 @@ fordelingsfig_UI <- function(id){
                   max = 4,
                   value = c(1, 4), step = 0.01,
                   ),
+      # uiOutput(ns("slider")),
       selectInput(inputId = ns("bildeformat"),
                   label = "Velg bildeformat",
                   choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
@@ -119,6 +120,30 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
         selectInput(inputId = ns("valgtShus"), label = "Velg sykehus",
                     choices = sykehus, multiple = T)
       })
+
+      # output$slider <- renderUI({
+      #
+      #   # args       <- list(inputId="foo", label="slider :", ticks=c(90,95,99,99.9), value=c(2,3))
+      #   args       <- list(inputId="foo", label="slider :", ticks=c(1, 1.85, 4), value=c(1,4))
+      #
+      #   args$min   <- 1
+      #   args$max   <- length(args$ticks)
+      #
+      #   if (sessionInfo()$otherPkgs$shiny$Version>="0.11") {
+      #     # this part works with shiny 1.5.0
+      #     ticks <- paste0(args$ticks, collapse=',')
+      #     args$ticks <- T
+      #     html  <- do.call('sliderInput', args)
+      #
+      #     # html$children[[2]]$attribs[['data-values']] <- ticks;
+      #     html$children[[2]]$attribs[['data-values']] <- seq(from = 1, to = 4, by = 0.1);
+      #
+      #   } else {
+      #     html  <- do.call('sliderInput', args)
+      #   }
+      #
+      #   html
+      # })
 
       observe(
         if (userRole != 'SC') {
