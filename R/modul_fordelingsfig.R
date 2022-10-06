@@ -65,8 +65,22 @@ fordelingsfig_UI <- function(id){
                   label = "HSCL score",
                   min = 1,
                   max = 4,
-                  value = c(1, 4), step = 0.01,
-                  ),
+                  value = c(1, 4),
+                  step = 0.01),
+      shiny::checkboxGroupInput(inputId = ns("medikamenter"),
+                                label = "Medikamenter (Bruker minst én av de avkryssede)",
+                                choices = c("A-preparat" = "MedicationA",
+                                            "B-preparat" = "MedicationB",
+                                            "C-preparat" = "MedicationC")),
+      shiny::selectInput(inputId = ns("smerte"),
+                         label = "Smertevarighet",
+                         choices = c('Ingen smerter' = 1,
+                                     'Mindre enn 3 måneder' = 2,
+                                     '3 til 12 måneder' = 3,
+                                     '1-2 år' = 4,
+                                     'Mer enn 2' = 5,
+                                     'Ikke svart' = 99),
+                         multiple = TRUE),
       # uiOutput(ns("slider")),
       selectInput(inputId = ns("bildeformat"),
                   label = "Velg bildeformat",
@@ -79,6 +93,7 @@ fordelingsfig_UI <- function(id){
       tabsetPanel(id = ns("tab"),
                   tabPanel("Figur",
                            value = "fig",
+                           verbatimTextOutput(ns("value")),
                            plotOutput(ns("Figur1"),
                                       height="auto"),
                            downloadButton(ns("lastNedBilde"),
@@ -124,10 +139,11 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
       # output$slider <- renderUI({
       #
       #   # args       <- list(inputId="foo", label="slider :", ticks=c(90,95,99,99.9), value=c(2,3))
-      #   args       <- list(inputId="foo", label="slider :", ticks=c(1, 1.85, 4), value=c(1,4))
+      #   args       <- list(inputId="foo", label="slider :", ticks=c(1, 1.5, 1.85, 2, 2.5, 3, 3.5, 4),
+      #                      value=c(1,4), step=0.1)
       #
       #   args$min   <- 1
-      #   args$max   <- length(args$ticks)
+      #   args$max   <- 4
       #
       #   if (sessionInfo()$otherPkgs$shiny$Version>="0.11") {
       #     # this part works with shiny 1.5.0
@@ -135,8 +151,8 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
       #     args$ticks <- T
       #     html  <- do.call('sliderInput', args)
       #
-      #     # html$children[[2]]$attribs[['data-values']] <- ticks;
-      #     html$children[[2]]$attribs[['data-values']] <- seq(from = 1, to = 4, by = 0.1);
+      #     html$children[[2]]$attribs[['data-values']] <- ticks;
+      #     # html$children[[2]]$attribs[['data-values']] <- paste0(seq(from = 1, to = 4, by = 0.1), collapse=',');
       #
       #   } else {
       #     html  <- do.call('sliderInput', args)
@@ -148,21 +164,28 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
       observe(
         if (userRole != 'SC') {
           shinyjs::hide(id = 'valgtShus')
-        })
+        }
+      )
+
+      # observeEvent(input$medikamenter, {
+      #   print(paste0(input$medikamenter))
+      # })
 
       tabellReager <- reactive({
-        TabellData <- nnrr::nnrrFigAndeler(RegData = RegData,
-                                           valgtVar=input$valgtVar,
-                                           datoFra=input$datovalg[1],
-                                           datoTil=input$datovalg[2],
-                                           minald=as.numeric(input$alder[1]),
-                                           maxald=as.numeric(input$alder[2]),
-                                           erMann=as.numeric(input$erMann),
-                                           reshID=reshID,
-                                           tverrfaglig = as.numeric(input$tverrfaglig),
-                                           minHSCL = input$HSCL[1],
-                                           maxHSCL = input$HSCL[2],
-                                           enhetsUtvalg=input$enhetsUtvalg)
+        TabellData <- nnrr::nnrrBeregnAndeler(RegData = RegData,
+                                              valgtVar=input$valgtVar,
+                                              datoFra=input$datovalg[1],
+                                              datoTil=input$datovalg[2],
+                                              minald=as.numeric(input$alder[1]),
+                                              maxald=as.numeric(input$alder[2]),
+                                              erMann=as.numeric(input$erMann),
+                                              reshID=reshID,
+                                              tverrfaglig = as.numeric(input$tverrfaglig),
+                                              minHSCL = input$HSCL[1],
+                                              maxHSCL = input$HSCL[2],
+                                              medikamenter = input$medikamenter,
+                                              smerte = as.numeric(input$smerte),
+                                              enhetsUtvalg=input$enhetsUtvalg)
       })
 
       output$Figur1 <- renderPlot({

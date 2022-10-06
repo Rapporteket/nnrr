@@ -18,6 +18,8 @@ nnrrUtvalg <- function(RegData,
                        tverrfaglig = 99,
                        minHSCL = 1,
                        maxHSCL = 4,
+                       medikamenter = NULL,
+                       smerte = NULL,
                        fargepalett='BlaaRapp')
 {
   # Definerer intersect-operator
@@ -44,23 +46,39 @@ nnrrUtvalg <- function(RegData,
   indHSCL <- if (minHSCL > 1 | maxHSCL < 4) {
     which(RegData$HSCL10.Score >= minHSCL & RegData$HSCL10.Score <= maxHSCL)
   } else indAlle
+  indMedikament <- if (length(medikamenter %i% c("MedicationA", "MedicationB", "MedicationC"))>=1) {
+    # which(rowSums(RegData[, medikamenter]) > 0)
+    which(RegData %>% select(medikamenter) %>% rowSums() > 0)
+  } else indAlle
+  indSmerte <- if (smerte[1] %in% c(1,2,3,4,5,99)) {
+    which(RegData$SmerteNum %in% smerte)
+  } else indAlle
 
 
-  indMed <- indAld %i% indDato %i% indKj %i% indTverr %i% indHSCL
+
+  indMed <- indAld %i% indDato %i% indKj %i% indTverr %i% indHSCL %i%
+    indMedikament %i% indSmerte
   RegData <- RegData[indMed,]
 
   utvalgTxt <- c(paste0(datotxt,
-                       min(RegData$Dato, na.rm=T), ' til ',
-                       max(RegData$Dato, na.rm=T)),
+                        min(RegData$Dato, na.rm=T), ' til ',
+                        max(RegData$Dato, na.rm=T)),
                  if ((minald>0) | (maxald<120)) {
                    paste0('Pasienter fra ', min(RegData$PatientAge, na.rm=T), ' til ',
-                         max(RegData$PatientAge, na.rm=T), ' år')},
+                          max(RegData$PatientAge, na.rm=T), ' år')},
                  if (erMann %in% 0:1) {paste0('Kjønn: ',
-                                             c('Kvinner', 'Menn')[erMann+1])},
+                                              c('Kvinner', 'Menn')[erMann+1])},
                  if (tverrfaglig %in% 0:1) {paste0("Tverrfaglig behandlet: ",
                                                    c("Nei", "Ja")[tverrfaglig+1])},
                  if (minHSCL > 1 | maxHSCL < 4) {paste0("HSCL fra ", minHSCL,
-                                                        " til ", maxHSCL)}
+                                                        " til ", maxHSCL)},
+                 if (length(medikamenter %i% c("MedicationA", "MedicationB", "MedicationC"))>=1) {
+                   paste0("Medikamenter: ", paste(medikamenter, collapse = ", "))
+                 },
+                 if (smerte[1] %in% c(1,2,3,4,5,99)) {
+                   paste0("Varighet av nåværende smerter: ",
+                          paste(RegData$PainDurationNow[match(smerte, RegData$SmerteNum)], collapse = ", " ))
+                 }
   )
 
 

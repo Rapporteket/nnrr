@@ -30,6 +30,7 @@ nnrrFigAndeler  <- function(RegData,
                             tverrfaglig = 99,
                             minHSCL = 1,
                             maxHSCL = 4,
+                            medikamenter = NULL,
                             outfile='',
                             reshID)
 {
@@ -53,7 +54,7 @@ nnrrFigAndeler  <- function(RegData,
                            datoTil=datoTil, minald=minald,
                            maxald=maxald, erMann=erMann,
                            tverrfaglig=tverrfaglig, minHSCL = minHSCL,
-                           maxHSCL = maxHSCL,)
+                           maxHSCL = maxHSCL, medikamenter = medikamenter)
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
 

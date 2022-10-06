@@ -119,6 +119,7 @@ nnrrPreprosess <- function(RegData)
                                               , 'Høyskole eller universitet (4 år eller mer)', 'Ikke svart'))
 
   RegData$PainDurationNow[RegData$PainDurationNow==0] <- 99
+  RegData$SmerteNum <- RegData$PainDurationNow
   RegData$PainDurationNow <- factor(RegData$PainDurationNow, levels = c(1:5,99),
                                  labels = c('Ingen smerter', 'Mindre enn 3 måneder', '3 til 12 måneder',
                                             '1-2 år', 'Mer enn 2', 'Ikke svart'))

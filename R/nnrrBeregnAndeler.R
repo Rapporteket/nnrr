@@ -18,9 +18,20 @@
 #'
 #' @export
 
-nnrrBeregnAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01',
-                               datoTil='2050-12-31', enhetsUtvalg=1,
-                               minald=0, maxald=130, erMann=99, outfile='', reshID)
+nnrrBeregnAndeler  <- function(RegData,
+                               valgtVar,
+                               datoFra='2014-01-01',
+                               datoTil='2050-12-31',
+                               enhetsUtvalg=1,
+                               minald=0,
+                               maxald=120,
+                               erMann=99,
+                               tverrfaglig = 99,
+                               minHSCL = 1,
+                               maxHSCL = 4,
+                               medikamenter = NULL,
+                               smerte = NULL,
+                               reshID)
 {
 
   # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
@@ -34,8 +45,12 @@ nnrrBeregnAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01',
   }
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
-  NNRRUtvalg <- nnrrUtvalg(RegData=RegData, datoFra=datoFra, datoTil=datoTil, minald=minald,
-                           maxald=maxald, erMann=erMann)
+  NNRRUtvalg <- nnrrUtvalg(RegData=RegData, datoFra=datoFra,
+                           datoTil=datoTil, minald=minald,
+                           maxald=maxald, erMann=erMann,
+                           tverrfaglig=tverrfaglig, minHSCL = minHSCL,
+                           maxHSCL = maxHSCL, medikamenter = medikamenter,
+                           smerte = smerte)
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
 
@@ -108,7 +123,7 @@ nnrrBeregnAndeler  <- function(RegData, valgtVar, datoFra='2014-01-01',
   AntallUt <- rbind(AntHoved, AntRest)
   rownames(AntallUt) <- c('Hoved', 'Rest')
 
-  UtData <- list(paste(toString(tittel),'.', sep=''), AndelerUt, AntallUt, grtxt)
+  UtData <- list(paste(toString(tittel),'.', sep=''), AndelerUt, AntallUt, grtxt )
   names(UtData) <- c('Tittel', 'Andeler', 'Antall', 'GruppeTekst')
   UtData$utvalgTxt <- utvalgTxt
   UtData$N <- data.frame(NHoved = NvarHoved, NRest = NvarRest)

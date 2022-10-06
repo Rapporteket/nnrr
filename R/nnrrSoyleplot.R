@@ -19,7 +19,7 @@
 #'
 #' @export
 
-nnrrSoyleplot  <- function(plotdata, outfile='') {
+nnrrSoyleplot  <- function(plotdata, outfile='', fargepalett="BlaaRapp") {
 
   tittel <- plotdata$PlotParams$tittel;
   grtxt <- plotdata$PlotParams$grtxt;
@@ -31,7 +31,7 @@ nnrrSoyleplot  <- function(plotdata, outfile='') {
   utvalgTxt <- plotdata$utvalgTxt
   enhetsUtvalg <- plotdata$enhetsUtvalg
   shtxt <- plotdata$shtxt
-  FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett="BlaaRapp", pointsizePDF=12)
+  FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=fargepalett, pointsizePDF=12)
 
   if (NHoved < 5 | (NRest<5 & enhetsUtvalg==1)) {
     farger <- FigTypUt$farger
