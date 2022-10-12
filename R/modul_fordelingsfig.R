@@ -81,6 +81,9 @@ fordelingsfig_UI <- function(id){
                                      'Mer enn 2' = 5,
                                      'Ikke svart' = 99),
                          multiple = TRUE),
+      shiny::selectInput(inputId = ns("tolk"),
+                           label = "Tolk",
+                          choices = c("--"=99, "Ja" = 1, "Nei"=0)),
       # uiOutput(ns("slider")),
       selectInput(inputId = ns("bildeformat"),
                   label = "Velg bildeformat",
@@ -167,9 +170,9 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
         }
       )
 
-      # observeEvent(input$medikamenter, {
-      #   print(paste0(input$medikamenter))
-      # })
+      # observe(
+      #   print(paste0(input$tolk))
+      # )
 
       tabellReager <- reactive({
         TabellData <- nnrr::nnrrBeregnAndeler(RegData = RegData,
@@ -185,6 +188,7 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
                                               maxHSCL = input$HSCL[2],
                                               medikamenter = input$medikamenter,
                                               smerte = as.numeric(input$smerte),
+                                              tolk = as.numeric(input$tolk),
                                               enhetsUtvalg=input$enhetsUtvalg)
       })
 

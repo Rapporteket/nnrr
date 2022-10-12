@@ -458,7 +458,8 @@ nnrrFigIndikator(indikator, c('Andel tilbake i arbeid eller', 'med lavere andel 
                  outfile=outfile, maal = 30, minstekrav = 25)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, c('Andel tilbake i arbeid eller', 'med lavere andel sykemelding' ), outfile=outfile, maal = 30, minstekrav = 25)
+  nnrrFigIndikator(indikator, c('Andel tilbake i arbeid eller', 'med lavere andel sykemelding' ),
+                   outfile=outfile, maal = 30, minstekrav = 25)
 }
 
 # tmp <- aux[, c("Besoksdato", "IsEmployed", "S2_Working", "S2_Unemployed", "S2_SickLeave",

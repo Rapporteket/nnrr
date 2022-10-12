@@ -31,6 +31,7 @@ nnrrBeregnAndeler  <- function(RegData,
                                maxHSCL = 4,
                                medikamenter = NULL,
                                smerte = NULL,
+                               tolk = 99,
                                reshID)
 {
 
@@ -50,7 +51,7 @@ nnrrBeregnAndeler  <- function(RegData,
                            maxald=maxald, erMann=erMann,
                            tverrfaglig=tverrfaglig, minHSCL = minHSCL,
                            maxHSCL = maxHSCL, medikamenter = medikamenter,
-                           smerte = smerte)
+                           smerte = smerte, tolk=tolk)
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
 
