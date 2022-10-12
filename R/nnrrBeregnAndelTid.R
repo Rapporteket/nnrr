@@ -19,7 +19,7 @@
 #'
 #' @export
 #'
-nnrrFigAndelTid <- function(RegData,
+nnrrBeregnAndelTid <- function(RegData,
                             valgtVar="tverrfaglig_behandlet",
                             datoFra='2014-01-01',
                             datoTil='2050-12-31',
