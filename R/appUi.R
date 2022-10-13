@@ -50,6 +50,9 @@ appUi <- function() {
       shiny::tabPanel("Sykehusvisning",
                       sykehusvisning_UI(id = "sykehusvisning_id")
       ),
+      shiny::tabPanel("Andeler over tid",
+                      tidsvisning_UI(id = "tidsvisning_id")
+      ),
       shiny::tabPanel("Indikatorer",
                       indikatorfig_UI(id = "indikatorfig_id")
       ),

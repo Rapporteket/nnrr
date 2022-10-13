@@ -11,9 +11,14 @@ nnrrBeregnAndeler(
   datoTil = "2050-12-31",
   enhetsUtvalg = 1,
   minald = 0,
-  maxald = 130,
+  maxald = 120,
   erMann = 99,
-  outfile = "",
+  tverrfaglig = 99,
+  minHSCL = 1,
+  maxHSCL = 4,
+  medikamenter = NULL,
+  smerte = NULL,
+  tolk = 99,
   reshID
 )
 }

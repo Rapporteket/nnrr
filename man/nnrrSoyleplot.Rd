@@ -4,7 +4,7 @@
 \alias{nnrrSoyleplot}
 \title{Lag søylediagram som viser andeler av ulike variabler:}
 \usage{
-nnrrSoyleplot(plotdata, outfile = "")
+nnrrSoyleplot(plotdata, outfile = "", fargepalett = "BlaaRapp")
 }
 \arguments{
 \item{outfile}{- navn på fil figuren skrives til, default '' dvs. skriv til skjerm}

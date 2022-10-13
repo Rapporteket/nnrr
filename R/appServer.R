@@ -34,6 +34,9 @@ appServer <- function(input, output, session) {
   sykehusvisningServer("sykehusvisning_id",
                       RegData = RegData, userRole = userRole, hvd_session = session)
 
+  tidsvisningServer("tidsvisning_id", reshID = userReshId,
+                    RegData = RegData, userRole = userRole, hvd_session = session)
+
   indikatorfigServer("indikatorfig_id",
                      RegData = RegData, userRole = userRole, hvd_session = session)
 
