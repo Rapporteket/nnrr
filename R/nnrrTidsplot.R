@@ -21,6 +21,20 @@
 #'
 nnrrTidsplot <- function(plotdata, outfile='', fargepalett="BlaaRapp") {
 
+
+  tittel <- plotdata$PlotParams$tittel;
+  grtxt <- plotdata$PlotParams$grtxt;
+  subtxt <- plotdata$PlotParams$subtxt;
+  retn <- plotdata$PlotParams$retn;
+  cexgr <- plotdata$PlotParams$cexgr;
+  NHoved <- plotdata$NHoved
+  NRest <- plotdata$NRest
+  utvalgTxt <- plotdata$utvalgTxt
+  enhetsUtvalg <- plotdata$enhetsUtvalg
+  shtxt <- plotdata$shtxt
+  FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=fargepalett, pointsizePDF=12)
+
+
   if (length(indHoved) < 10 | (medSml ==1 & length(indRest)<10)) {
     #-----------Figur---------------------------------------
     farger <- FigTypUt$farger

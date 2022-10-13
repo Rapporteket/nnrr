@@ -137,10 +137,6 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session){
         }
       )
 
-      # observe(
-      #   print(paste0(input$tolk))
-      # )
-
       tabellReager <- reactive({
         TabellData <- nnrr::nnrrBeregnAndelTid(RegData = RegData,
                                               valgtVar=input$valgtVar,
@@ -159,10 +155,10 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session){
                                               enhetsUtvalg=input$enhetsUtvalg)
       })
 
-      # output$Figur1 <- renderPlot({
-      #   nnrr::nnrrTidsplot(plotdata = tabellReager(),
-      #                       outfile='')
-      # }, width = 700, height = 700)
+      output$Figur1 <- renderPlot({
+        nnrr::nnrrTidsplot(plotdata = tabellReager(),
+                           outfile='')
+      }, width = 700, height = 700)
 
       output$utvalg <- renderUI({
         TabellData <- tabellReager()
