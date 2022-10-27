@@ -19,27 +19,35 @@
 #'
 #' @export
 #'
-nnrrTidsplot <- function(plotdata, outfile='', fargepalett="BlaaRapp") {
+nnrrTidsplot <- function(plotdata, outfile='',
+                         fargepalett="BlaaRapp",
+                         inkl_konf = 1) {
 
 
-  tittel <- plotdata$PlotParams$tittel;
+  tittel <- plotdata$tittel;
+  Tidtxt <- plotdata$Tidtxt
+  AndelHoved <- plotdata$Andeler$AndelHoved
+  AndelRest <- plotdata$Andeler$AndelRest
+  NHoved <- plotdata$NTid$NHoved
+  NRest <- plotdata$NTid$NRest
+
+  medSml <- plotdata$medSml
+
   grtxt <- plotdata$PlotParams$grtxt;
   subtxt <- plotdata$PlotParams$subtxt;
   retn <- plotdata$PlotParams$retn;
   cexgr <- plotdata$PlotParams$cexgr;
-  NHoved <- plotdata$NHoved
-  NRest <- plotdata$NRest
   utvalgTxt <- plotdata$utvalgTxt
   enhetsUtvalg <- plotdata$enhetsUtvalg
   shtxt <- plotdata$shtxt
   FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=fargepalett, pointsizePDF=12)
-
+  farger <- FigTypUt$farger
 
   if (length(indHoved) < 10 | (medSml ==1 & length(indRest)<10)) {
     #-----------Figur---------------------------------------
-    farger <- FigTypUt$farger
+
     plot.new()
-    title(main=paste('variabel: ', valgtVar, sep=''))	#, line=-6)
+    title(main=tittel)	#, line=-6)
     legend('topleft',utvalgTxt, bty='n', cex=0.9, text.col=farger[1])
     text(0.5, 0.65, 'Færre enn 10 registreringer i hoved-', cex=1.2)
     text(0.55, 0.6, 'eller sammenlikningsgruppe', cex=1.2)
@@ -107,7 +115,6 @@ nnrrTidsplot <- function(plotdata, outfile='', fargepalett="BlaaRapp") {
         }
       }
 
-      # par('fig'=c(0, 1, 0, 1))
       if ( outfile != '') {dev.off()}
 
     } else {
