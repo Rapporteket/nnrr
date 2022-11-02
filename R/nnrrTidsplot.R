@@ -28,22 +28,27 @@ nnrrTidsplot <- function(plotdata, outfile='',
   Tidtxt <- plotdata$Tidtxt
   AndelHoved <- plotdata$Andeler$AndelHoved
   AndelRest <- plotdata$Andeler$AndelRest
-  NHoved <- plotdata$NTid$NHoved
-  NRest <- plotdata$NTid$NRest
-
-  medSml <- plotdata$medSml
-
-  grtxt <- plotdata$PlotParams$grtxt;
-  subtxt <- plotdata$PlotParams$subtxt;
-  retn <- plotdata$PlotParams$retn;
-  cexgr <- plotdata$PlotParams$cexgr;
+  NTidHoved <- plotdata$NTid$NTidHoved
+  NTidRest <- plotdata$NTid$NTidRest
+  Konf <- plotdata$KonfInt$Konf
+  KonfRest <- plotdata$KonfInt$KonfRest
   utvalgTxt <- plotdata$utvalgTxt
-  enhetsUtvalg <- plotdata$enhetsUtvalg
+  tidsenhet <- plotdata$tidsenhet
+  VarTxt <- plotdata$VarTxt
+  medSml <- plotdata$medSml
   shtxt <- plotdata$shtxt
+  AndelRestGjsn <- plotdata$AndelRestGjsn
+  AndelHovedGjsn <- plotdata$AndelHovedGjsn
+  maal <- plotdata$maal
+  smltxt <- plotdata$smltxt
+  xaksetxt <- plotdata$xaksetxt
+
+  NHovedRes <- sum(NTidHoved, na.rm = T)
+  NSmlRes <- sum(NTidRest, na.rm = T)
   FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=fargepalett, pointsizePDF=12)
   farger <- FigTypUt$farger
 
-  if (length(indHoved) < 10 | (medSml ==1 & length(indRest)<10)) {
+  if (NHovedRes < 10 | (medSml ==1 & NSmlRes<10)) {
     #-----------Figur---------------------------------------
 
     plot.new()
@@ -53,12 +58,11 @@ nnrrTidsplot <- function(plotdata, outfile='',
     text(0.55, 0.6, 'eller sammenlikningsgruppe', cex=1.2)
     if ( outfile != '') {dev.off()}
   } else {
-
+    cexgr <- 0.9
     if (inkl_konf==1) {
       Ant_tidpkt <- length(Tidtxt)
       xmin <- 0.9
       xmax <- Ant_tidpkt
-      cexgr <- 0.9	#Kan endres for enkeltvariable
       ymin <- 0.9*min(KonfRest, Konf, na.rm=TRUE)	#ymin1 - 2*h
       ymax <- 1.1*max(KonfRest, Konf, na.rm=TRUE)
       NutvTxt <- length(utvalgTxt)
@@ -71,8 +75,7 @@ nnrrTidsplot <- function(plotdata, outfile='',
 
       plot(xskala, AndelHoved, xlim= c(xmin, xmax), ylim=c(ymin, ymax), type='n', frame.plot=FALSE,
            ylab=c(paste0('Andel ', VarTxt),'inkl. 95% konfidensintervall'),
-           xlab=switch(tidsenhet, Aar='Intervensjonsår', Mnd='Intervensjonsår og -måned',
-                       Kvartal='Intervensjonsår og -kvartal', Halvaar='Intervensjonsår og -halvår'),
+           xlab=xaksetxt,
            xaxt='n',
            sub='(Tall i boksene angir antall intervensjoner)', cex.sub=cexgr)	#, axes=F)
       axis(side=1, at = xskala, labels = Tidtxt)
@@ -102,19 +105,14 @@ nnrrTidsplot <- function(plotdata, outfile='',
       arrows(x0=xskala, y0=AndelHoved+h, x1=xskala, y1=replace(Konf[2, ], ind2, AndelHoved[ind2]+h),
              length=0.08, code=2, angle=90, col=fargeHovedRes, lwd=1.5)
 
-      title(main=tittel, font.main=1, line=1)
+      title(main=tittel, font.main=1.4, line=1)
       mtext(utvalgTxt, side=3, las=1, cex=0.9, adj=0, col=farger[1], line=c(3+0.8*((NutvTxt-1):0)))
-
-      # if (!is.na(maal)) {
-      #   lines(range(xskala),rep(maal,2), col="green", lwd=2, lty=1)
-      # }
       if (!is.na(maal)) {
         lines(range(xskala),rep(maal,2), col="green", lwd=2, lty=2)
         if (!is.na(maalnivaatxt)) {
           text(x = length(Tidtxt), y = maal, labels = maalnivaatxt, adj = c(1,1), xpd=T)
         }
       }
-
       if ( outfile != '') {dev.off()}
 
     } else {
@@ -127,9 +125,9 @@ nnrrTidsplot <- function(plotdata, outfile='',
       cexleg <- 1	#Størrelse på legendtekst
       cexskala <- switch(tidsenhet, Aar=1, Mnd=0.9, Kvartal=0.9, Halvaar=0.9)
       xskala <- 1:length(Tidtxt)
-      xaksetxt <- switch(tidsenhet, Aar='Intervensjonsår', Mnd='Intervensjonsår og -måned',
-                         Kvartal='Intervensjonsår og -kvartal', Halvaar='Intervensjonsår og -halvår')
-      ymax <- min(119, 1.25*max(Andeler,na.rm=T))
+      # xaksetxt <- switch(tidsenhet, Aar='Intervensjonsår', Mnd='Intervensjonsår og -måned',
+      #                    Kvartal='Intervensjonsår og -kvartal', Halvaar='Intervensjonsår og -halvår')
+      ymax <- min(119, 1.25*max(AndelHoved, AndelRest,na.rm=T))
 
       plot(AndelHoved,  font.main=1,  type='o', pch="'", col=fargeHoved, xaxt='n',
            frame.plot = FALSE,  xaxp=c(1,length(Tidtxt),length(Tidtxt)-1),xlim = c(1,length(Tidtxt)),
@@ -137,7 +135,7 @@ nnrrTidsplot <- function(plotdata, outfile='',
            sub='(Tall ved punktene angir antall intervensjoner)', cex.sub=cexgr)
 
       axis(side=1, at = xskala, labels = Tidtxt, cex.axis=0.9)
-      title(tittel, line=1, font.main=1)
+      title(tittel, line=1, font.main=1.4)
       text(xskala, AndelHoved, pos=3, NTidHoved, cex=0.9, col=fargeHoved)#pos=1,
 
       if (medSml == 1) {
@@ -149,13 +147,8 @@ nnrrTidsplot <- function(plotdata, outfile='',
                                    paste0(smltxt, ' (N=', NSmlRes, ')')),
                bty='n', lty=c(1,1), ncol=1, cex=cexleg,
                col=c(fargeHoved, fargeRest), lwd=c(3,3))
-        # legend('topleft', border=NA, c(paste0(shtxt, ' (N=', NHovedRes, ')'),
-        #                                paste0(smltxt, ' (N=', NSmlRes, ')'), paste0(shtxt, ' Gj.snitt'), paste0(smltxt, ' Gj.snitt')),
-        #        bty='n', lty=c(1,1,2,2), ncol=2, cex=cexleg,
-        #        col=c(fargeHoved, fargeRest, fargeHoved, fargeRest), lwd=c(3,3,2,2))
-
       } else {
-        legend('top', paste0(shtxt, ' (N=', NHovedRes, ')'),
+        legend('top', paste0(shtxt, ' (N=', sum(NTidHoved), ')'),
                col=c(fargeHoved, NA), lwd=3, bty='n')
       }
 

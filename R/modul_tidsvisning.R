@@ -37,7 +37,9 @@ tidsvisning_UI <- function(id){
                   label = "Velg tidsenhet",
                   choices = c('Aar', 'Mnd', 'Kvartal', 'Halvaar'),
                   selected = 'Kvartal'),
-
+      selectInput(inputId = ns("inkl_konf"),
+                  label = "Inkluder konfidensintervall",
+                  choices = c("Ja" = 1, "Nei" = 0)),
       selectInput(inputId = ns("enhetsUtvalg"),
                   label = "Kjør rapport for",
                   choices = c('Hele landet'=0,
@@ -137,27 +139,47 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session){
         }
       )
 
+      datovar <- shiny::reactive({
+        switch(input$valgtVar,
+               tverrfaglig_behandlet = "Besoksdato",
+               individuell_oppfolging = "Besoksdato",
+               fabq11 = "Besoksdato",
+               Oppfolging_utfylt = "dato_oppfolg",
+               opplevd_nytte_beh = "dato_oppfolg",
+               odi_klinisk_viktig = "dato_oppfolg",
+               odi_klinisk_viktig_v2 = "dato_oppfolg",
+               bedring_smerte_hvile = "dato_oppfolg",
+               bedring_smerte_aktiv = "dato_oppfolg",
+               misfornoyd = "dato_oppfolg",
+               fornoyd = "dato_oppfolg",
+               HSCL10.Score = "dato_oppfolg",
+               smerter_2aar = "dato_oppfolg"
+               )
+      })
+
       tabellReager <- reactive({
         TabellData <- nnrr::nnrrBeregnAndelTid(RegData = RegData,
                                               valgtVar=input$valgtVar,
+                                              datovar = datovar(),
                                               datoFra=input$datovalg[1],
                                               datoTil=input$datovalg[2],
                                               minald=as.numeric(input$alder[1]),
                                               maxald=as.numeric(input$alder[2]),
                                               erMann=as.numeric(input$erMann),
                                               reshID=reshID,
-                                              # tverrfaglig = as.numeric(input$tverrfaglig),
-                                              # minHSCL = input$HSCL[1],
-                                              # maxHSCL = input$HSCL[2],
-                                              # medikamenter = input$medikamenter,
-                                              # smerte = as.numeric(input$smerte),
-                                              # tolk = as.numeric(input$tolk),
+                                              tidsenhet=input$tidsenhet,
+                                              tverrfaglig = as.numeric(input$tverrfaglig),
+                                              minHSCL = input$HSCL[1],
+                                              maxHSCL = input$HSCL[2],
+                                              medikamenter = input$medikamenter,
+                                              smerte = as.numeric(input$smerte),
+                                              tolk = as.numeric(input$tolk),
                                               enhetsUtvalg=input$enhetsUtvalg)
       })
 
       output$Figur1 <- renderPlot({
         nnrr::nnrrTidsplot(plotdata = tabellReager(),
-                           outfile='')
+                           outfile='', inkl_konf = as.numeric(input$inkl_konf))
       }, width = 700, height = 700)
 
       output$utvalg <- renderUI({
@@ -171,7 +193,7 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session){
 
         utdata <- tabellReager()
         if (input$enhetsUtvalg == 1) {
-          Tabell_tid <- tibble(Tidsperiode = utdata$Tidtxt, Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
+          Tabell_tid <- dplyr::tibble(Tidsperiode = utdata$Tidtxt, Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
                                N = utdata$NTid$NTidHoved, Andel = utdata$Andeler$AndelHoved, Konf.int.nedre = utdata$KonfInt$Konf[1,],
                                Konf.int.ovre = utdata$KonfInt$Konf[2,], Antall2 = round(utdata$Andeler$AndelRest*utdata$NTid$NTidRest/100),
                                N2 = utdata$NTid$NTidRest, Andel2 = utdata$Andeler$AndelRest, Konf.int.nedre2 = utdata$KonfInt$KonfRest[1,],
@@ -182,7 +204,7 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session){
             kableExtra::kable_styling("hover", full_width = F) %>%
             kableExtra::add_header_above(c(" ", "Din avdeling" = 5, "Landet forøvrig" = 5))
         } else {
-          Tabell_tid <- tibble(Tidsperiode = utdata$Tidtxt,
+          Tabell_tid <- dplyr::tibble(Tidsperiode = utdata$Tidtxt,
                                Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
                                N = utdata$NTid$NTidHoved, 'Andel (%)'= utdata$Andeler$AndelHoved, KI_nedre = utdata$KonfInt$Konf[1,],
                                KI_ovre = utdata$KonfInt$Konf[2,])

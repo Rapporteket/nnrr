@@ -31,6 +31,13 @@ nnrrBeregnIndikator <- function(RegData, ind_id) {
   height=700
   maalretn="hoy"
 
+  if (ind_id == "nnrr_tid_henvisning_besok_50") {
+    indikator <- RegData[RegData$regstatus==1, ]
+    indikator$VentetidFraHenvisningTilBesok[indikator$VentetidFraHenvisningTilBesok < 0] <- NA
+    indikator <- indikator[!is.na(indikator$VentetidFraHenvisningTilBesok), ]
+  }
+
+
   if (ind_id == "nnrr_tverrfaglig_behandling") {
     indikator <- RegData[RegData$regstatus==1, ]
 

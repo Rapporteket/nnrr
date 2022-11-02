@@ -49,10 +49,10 @@ nnrrUtvalg <- function(RegData,
   } else indAlle
   indMedikament <- if (length(medikamenter %i% c("MedicationA", "MedicationB", "MedicationC"))>=1) {
     # which(rowSums(RegData[, medikamenter]) > 0)
-    which(RegData %>% select(medikamenter) %>% rowSums() > 0)
+    which(RegData %>% dplyr::select(medikamenter) %>% rowSums() > 0)
   } else indAlle
-  indSmerte <- if (smerte[1] %in% c(1,2,3,4,5,99)) {
-    which(RegData$SmerteNum %in% smerte)
+  indSmerte <- if (length(smerte)>0) {if (smerte[1] %in% c(1,2,3,4,5,99)) {
+    which(RegData$SmerteNum %in% smerte)}
   } else indAlle
   indTolk <- if (tolk %in% c(0,1)) {
     which(RegData$Interpreter %in% tolk)
@@ -79,9 +79,9 @@ nnrrUtvalg <- function(RegData,
                  if (length(medikamenter %i% c("MedicationA", "MedicationB", "MedicationC"))>=1) {
                    paste0("Medikamenter: ", paste(medikamenter, collapse = ", "))
                  },
-                 if (smerte[1] %in% c(1,2,3,4,5,99)) {
+                 if (length(smerte)>0) {if (smerte[1] %in% c(1,2,3,4,5,99)) {
                    paste0("Varighet av nåværende smerter: ",
-                          paste(RegData$PainDurationNow[match(smerte, RegData$SmerteNum)], collapse = ", " ))
+                          paste(RegData$PainDurationNow[match(smerte, RegData$SmerteNum)], collapse = ", " ))}
                  },
                  if (tolk %in% c(0,1)) {paste0("Tolk: ", c("Nei", "Ja")[tolk+1])}
   )
