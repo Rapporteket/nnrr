@@ -29,7 +29,8 @@ nnrrUtvalg <- function(RegData,
   RegData$Dato <- RegData[, datovar]
   datotxt <- switch(datovar,
                     "Besoksdato"="Besoksdato: ",
-                    "dato_oppfolg"="Oppfølgingsdato: ")
+                    "dato_oppfolg"="6mnd-oppfølgingsdato: ",
+                    "dato_oppfolg2"="12mnd-oppfølgingsdato: ")
 
   Ninn <- dim(RegData)[1]
   indAlle <- 1:Ninn
