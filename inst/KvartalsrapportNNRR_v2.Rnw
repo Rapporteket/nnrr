@@ -228,7 +228,9 @@ plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra
                                      minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
                                      tidsenhet="Kvartal", maal = 30, maalnivaatxt = "Mål")
 nnrr::nnrrTidsplot(plotdata = plotdata,
-                   outfile='')
+                   outfile='', maal = 30,
+                   maalnivaatxt = "Mål",
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "individuell_oppfolging.pdf")
 valgtVar <- "individuell_oppfolging"

@@ -21,7 +21,9 @@
 #'
 nnrrTidsplot <- function(plotdata, outfile='',
                          fargepalett="BlaaRapp",
-                         inkl_konf = 1) {
+                         inkl_konf = 1,
+                         maal=NA,
+                         maalnivaatxt=NA) {
 
 
   tittel <- plotdata$tittel;
@@ -39,7 +41,7 @@ nnrrTidsplot <- function(plotdata, outfile='',
   shtxt <- plotdata$shtxt
   AndelRestGjsn <- plotdata$AndelRestGjsn
   AndelHovedGjsn <- plotdata$AndelHovedGjsn
-  maal <- plotdata$maal
+  # maal <- plotdata$maal
   smltxt <- plotdata$smltxt
   xaksetxt <- plotdata$xaksetxt
 
