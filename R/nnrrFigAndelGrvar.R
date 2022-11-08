@@ -8,9 +8,12 @@
 #'
 #' @export
 #'
-nnrrFigAndelGrvar <- function(RegData, valgtVar="opplevd_nytte_beh", datoFra='2014-01-01', datoTil='2050-12-31', enhetsUtvalg=1, datovar="Besoksdato",
-                            minald=0, maxald=130, erMann=99, outfile='', reshID, inkl_konf=0, grvar="beh_spes",
-                            grtittel="Behandling i spesialisthelsetjenesten")
+nnrrFigAndelGrvar <- function(RegData, valgtVar="opplevd_nytte_beh",
+                              datoFra='2014-01-01', datoTil='2050-12-31',
+                              enhetsUtvalg=1, datovar="Besoksdato",
+                              minald=0, maxald=130, erMann=99, outfile='',
+                              reshID, inkl_konf=0, grvar="beh_spes",
+                              grtittel="Behandling i spesialisthelsetjenesten")
 {
 
   # valgtVar="opplevd_nytte_beh"; datoFra='2014-01-01'; datoTil='2050-12-31'; enhetsUtvalg=1; datovar="dato_oppfolg";
@@ -47,18 +50,18 @@ nnrrFigAndelGrvar <- function(RegData, valgtVar="opplevd_nytte_beh", datoFra='20
 
   if (enhetsUtvalg==1) {
     tabell_hoved <- RegData[ind$Hoved, ] %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
-                                                 N = n(),
-                                                 Andel = Antall/N*100)
+                                                                                          N = n(),
+                                                                                          Andel = Antall/N*100)
     tabell_rest <- RegData[ind$Rest, ] %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
-                                                              N = n(),
-                                                              Andel = Antall/N*100)
+                                                                                        N = n(),
+                                                                                        Andel = Antall/N*100)
     tabell_hoved$Andel[tabell_hoved$N == 0] <- 0
     tabell_rest$Andel[tabell_rest$N == 0] <- 0
     plottab <- tibble(hoved=tabell_hoved$Andel, rest=tabell_rest$Andel)
   } else {
     tabell_hoved <- RegData %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
-                                                              N = n(),
-                                                              Andel = Antall/N*100)
+                                                                             N = n(),
+                                                                             Andel = Antall/N*100)
   }
 
   #-----------Figur---------------------------------------

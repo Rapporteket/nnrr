@@ -53,8 +53,7 @@ nnrrUtvalg <- function(RegData,
     which(RegData %>% dplyr::select(medikamenter) %>% rowSums() > 0)
   } else indAlle
   indSmerte <- if (length(smerte)>0) {if (smerte[1] %in% c(1,2,3,4,5,99)) {
-    which(RegData$SmerteNum %in% smerte)}
-  } else indAlle
+    which(RegData$SmerteNum %in% smerte)} else indAlle} else indAlle
   indTolk <- if (tolk %in% c(0,1)) {
     which(RegData$Interpreter %in% tolk)
   } else indAlle

@@ -178,8 +178,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='fornoyd_6mnd') {
-    tittel <- "Fornøyd med behandling 6 mnd
-    "
+    tittel <- "Fornøyd med behandling 6 mnd"
     RegData <- RegData[which(RegData$regstatus==1 & RegData$regstatus_post==1 &
                                RegData$TreatmentSatisfaction != 0 &
                                !is.na(RegData$TreatmentSatisfaction)), ]
