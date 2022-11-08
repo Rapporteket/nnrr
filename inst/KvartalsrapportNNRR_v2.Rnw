@@ -64,14 +64,13 @@ shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
 figstr <- 0.61
 # tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 
-figfolder <- "C:/GIT/nnrr/inst/figfolder/"
+figfolder <- "~/nnrr/inst/figfolder/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
 @
 
 \begin{document}
-
 %%%%% Forside
 
 \newgeometry{left=2.5cm,bottom=0.1cm, top=2.1cm}
@@ -257,14 +256,23 @@ nnrr::nnrrTidsplot(plotdata = plotdata,
                    outfile=outfile,
                    inkl_konf = 0)
 
-outfile <- paste0(figfolder, "Oppfolging_utfylt_6mnd.pdf")
-valgtVar <- "Oppfolging_utfylt_6mnd"
-plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
-nnrr::nnrrTidsplot(plotdata = plotdata,
-                   outfile=outfile,
-                   inkl_konf = 0)
+# outfile <- paste0(figfolder, "Oppfolging_utfylt_6mnd.pdf")
+# valgtVar <- "Oppfolging_utfylt_6mnd"
+# plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+#                                      minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+#                                      tidsenhet="Kvartal", datovar = "dato_oppfolg")
+# nnrr::nnrrTidsplot(plotdata = plotdata,
+#                    outfile=outfile,
+#                    inkl_konf = 0)
+#
+# outfile <- paste0(figfolder, "Oppfolging_utfylt_12mnd.pdf")
+# valgtVar <- "Oppfolging_utfylt_12mnd"
+# plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+#                                      minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+#                                      tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+# nnrr::nnrrTidsplot(plotdata = plotdata,
+#                    outfile=outfile,
+#                    inkl_konf = 0)
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_6mnd.pdf")
 valgtVar <- "opplevd_nytte_beh_6mnd"
@@ -275,6 +283,14 @@ nnrr::nnrrTidsplot(plotdata = plotdata,
                    outfile=outfile,
                    inkl_konf = 0)
 
+outfile <- paste0(figfolder, "opplevd_nytte_beh_12mnd.pdf")
+valgtVar <- "opplevd_nytte_beh_12mnd"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "odi_klinisk_viktig_6mnd.pdf")
 valgtVar <- "odi_klinisk_viktig_6mnd"
@@ -348,7 +364,7 @@ nnrr::nnrrTidsplot(plotdata = plotdata,
                    outfile=outfile,
                    inkl_konf = 0)
 
-outfile <- paste0(figfolder, "fornoyd_gruppert.pdf")
+outfile <- paste0(figfolder, "fornoyd_gruppert_6mnd.pdf")
 valgtVar <- "fornoyd_6mnd"
 nnrrFigAndelGrvar(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
                   minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
@@ -407,13 +423,25 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_6mnd.pdf}
-\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) av utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 6 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_12mnd.pdf}
+\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 12 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert_6mnd.pdf}
-\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) av utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
+\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 6 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert_12mnd.pdf}
+\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 12 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
 \end{figure}
 
 \clearpage
@@ -423,7 +451,13 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}odi_klinisk_viktig_6mnd.pdf}
-\caption{Andel pasienter som har hatt klinisk bedring i funksjon (ODI) (30 \% eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som 6 mnd etter utredning/behandling har hatt klinisk bedring i funksjon (ODI) (30 \% eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}odi_klinisk_viktig_12mnd.pdf}
+\caption{Andel pasienter som 12 mnd etter utredning/behandling har hatt klinisk bedring i funksjon (ODI) (30 \% eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \clearpage
@@ -433,13 +467,25 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}bedring_smerte_hvile_6mnd.pdf}
-\caption{Andel pasienter som har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som 6 mnd etter utredning/behandling har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}bedring_smerte_hvile_12mnd.pdf}
+\caption{Andel pasienter som 12 mnd etter utredning/behandling har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}bedring_smerte_aktiv_6mnd.pdf}
-\caption{Andel pasienter som har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som 6 mnd etter utredning/behandling har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}bedring_smerte_aktiv_12mnd.pdf}
+\caption{Andel pasienter som 12 mnd etter utredning/behandling har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \clearpage
@@ -449,13 +495,13 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_6mnd.pdf}
-\caption{Andel pasienter som angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som 6 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_gruppert_6mnd.pdf}
-\caption{Andel pasienter som angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
+\caption{Andel pasienter som 6 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
 \end{figure}
 
 

@@ -140,8 +140,8 @@ nnrrBeregnAndelTid <- function(RegData,
   incl_pst <- PlotParams$incl_pst; retn <- PlotParams$retn; cexgr <- PlotParams$cexgr;
   VarTxt <- PlotParams$VarTxt; ##
 
-  FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett)
-  farger <- FigTypUt$farger
+  # FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett)
+  # farger <- FigTypUt$farger
   tittel <-  c(tittel, shtxt)
 
   utData <- list(tittel = tittel,

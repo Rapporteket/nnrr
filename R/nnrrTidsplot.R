@@ -115,7 +115,7 @@ nnrrTidsplot <- function(plotdata, outfile='',
           text(x = length(Tidtxt), y = maal, labels = maalnivaatxt, adj = c(1,1), xpd=T)
         }
       }
-      if ( outfile != '') {dev.off()}
+      # if ( outfile != '') {dev.off()}
 
     } else {
 
@@ -174,8 +174,9 @@ nnrrTidsplot <- function(plotdata, outfile='',
         }
       }
 
-      par('fig'=c(0, 1, 0, 1))
-      if ( outfile != '') {dev.off()}
+      # par('fig'=c(0, 1, 0, 1))
+      # if ( outfile != '') {dev.off()}
     }
+    if ( outfile != '') {dev.off()}
   }
 }
