@@ -64,7 +64,7 @@ shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
 figstr <- 0.61
 # tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 
-figfolder <- "~/nnrr/inst/figfolder/"
+figfolder <- "C:/GIT/nnrr/inst/figfolder/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
@@ -205,8 +205,11 @@ print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
 <<'Figur:Aldersfordeling', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
 outfile <- paste0(figfolder, "alder.pdf")
 valgtVar <- "PatientAge"
-nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=datoTil, enhetsUtvalg=1,
-               minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID)
+plotdata <- nnrr::nnrrBeregnAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=datoTil, enhetsUtvalg=1,
+               minald=0, maxald=130, erMann=99, reshID=reshID)
+nnrr::nnrrSoyleplot(plotdata = plotdata,
+                   outfile=outfile)
+
 @
 
 \begin{figure}[ht]
@@ -217,100 +220,133 @@ nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=
 
 <<'Figur:Tidsvisning', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
 outfile <- paste0(figfolder, "andel_tverrfaglig.pdf")
-# x11()
-# outfile <- ""
 valgtVar <- "tverrfaglig_behandlet"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, maal = 30, maalnivaatxt = "Mål")
-
 plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
                                      minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
                                      tidsenhet="Kvartal", maal = 30, maalnivaatxt = "Mål")
 nnrr::nnrrTidsplot(plotdata = plotdata,
-                   outfile='', maal = 30,
+                   outfile=outfile, maal = 30,
                    maalnivaatxt = "Mål",
                    inkl_konf = 0)
 
 outfile <- paste0(figfolder, "individuell_oppfolging.pdf")
 valgtVar <- "individuell_oppfolging"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0)
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "smerter_2aar.pdf")
 valgtVar <- "smerter_2aar"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0)
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 
 outfile <- paste0(figfolder, "fabq11.pdf")
 valgtVar <- "fabq11"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0)
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
-outfile <- paste0(figfolder, "Oppfolging_utfylt.pdf")
-valgtVar <- "Oppfolging_utfylt"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg")
+outfile <- paste0(figfolder, "Oppfolging_utfylt_6mnd.pdf")
+valgtVar <- "Oppfolging_utfylt_6mnd"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
-outfile <- paste0(figfolder, "opplevd_nytte_beh.pdf")
-valgtVar <- "opplevd_nytte_beh"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg")
+outfile <- paste0(figfolder, "opplevd_nytte_beh_6mnd.pdf")
+valgtVar <- "opplevd_nytte_beh_6mnd"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 
 outfile <- paste0(figfolder, "odi_klinisk_viktig_6mnd.pdf")
 valgtVar <- "odi_klinisk_viktig_6mnd"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "odi_klinisk_viktig_12mnd.pdf")
 valgtVar <- "odi_klinisk_viktig_12mnd"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg2")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "bedring_smerte_hvile_6mnd.pdf")
 valgtVar <- "bedring_smerte_hvile_6mnd"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "bedring_smerte_hvile_12mnd.pdf")
 valgtVar <- "bedring_smerte_hvile_12mnd"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg2")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "bedring_smerte_aktiv_6mnd.pdf")
 valgtVar <- "bedring_smerte_aktiv_6mnd"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "bedring_smerte_aktiv_12mnd.pdf")
 valgtVar <- "bedring_smerte_aktiv_12mnd"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg2")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "fornoyd_6mnd.pdf")
 valgtVar <- "fornoyd_6mnd"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "fornoyd_12mnd.pdf")
 valgtVar <- "fornoyd_12mnd"
-nnrrFigAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                tidsenhet="Kvartal", inkl_konf=0, datovar = "dato_oppfolg2")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 outfile <- paste0(figfolder, "fornoyd_gruppert.pdf")
 valgtVar <- "fornoyd_6mnd"
@@ -319,14 +355,17 @@ nnrrFigAndelGrvar(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, 
                   grtittel="Behandling i spesialisthelsetjenesten")
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert_6mnd.pdf")
-nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_6mnd", datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
-                  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
+nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_6mnd", datoFra=datoFra,
+                  datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
+                  minald=0, maxald=130, erMann=99, outfile=outfile,
+                  reshID=reshID, grvar="beh_spes_v3",
                   grtittel="Behandling i spesialisthelsetjenesten")
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert_12mnd.pdf")
 nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_12mnd", datoFra=datoFra, datoTil=datoTil,
                   enhetsUtvalg=1, datovar="dato_oppfolg2",
-                  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
+                  minald=0, maxald=130, erMann=99, outfile=outfile,
+                  reshID=reshID, grvar="beh_spes_v3",
                   grtittel="Behandling i spesialisthelsetjenesten")
 @
 
