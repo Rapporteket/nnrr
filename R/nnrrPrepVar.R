@@ -24,6 +24,30 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- RegData$Variabel
   }
 
+  if (valgtVar == "VentetidFraHenvisning_kat") {
+    RegData$Variabel <- RegData[, "VentetidFraHenvisningTilBesok"]
+    RegData$Variabel[RegData$Variabel < 0] <- NA
+    RegData <- RegData[!is.na(RegData$Variabel), ]
+    tittel <- 'Ventetid fra henvisning til besøk'
+    # gr <- c(seq(0, 180, 30), 100000)
+    gr <- c(0, seq(25, 150, 25)+1, 100000)
+    RegData$VariabelGr <- cut(RegData$Variabel, breaks=gr, include.lowest=TRUE, right=FALSE)
+    grtxt <- c('0-25', '26-50', '51-75', '76-100', '101-125', '126-150', '150+')
+    # grtxt <- c('0-29', '30-59', '60-89', '90-119', '120-149', '150-179', '180+')
+    subtxt <- 'Dager'
+  }
+
+  if (valgtVar=='ventetid_krav') {
+    tittel <- "Ventetid 50 dager eller mindre"
+    RegData <- RegData[!is.na(RegData$VentetidFraHenvisningTilBesok) &
+                         RegData$VentetidFraHenvisningTilBesok >= 0, ]
+    RegData$Variabel <- 0
+    # RegData$Variabel[RegData$VentetidFraHenvisningTilBesok > 50] <- 0
+    RegData$Variabel[RegData$VentetidFraHenvisningTilBesok <= 50] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
   if (valgtVar=='tverrfaglig_behandlet') {
     tittel <- "Tverrfaglig behandlet"
     RegData <- RegData[RegData$regstatus==1, ]
