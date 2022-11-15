@@ -1,13 +1,49 @@
 rm(list=ls())
 library(nnrr)
 
+########## Utlevering HiaNor forberedelser #######################################
+
+var1 <- readxl::read_xlsx("~/nnrr/doc/HIANOR Variabler kun variabelnavn.xlsx", sheet = 1)
+var2 <- readxl::read_xlsx("~/nnrr/doc/HIANOR Variabler kun variabelnavn.xlsx", sheet = 2)
+var3 <- readxl::read_xlsx("~/nnrr/doc/HIANOR Variabler kun variabelnavn.xlsx", sheet = 3)
+
+
+pasientsvar_pre <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-11-07_1221.csv',
+                              sep=';', header=T, stringsAsFactors = F, fileEncoding = "UTF-8-BOM")
+legeskjema <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-11-07_1221.csv', sep=';',
+                         header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-11-07_1221.csv',
+                               sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post2 <- read.table('~/.ssh/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-11-07_1221.csv',
+                                sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+
+
+var3$Variabelnavn[match(c("Eq5d-L-spm1", "Eq5d-L-spm2", "Eq5d-L-spm3",
+                          "Eq5d-L-spm4", "Eq5d-L-spm5", "Eq5d-L-spm6"),
+                        var3$Variabelnavn)] <- c("Eq5d_L_spm1", "Eq5d_L_spm2", "Eq5d_L_spm3",
+                                                 "Eq5d_L_spm4", "Eq5d_L_spm5", "Eq5d_L_spm6")
+var1$Variabelnavn[match(c("Eq5d-L-spm1", "Eq5d-L-spm2", "Eq5d-L-spm3",
+                          "Eq5d-L-spm4", "Eq5d-L-spm5", "Eq5d-L-spm6"),
+                        var1$Variabelnavn)] <- c("Eq5d_L_spm1", "Eq5d_L_spm2", "Eq5d_L_spm3",
+                                                 "Eq5d_L_spm4", "Eq5d_L_spm5", "Eq5d_L_spm6")
+var2$Variabelnavn[match(c("Eq5d-L-spm1", "Eq5d-L-spm2", "Eq5d-L-spm3",
+                          "Eq5d-L-spm4", "Eq5d-L-spm5", "Eq5d-L-spm6"),
+                        var2$Variabelnavn)] <- c("Eq5d_L_spm1", "Eq5d_L_spm2", "Eq5d_L_spm3",
+                                                 "Eq5d_L_spm4", "Eq5d_L_spm5", "Eq5d_L_spm6")
+
+setdiff(var3$Variabelnavn, names(pasientsvar_pre))
+setdiff(var2$Variabelnavn, names(pasientsvar_post))
+setdiff(var1$Variabelnavn, names(pasientsvar_post2))
+
+
 ########## Utlevering AID spine 10.05.2022 #######################################
 
 
 # pasientsvar_pre <- readr::read_csv2('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-05-09_1545_red.csv',
 #                                     locale = readr::locale(encoding = "latin1"))
 pasientsvar_6mnd <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2022-05-09_1545.csv',
-                         sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+                               sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 # pasientsvar_12mnd <- read.table('I:/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2022-05-09_1545.csv',
 #                                sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 legeskjema <- read.table('I:/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-05-09_1544.csv',
@@ -54,14 +90,14 @@ pasientsvar_pre <- pasientsvar_pre[pasientsvar_pre$HovedskjemaGUID %in% legeskje
 pasientsvar_post <- pasientsvar_post[pasientsvar_post$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
 
 ikkemed <- c("BackSurgery", "NeckSurgery", "PelvisSurgery", "Radiological_None", "RadiologicalUS_CT", "RadiologicalUS_MR",
-  "RadiologicalUS_Radikulgraphy", "RadiologicalUS_Discography", "RadiologicalUS_LS_C_Columna",
-  "RadiologicalUS_FlexionExtention", "RadiologicalF_Normal", "RadiologicalF_DiscHernitation",
-  "RadiologicalF_CentralSpinalCord", "RadiologicalF_RecesStenosis", "RadiologicalF_Spondylolisthesis2018",
-  "RadiologicalF_Spondylolisthesis", "RadiologicalF_Scoliosis", "RadiologicalF_Scoliosis_Subcategory",
-  "RadiologicalF_Modicchanges", "RadiologicalF_Modicchanges1", "RadiologicalF_Modicchanges2",
-  "RadiologicalF_Modicchanges3", "RadiologicalF_ModicchangesUnspecified", "RadiologicalF_Other",
-  "OtherSupplementaryDiagnostic_DiagnosticInjection", "OtherSupplementaryDiagnostic_Radikulgraphy",
-  "RadiologicalUS_DiagnosticBlock", "OtherSupplementaryDiagnostic_Emg", "OtherSupplementaryDiagnostic_Nevrografi")
+             "RadiologicalUS_Radikulgraphy", "RadiologicalUS_Discography", "RadiologicalUS_LS_C_Columna",
+             "RadiologicalUS_FlexionExtention", "RadiologicalF_Normal", "RadiologicalF_DiscHernitation",
+             "RadiologicalF_CentralSpinalCord", "RadiologicalF_RecesStenosis", "RadiologicalF_Spondylolisthesis2018",
+             "RadiologicalF_Spondylolisthesis", "RadiologicalF_Scoliosis", "RadiologicalF_Scoliosis_Subcategory",
+             "RadiologicalF_Modicchanges", "RadiologicalF_Modicchanges1", "RadiologicalF_Modicchanges2",
+             "RadiologicalF_Modicchanges3", "RadiologicalF_ModicchangesUnspecified", "RadiologicalF_Other",
+             "OtherSupplementaryDiagnostic_DiagnosticInjection", "OtherSupplementaryDiagnostic_Radikulgraphy",
+             "RadiologicalUS_DiagnosticBlock", "OtherSupplementaryDiagnostic_Emg", "OtherSupplementaryDiagnostic_Nevrografi")
 legeskjema <- legeskjema[, -which(names(legeskjema) %in% ikkemed)]
 
 flere_hovedskjemaGuid_pre <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
@@ -137,9 +173,9 @@ kodebok1b <- read.table('I:/nnrr/Kodebok1b_feb2019.csv', sep=';', header=T, stri
 
 variabler <- read.table('C:/GIT/nnrr/doc/NNRR_variabelliste_utlevering_tyrdal.csv', sep=';', header=T, stringsAsFactors=F)
 skjema1a <- read.table('I:/nnrr/DataDump_Prod_1a_Spørreskjema+før+behandling_2019-05-14_red.csv', sep=';',
-                              header=T, stringsAsFactors = F)
+                       header=T, stringsAsFactors = F)
 skjema1b <- read.table('I:/nnrr/DataDump_Prod_1b_Registreringsskjema+poliklinikk_2019-05-14.csv', sep=';',
-                         header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+                       header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 flere_hovedskjemaGuid <- names(table(skjema1a$HovedskjemaGUID))[table(skjema1a$HovedskjemaGUID)>1]
 skjema1a <- skjema1a[!(skjema1a$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
 
@@ -176,7 +212,7 @@ utlever1a <- read.table(system.file(file='extdata/datadumpnavn Jorunn NNRR skjem
 utlever1b <- read.table(system.file(file='extdata/datadumpnavn Jorunn NNRR skjema 1b.csv', package='nnrr'), sep=';',
                         header=F, stringsAsFactors = F, fileEncoding = 'UTF-8-BOM')
 utlever2 <- read.table(system.file(file='extdata/datadumpnavn Jorunn NNRR skjema 2.csv', package='nnrr'), sep=';',
-                        header=F, stringsAsFactors = F, fileEncoding = 'UTF-8-BOM')
+                       header=F, stringsAsFactors = F, fileEncoding = 'UTF-8-BOM')
 
 pasientsvar_pre <- pasientsvar_pre[, c("HovedskjemaGUID", utlever1a$V1)]
 legeskjema <- legeskjema[, c("SkjemaGUID", utlever1b$V1)]
