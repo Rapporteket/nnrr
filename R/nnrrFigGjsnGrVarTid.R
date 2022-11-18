@@ -42,14 +42,14 @@ nnrrFigGjsnGrVarTid <- function(RegData, valgtVar='PatientAge', tittel='', datoF
   Tabell <- RegData %>% dplyr::group_by(Gr_var, Aar) %>%
     dplyr::summarise(gj.sn = mean(Variabel),
                      std.avvik= sd(Variabel),
-                     N = n())
+                     N = dplyr::n())
   aux <- RegData %>% dplyr::group_by(Aar) %>%
     dplyr::summarise(gj.sn = mean(Variabel),
                      std.avvik= sd(Variabel),
-                     N = n())
+                     N = dplyr::n())
   aux$Gr_var <- 'Samlet'
   aux <- aux[, c(5,1:4)]
-  Tabell <- bind_rows(Tabell, aux)
+  Tabell <- dplyr::bind_rows(Tabell, aux)
 
 
   gj.sn <- tidyr::spread(Tabell[, -c(4,5)], 'Aar', 'gj.sn')

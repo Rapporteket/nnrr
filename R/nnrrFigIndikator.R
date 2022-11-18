@@ -21,7 +21,7 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
 
   Tabell <- indikatordata %>% dplyr::group_by(SykehusNavn, Aar) %>%
     dplyr::summarise(Antall = sum(Teller),
-                     N = n(),
+                     N = dplyr::n(),
                      Andel = Antall/N*100)
 
 
@@ -35,7 +35,7 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
   N[is.na(N)] <- 0
 
   # Andeler, inkludert nasjonalt
-  andeler <- bind_cols(AntTilfeller[,1], AntTilfeller[,-1]/N[,-1] * 100)
+  andeler <- dplyr::bind_cols(AntTilfeller[,1], AntTilfeller[,-1]/N[,-1] * 100)
 
   # Fjern år med færre registreringer enn terskelverdi og sykehus med for lav dekningsgrad
   andeler[N < terskel] <- NA
