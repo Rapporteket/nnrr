@@ -4,7 +4,14 @@
 \alias{nnrrTidsplot}
 \title{Tidstrend av rate/andel for en gitt variabel}
 \usage{
-nnrrTidsplot(plotdata, outfile = "", fargepalett = "BlaaRapp", inkl_konf = 1)
+nnrrTidsplot(
+  plotdata,
+  outfile = "",
+  fargepalett = "BlaaRapp",
+  inkl_konf = 1,
+  maal = NA,
+  maalnivaatxt = NA
+)
 }
 \arguments{
 \item{outfile}{- navn på fil figuren skrives til, default '' dvs. skriv til skjerm}

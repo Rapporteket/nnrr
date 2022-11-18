@@ -14,7 +14,7 @@ nnrrFigIndikator(
   pktStr = 1.4,
   legPlass = "top",
   minstekravTxt = "Min.",
-  maalTxt = "Mål",
+  maalTxt = "M<U+00E5>l",
   graaUt = NA,
   decreasing = F,
   outfile = "",

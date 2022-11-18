@@ -17,9 +17,14 @@ nnrrBeregnAndelTid(
   outfile = "",
   reshID,
   tidsenhet = "Kvartal",
-  inkl_konf = 0,
   maal = NA,
-  maalnivaatxt = NA
+  maalnivaatxt = NA,
+  tverrfaglig = 99,
+  minHSCL = 1,
+  maxHSCL = 4,
+  medikamenter = NULL,
+  smerte = NULL,
+  tolk = 99
 )
 }
 \arguments{
@@ -45,11 +50,6 @@ nnrrBeregnAndelTid(
 'Aar' (Default)
 'Kvartal'
 'Mnd'}
-
-\item{inkl_konf}{Inkluder konfidensintervall i figur
-0: Nei
-1: Ja
-99: Bruk default som definert i nnrrPrepVar}
 }
 \value{
 En figur med tidsutvikling av andel over tid

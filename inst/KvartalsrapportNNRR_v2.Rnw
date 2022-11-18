@@ -64,7 +64,7 @@ shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
 figstr <- 0.61
 # tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 
-figfolder <- "~/nnrr/inst/figfolder/"
+figfolder <- "C:/GIT/nnrr/inst/figfolder/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
