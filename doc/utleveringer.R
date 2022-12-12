@@ -1,6 +1,37 @@
 rm(list=ls())
 library(nnrr)
 
+########## Utlevering hianor 02.12.2022 #######################################
+pasientsvar_pre <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_red.csv',
+                              sep=';', header=T, stringsAsFactors = F)
+legeskjema <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-12-09_1116.csv',
+                         sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+maneder+etter+behandling_2022-12-09_1116.csv',
+                               sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+
+legeskjema <- legeskjema[which(as.Date(legeskjema$S1b_DateOfCompletion, format="%d.%m.%Y") >= "2016-01-01"), ]
+pasientsvar_pre <- pasientsvar_pre[pasientsvar_pre$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+pasientsvar_post <- pasientsvar_post[pasientsvar_post$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+
+ikkemed <- c("BackSurgery", "NeckSurgery", "PelvisSurgery", "Radiological_None", "RadiologicalUS_CT", "RadiologicalUS_MR",
+             "RadiologicalUS_Radikulgraphy", "RadiologicalUS_Discography", "RadiologicalUS_LS_C_Columna",
+             "RadiologicalUS_FlexionExtention", "RadiologicalF_Normal", "RadiologicalF_DiscHernitation",
+             "RadiologicalF_CentralSpinalCord", "RadiologicalF_RecesStenosis", "RadiologicalF_Spondylolisthesis2018",
+             "RadiologicalF_Spondylolisthesis", "RadiologicalF_Scoliosis", "RadiologicalF_Scoliosis_Subcategory",
+             "RadiologicalF_Modicchanges", "RadiologicalF_Modicchanges1", "RadiologicalF_Modicchanges2",
+             "RadiologicalF_Modicchanges3", "RadiologicalF_ModicchangesUnspecified", "RadiologicalF_Other",
+             "OtherSupplementaryDiagnostic_DiagnosticInjection", "OtherSupplementaryDiagnostic_Radikulgraphy",
+             "RadiologicalUS_DiagnosticBlock", "OtherSupplementaryDiagnostic_Emg", "OtherSupplementaryDiagnostic_Nevrografi")
+legeskjema <- legeskjema[, -which(names(legeskjema) %in% ikkemed)]
+
+flere_hovedskjemaGuid_pre <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+flere_hovedskjemaGuid_post <- names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+
+write.csv2(legeskjema, "C:/GIT/data/nnrr/skjema1b_09122022.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(pasientsvar_pre, "C:/GIT/data/nnrr/skjema1a_09122022.csv", row.names = F, fileEncoding = "Latin1")
+write.csv2(pasientsvar_post, "C:/GIT/data/nnrr/skjema2_09122022.csv", row.names = F, fileEncoding = "Latin1")
+
+
 ########## Utlevering HiaNor forberedelser #######################################
 
 var1 <- readxl::read_xlsx("~/nnrr/doc/HIANOR Variabler kun variabelnavn.xlsx", sheet = 1)
