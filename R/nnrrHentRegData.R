@@ -18,9 +18,9 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   #                 WHERE HovedDato >= \'", datoFra, "\' AND HovedDato <= \'", datoTil, "\' ")
   # RegData <- rapbase::LoadRegData(registryName, query, dbType)
 
-  pasientsvar_pre <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_red.csv',
-                                sep=';', header=T, stringsAsFactors = F, fileEncoding = "UTF-8-BOM")
-  # tmp <- readr::read_csv2('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2022-10-27_1244.csv')
+  # pasientsvar_pre <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_red.csv',
+  #                               sep=';', header=T, stringsAsFactors = F, fileEncoding = "UTF-8-BOM")
+  pasientsvar_pre <- readr::read_csv2('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_v2.csv')
   legeskjema <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-12-09_1116.csv', sep=';',
                            header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
   pasientsvar_post <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+maneder+etter+behandling_2022-12-09_1116.csv',

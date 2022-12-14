@@ -40,7 +40,7 @@ options(dplyr.summarise.inform = FALSE)
 
 rap_aar <- 2022
 
-icd10 <- read.table('~/.ssh/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 RegData <- nnrr::nnrrHentRegData()
 
 RegDataAll <- RegData
@@ -66,7 +66,7 @@ map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
 # kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
 format_ut <- ".pdf"
-figfolder <- "~/nnrr/inst/indikatorer_2022/"
+figfolder <- "C:/GIT/nnrr/inst/indikatorer_2022/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
@@ -553,7 +553,7 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel oppfølgings
 <<'Nokkeltall NNRR', results='asis', echo=FALSE, message=FALSE>>=
 
 nokkeltall_pr_forlop <-  RegData %>% group_by(Aar) %>%
-  summarise("Antall forløp" = n(),
+  summarise("Antall forlop" = n(),
             "Andel kvinner" = sum(ErMann==0)/n(),
             Gjennomsnittsalder = mean(PatientAge),
             "Andel i arbeid ved utredning" = sum(Working)/n(),
@@ -580,11 +580,12 @@ Indikatorer$context <- "caregiver"
 Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
 Indikatorer <- Indikatorer[!(Indikatorer$ind_id == "nnrr_jobb" & Indikatorer$year > 2020 ), ] # Fjerner arbeidsind for nyere registrernger
                                                                                               # Ny variant kommer
-# write.csv2(Indikatorer, paste0('~/.ssh/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
+# write.csv2(Indikatorer, paste0('C:/GIT/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 
-dg <- readr::read_csv2("~/.ssh/data/nnrr/dg_nnrr_raa.csv",
+dg <- readr::read_csv2("C:/GIT/data/nnrr/dg_nnrr_raa.csv",
                        locale = readr::locale(encoding = "Latin1"),
                        show_col_types = FALSE)
+# dg <- read.csv2("C:/GIT/data/nnrr/dg_nnrr_raa.csv")
 dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
 
 
@@ -594,7 +595,7 @@ map_dg2 <- data.frame(enhet=c("Sandnessjøen", "St Olavs", "Harstad", "Tromsø",
                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
                                   4212982, 114174, 102959, 103736, 105821))
 
-dg_ny <- readr::read_csv2("~/.ssh/data/nnrr/Dekningsgrad 2021 NNRR.csv",
+dg_ny <- readr::read_csv2("C:/GIT/data/nnrr/Dekningsgrad 2021 NNRR.csv",
                           locale = readr::locale(encoding = "Latin1"))
 dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
 dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
@@ -614,7 +615,8 @@ dg$context <- "caregiver"
 
 Indikatorer <- dplyr::bind_rows(Indikatorer, dg)
 
-# write.csv2(Indikatorer, paste0('~/.ssh/data/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
+write.csv2(Indikatorer, paste0('C:/GIT/data/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
+           row.names = F, fileEncoding = "UTF-8")
 @
 
 
