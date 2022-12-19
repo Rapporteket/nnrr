@@ -57,11 +57,13 @@ map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
                                           974795639, 974703300,
                                           974795477, 974733013,
                                           974754118, 974747138,
-                                          974631326),
-                             resh = c(109834, 104293, 102959,
-                                      601032, 700735, 4211588,
-                                      102169, 114174, 105821,
-                                      4212982, 103736))
+                                          974631326, 974575396),
+                             resh = c(109834, 104293,
+                                      102959,  601032,
+                                      700735, 4211588,
+                                      102169, 114174,
+                                      105821, 4212982,
+                                      103736, 700138))
 
 # kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
@@ -247,7 +249,7 @@ datasett_indikator8minimal_funksjonsnedsettelseNDI <- aux[, c("UnitId", "Sykehus
 <<'Indikator 9: andel med klinisk viktig endring smerte', results='asis', echo=FALSE>>=
 
 aux <- Oppf_data %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
-                             !is.na(PainExperiencesNoActivity_post) & PainExperiencesNoActivity != 0)
+                              !is.na(PainExperiencesNoActivity_post) & PainExperiencesNoActivity != 0)
 
 aux$pstEndringSmerteHvile <- (aux$PainExperiencesNoActivity - aux$PainExperiencesNoActivity_post)/aux$PainExperiencesNoActivity*100
 
@@ -283,7 +285,7 @@ if (format_ut != "pdf") {
 #### Smerte i aktivitet
 
 aux <- Oppf_data %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
-                             !is.na(PainExperiencesActivity_post) & PainExperiencesActivity != 0)
+                              !is.na(PainExperiencesActivity_post) & PainExperiencesActivity != 0)
 
 aux$pstEndringSmerteAktiv <- (aux$PainExperiencesActivity - aux$PainExperiencesActivity_post)/aux$PainExperiencesActivity*100
 
@@ -374,7 +376,8 @@ aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 aux <- aux[which(aux$SickLeave & aux$WorkingPercent != 100), ]
 aux$tilbake_i_arbeid <- 0
 # aux$tilbake_i_arbeid[which(aux$WorkingPercent_post==100 & aux$WorkingStatus == 1)] <- 1
-aux$tilbake_i_arbeid[which((aux$WorkingPercent_post - aux$WorkingPercent) >= 0 & aux$WorkingStatus == 1)] <- 1
+aux$tilbake_i_arbeid[which((aux$WorkingPercent_post - aux$WorkingPercent) >= 0 &
+                             aux$WorkingStatus == 1)] <- 1
 
 tabell2 <- nnrrIndikatorTabell(aux, indikator = 'tilbake_i_arbeid')
 print(xtable::xtable(tabell2, digits=c(0,0,0,0,0,1), caption='Andel delvis/fullt tilbake i arbeid. Utvalget består av alle som det finnes oppfølgingsdata på og er registrert som sykemeldt ved inklusjon. Hvis de i tillegg er registrert som i 100 \\% arbeid ved inklusjon fjernes de fra utvalget. For å regnes som tilbake i arbeid skal de ha registrert arbeidsstatus som Inntektsgivende arbeid, samt ha en prosentvis stilling ved oppfølging som er større eller lik den ved inklusjon.'), include.rownames=FALSE)
@@ -397,7 +400,8 @@ indikator <- aux[, c("UnitId", "Aar", "indikator", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
-indikator$ind_id <- "nnrr_jobb_ny"
+indikator$ind_id <- "nnrr_jobb"
+Indikatorer <- bind_rows(Indikatorer, indikator)
 
 outfile <- "tilbake_i_arbeid_ny_v1.pdf"
 outfile <- paste0(figfolder, outfile)
@@ -416,7 +420,7 @@ indikator <- aux[, c("UnitId", "Aar", "indikator", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
-indikator$ind_id <- "nnrr_jobb_ny"
+indikator$ind_id <- "nnrr_jobb_v2"
 
 outfile <- "tilbake_i_arbeid_ny_v2.pdf"
 outfile <- paste0(figfolder, outfile)
@@ -578,8 +582,8 @@ Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
 names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
 Indikatorer$context <- "caregiver"
 Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
-Indikatorer <- Indikatorer[!(Indikatorer$ind_id == "nnrr_jobb" & Indikatorer$year > 2020 ), ] # Fjerner arbeidsind for nyere registrernger
-                                                                                              # Ny variant kommer
+# Indikatorer <- Indikatorer[!(Indikatorer$ind_id == "nnrr_jobb" & Indikatorer$year > 2020 ), ] # Fjerner arbeidsind for nyere registrernger
+# Ny variant kommer
 # write.csv2(Indikatorer, paste0('C:/GIT/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 
 dg <- readr::read_csv2("C:/GIT/data/nnrr/dg_nnrr_raa.csv",

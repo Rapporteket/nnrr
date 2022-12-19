@@ -2,8 +2,9 @@ rm(list=ls())
 library(nnrr)
 
 ########## Utlevering hianor 02.12.2022 #######################################
-pasientsvar_pre <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_red.csv',
-                              sep=';', header=T, stringsAsFactors = F)
+# pasientsvar_pre <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_red.csv',
+#                               sep=';', header=T, stringsAsFactors = F)
+pasientsvar_pre <- readr::read_csv2('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_v2.csv')
 legeskjema <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-12-09_1116.csv',
                          sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 pasientsvar_post <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+maneder+etter+behandling_2022-12-09_1116.csv',
@@ -28,8 +29,10 @@ flere_hovedskjemaGuid_pre <- names(table(pasientsvar_pre$HovedskjemaGUID))[table
 flere_hovedskjemaGuid_post <- names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
 
 write.csv2(legeskjema, "C:/GIT/data/nnrr/skjema1b_09122022.csv", row.names = F, fileEncoding = "Latin1")
-write.csv2(pasientsvar_pre, "C:/GIT/data/nnrr/skjema1a_09122022.csv", row.names = F, fileEncoding = "Latin1")
+# write.csv2(pasientsvar_pre, "C:/GIT/data/nnrr/skjema1a_09122022.csv", row.names = F, fileEncoding = "Latin1")
 write.csv2(pasientsvar_post, "C:/GIT/data/nnrr/skjema2_09122022.csv", row.names = F, fileEncoding = "Latin1")
+
+readr::write_csv2(pasientsvar_pre, "C:/GIT/data/nnrr/skjema1a_09122022_v2.csv")
 
 
 ########## Utlevering HiaNor forberedelser #######################################
