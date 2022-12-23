@@ -232,7 +232,7 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
 
       output$lastNed <- downloadHandler(
         filename = function(){
-          paste0(input$valgtVar, Sys.time(), '.csv')
+          fs::path_sanitize(paste0(input$valgtVar, Sys.time(), '.csv'))
         },
 
         content = function(file){
@@ -251,13 +251,13 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
                                      "Antall totalt" = unname(TabellData$N[,1]),
                                      "Andel (%)" = unname(TabellData$Andeler[1,]))
           }
-          write.csv2(Tabell1, file, row.names = F, fileEncoding = 'latin1')
+          write.csv2(Tabell1, file, row.names = F, fileEncoding = 'Latin1')
         }
       )
 
       output$lastNedBilde <- downloadHandler(
         filename = function(){
-          paste0(input$valgtVar, Sys.time(), '.', input$bildeformat)
+          fs::path_sanitize(paste0(input$valgtVar, Sys.time(), '.', input$bildeformat))
         },
 
         content = function(file){
@@ -266,46 +266,46 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
         }
       )
 
-      # shiny::observe({
-      #   if (rapbase::isRapContext()) {
-      #     if (req(input$tab) == "fig") {
-      #       mld_fordeling <- paste0(
-      #         "NoRGast: Figur - fordeling, variabel - ",
-      #         input$valgtVar)
-      #     }
-      #     if (req(input$tab) == "tab") {
-      #       mld_fordeling <- paste(
-      #         "NoRGast: tabell - fordeling. variabel - ",
-      #         input$valgtVar)
-      #     }
-      #     raplog::repLogger(
-      #       session = hvd_session,
-      #       msg = mld_fordeling
-      #     )
-      #     mldLastNedFig <- paste(
-      #       "NoRGast: nedlasting figur - fordeling. variabel -",
-      #       input$valgtVar
-      #     )
-      #     mldLastNedTab <- paste(
-      #       "NoRGast: nedlasting tabell - fordeling. variabel -",
-      #       input$valgtVar
-      #     )
-      #     shinyjs::onclick(
-      #       "lastNedBilde",
-      #       raplog::repLogger(
-      #         session = hvd_session,
-      #         msg = mldLastNedFig
-      #       )
-      #     )
-      #     shinyjs::onclick(
-      #       "lastNedTabell",
-      #       raplog::repLogger(
-      #         session = hvd_session,
-      #         msg = mldLastNedTab
-      #       )
-      #     )
-      #   }
-      # })
+      shiny::observe({
+        # if (rapbase::isRapContext()) {
+          if (req(input$tab) == "fig") {
+            mld_fordeling <- paste0(
+              "NoRGast: Figur - fordeling, variabel - ",
+              input$valgtVar)
+          }
+          if (req(input$tab) == "tab") {
+            mld_fordeling <- paste(
+              "NoRGast: tabell - fordeling. variabel - ",
+              input$valgtVar)
+          }
+          rapbase::repLogger(
+            session = hvd_session,
+            msg = mld_fordeling
+          )
+          mldLastNedFig <- paste(
+            "NoRGast: nedlasting figur - fordeling. variabel -",
+            input$valgtVar
+          )
+          mldLastNedTab <- paste(
+            "NoRGast: nedlasting tabell - fordeling. variabel -",
+            input$valgtVar
+          )
+          shinyjs::onclick(
+            "lastNedBilde",
+            rapbase::repLogger(
+              session = hvd_session,
+              msg = mldLastNedFig
+            )
+          )
+          shinyjs::onclick(
+            "lastNed",
+            rapbase::repLogger(
+              session = hvd_session,
+              msg = mldLastNedTab
+            )
+          )
+        # }
+      })
 
     }
   )

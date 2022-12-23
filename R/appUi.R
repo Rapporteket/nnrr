@@ -42,22 +42,23 @@ appUi <- function() {
                                                    organization = uiOutput("appOrgName"),
                                                    addUserInfo = TRUE),
                       tags$head(tags$link(rel="shortcut icon", href="rap/favicon.ico")),
-                      startside_UI("startside")
+                      nnrr::startside_UI("startside")
       ),
       shiny::tabPanel("Fordelinger",
-                      fordelingsfig_UI(id = "fordelingsfig_id")
+                      nnrr::fordelingsfig_UI(id = "fordelingsfig_id")
       ),
       shiny::tabPanel("Sykehusvisning",
-                      sykehusvisning_UI(id = "sykehusvisning_id")
+                      nnrr::sykehusvisning_UI(id = "sykehusvisning_id")
       ),
       shiny::tabPanel("Andeler over tid",
-                      tidsvisning_UI(id = "tidsvisning_id")
+                      nnrr::tidsvisning_UI(id = "tidsvisning_id")
       ),
       shiny::tabPanel("Indikatorer",
-                      indikatorfig_UI(id = "indikatorfig_id")
+                      nnrr::indikatorfig_UI(id = "indikatorfig_id")
       ),
       shiny::tabPanel("Datadump",
-                      h2("Datadump", align='center')
+                      nnrr::datadump_UI(id = "datadump_id")
+                      # h2("Datadump", align='center')
       ),
       shiny::tabPanel("Administrative tabeller",
                       h2("Administrative tabeller", align='center')

@@ -10,7 +10,7 @@
 #' @export
 #'
 nnrrBeregnGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra='2000-01-01', datoTil='2050-01-01', reshID,
-                                     minald=0, maxald=120, erMann=99, outfile='', sammenlign = 1,
+                                     minald=0, maxald=120, erMann=99, sammenlign = 1,
                                      enhetsUtvalg=0, gr_var='SykehusNavn')
 
 {

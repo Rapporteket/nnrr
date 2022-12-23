@@ -1,3 +1,7 @@
+#' UI-del av startside for NNRR app på Rapporteket
+#'
+#' @export
+#'
 startside_UI <- function(id){
   ns <- NS(id)
   shiny::bootstrapPage(
@@ -54,6 +58,10 @@ startside_UI <- function(id){
   )
 }
 
+#' Serverdel av startside for NNRR app på Rapporteket
+#'
+#' @export
+#'
 startside <- function(input, output,session, usrRole){
   observe(
     if (usrRole != "SC") {

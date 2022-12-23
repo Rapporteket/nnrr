@@ -84,90 +84,135 @@ sykehusvisningServer <- function(id, RegData, userRole, hvd_session){
       })
 
       tabellReager <- reactive({
-        TabellData <- nnrr::nnrrBeregnGjsnPrePostGrVar(RegData = RegData,
-                                                       valgtVar=input$valgtVar,
-                                                       datoFra=input$datovalg[1],
-                                                       datoTil=input$datovalg[2],
-                                                       minald=as.numeric(input$alder[1]),
-                                                       maxald=as.numeric(input$alder[2]),
-                                                       erMann=as.numeric(input$erMann),
-                                                       sammenlign = as.numeric(input$sammenlign),
-                                                       gr_var='SykehusNavn')
+        TabellData <- nnrr::nnrrBeregnGjsnPrePostGrVar(
+          RegData = RegData,
+          valgtVar=input$valgtVar,
+          datoFra=input$datovalg[1],
+          datoTil=input$datovalg[2],
+          minald=as.numeric(input$alder[1]),
+          maxald=as.numeric(input$alder[2]),
+          erMann=as.numeric(input$erMann),
+          sammenlign = as.numeric(input$sammenlign),
+          gr_var='SykehusNavn')
       })
 
       output$Figur1 <- renderPlot({
         nnrr::nnrrPlotGjsnPrePostGrVar(plotparams = tabellReager(),
                                        outfile='')
       }, width = 700, height = 700)
-      #
-      # output$utvalg <- renderUI({
-      #   TabellData <- tabellReager()
-      #   tagList(
-      #     h3(HTML(paste0(TabellData$Tittel, '<br />'))),
-      #     h5(HTML(paste0(TabellData$utvalgTxt, '<br />')))
-      #   )})
-      #
-      # output$Tabell1 <- function() {
-      #   TabellData <- tabellReager()
-      #   if (input$enhetsUtvalg == 1) {
-      #     Tabell1 <- data.frame("Kategori" = TabellData$GruppeTekst,
-      #                           "Antall i kategori" = round(unname(TabellData$Andeler[1,])*unname(TabellData$N[,1])/100),
-      #                           "Antall totalt" = unname(TabellData$N[,1]),
-      #                           "Andel (%)" = unname(TabellData$Andeler[1,]),
-      #                           "Antall i kategori" = round(unname(TabellData$Andeler[2,])*unname(TabellData$N[,2])/100),
-      #                           "Antall totalt" = unname(TabellData$N[,2]),
-      #                           "Andel (%)" = unname(TabellData$Andeler[2,]))
-      #     names(Tabell1) <- c('Kategori', 'Antall i kategori', 'Antall totalt', 'Andel (%)', 'Antall i kategori', 'Antall totalt', 'Andel (%)')
-      #     Tabell1 %>% knitr::kable("html", digits = c(0,0,0,1,0,0,1)) %>%
-      #       kableExtra::kable_styling("hover", full_width = F) %>%
-      #       kableExtra::add_header_above(c(" ", "Din avdeling" = 3, "Landet forøvrig" = 3))
-      #   } else {
-      #     Tabell1 <- data.frame("Kategori" = TabellData$GruppeTekst,
-      #                           "Antall i kategori" = round(unname(TabellData$Andeler[1,])*unname(TabellData$N[,1])/100),
-      #                           "Antall totalt" = unname(TabellData$N[,1]),
-      #                           "Andel (%)" = unname(TabellData$Andeler[1,]))
-      #     names(Tabell1) <- c('Kategori', 'Antall i kategori', 'Antall totalt', 'Andel (%)')
-      #     Tabell1 %>%
-      #       knitr::kable("html", digits = c(0,0,0,1)) %>%
-      #       kableExtra::kable_styling("hover", full_width = F)
-      #   }
-      # }
-      #
-      # output$lastNed <- downloadHandler(
-      #   filename = function(){
-      #     paste0(input$valgtVar, Sys.time(), '.csv')
-      #   },
-      #
-      #   content = function(file){
-      #     TabellData <- tabellReager()
-      #     if (input$enhetsUtvalg == 1) {
-      #       Tabell1 <- dplyr::tibble("Kategori" = TabellData$GruppeTekst,
-      #                                "Antall i kategori" = round(unname(TabellData$Andeler[1,])*unname(TabellData$N[,1])/100),
-      #                                "Antall totalt" = unname(TabellData$N[,1]),
-      #                                "Andel (%)" = unname(TabellData$Andeler[1,]),
-      #                                "Antall i kategori (resten)" = round(unname(TabellData$Andeler[2,])*unname(TabellData$N[,2])/100),
-      #                                "Antall totalt (resten)" = unname(TabellData$N[,2]),
-      #                                "Andel (%) (resten)" = unname(TabellData$Andeler[2,]))
-      #     } else {
-      #       Tabell1 <- dplyr::tibble("Kategori" = TabellData$GruppeTekst,
-      #                                "Antall i kategori" = round(unname(TabellData$Andeler[1,])*unname(TabellData$N[,1])/100),
-      #                                "Antall totalt" = unname(TabellData$N[,1]),
-      #                                "Andel (%)" = unname(TabellData$Andeler[1,]))
-      #     }
-      #     write.csv2(Tabell1, file, row.names = F, fileEncoding = 'latin1')
-      #   }
-      # )
-      #
-      # output$lastNedBilde <- downloadHandler(
-      #   filename = function(){
-      #     paste0(input$valgtVar, Sys.time(), '.', input$bildeformat)
-      #   },
-      #
-      #   content = function(file){
-      #     nnrr::nnrrSoyleplot(plotdata = tabellReager(),
-      #                         outfile=file)
-      #   }
-      # )
+
+      output$utvalg <- renderUI({
+        TabellData <- tabellReager()
+        tagList(
+          h3(HTML(paste0(TabellData$tittel, '<br />'))),
+          h5(HTML(paste0(TabellData$utvalgTxt, '<br />')))
+        )})
+
+      output$Tabell1 <- function() {
+        TabellData <- tabellReager()
+        if (as.numeric(input$sammenlign) == 0) {
+          Tabell1 <-
+            dplyr::tibble(
+              Sykehus = TabellData$grtxt, gj.sn = as.numeric(TabellData$PlotMatrise),
+              KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed)), '-',
+                          sprintf("%.1f", as.numeric(TabellData$KIOpp))),
+              N = TabellData$Ngr) %>%
+            knitr::kable("html", digits = c(0,1,0,0)) %>%
+            kableExtra::kable_styling("hover", full_width = F)
+        } else {
+          if (as.numeric(input$sammenlign) == 1) {
+            Tabell1 <-
+              dplyr::tibble(
+                Sykehus = TabellData$grtxt, gj.sn. = as.numeric(TabellData$PlotMatrise[1,]),
+                KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[1,])), '-',
+                            sprintf("%.1f", as.numeric(TabellData$KIOpp[1,]))),
+                gj.sn. = as.numeric(TabellData$PlotMatrise[2,]),
+                KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[2,])), '-',
+                            sprintf("%.1f", as.numeric(TabellData$KIOpp[2,]))),
+                N = TabellData$Ngr, .name_repair = "minimal") %>%
+              knitr::kable("html", digits = c(0,1,0,1,0,0)) %>%
+              kableExtra::kable_styling("hover", full_width = F) %>%
+              kableExtra::add_header_above(c(" ", "Før intervensjon" = 2, "6 mnd." = 2, " "))
+          } else {
+            if (as.numeric(input$sammenlign) == 2) {
+              Tabell1 <-
+                dplyr::tibble(
+                  Sykehus = TabellData$grtxt, gj.sn. = as.numeric(TabellData$PlotMatrise[1,]),
+                  KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[1,])), '-',
+                              sprintf("%.1f", as.numeric(TabellData$KIOpp[1,]))),
+                  gj.sn. = as.numeric(TabellData$PlotMatrise[2,]),
+                  KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[2,])), '-',
+                              sprintf("%.1f", as.numeric(TabellData$KIOpp[2,]))),
+                  gj.sn. = as.numeric(TabellData$PlotMatrise[3,]),
+                  KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[3,])), '-',
+                              sprintf("%.1f", as.numeric(TabellData$KIOpp[3,]))),
+                  N = TabellData$Ngr, .name_repair = "minimal") %>%
+                knitr::kable("html", digits = c(0,1,0,1,0,1,0,0)) %>%
+                kableExtra::kable_styling("hover", full_width = F) %>%
+                kableExtra::add_header_above(c(" ", "Før intervensjon" = 2,
+                                               "6 mnd." = 2, "12 mnd." = 2, " "))
+            }
+          }
+        }
+
+      }
+
+      output$lastNed <- downloadHandler(
+        filename = function(){
+          fs::path_sanitize(paste0(input$valgtVar, Sys.time(), '.csv'))
+        },
+
+        content = function(file){
+          TabellData <- tabellReager()
+          if (as.numeric(input$sammenlign) == 0) {
+            Tabell1 <-
+              dplyr::tibble(
+                Sykehus = TabellData$grtxt, gj.sn = as.numeric(TabellData$PlotMatrise),
+                KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed)), '-',
+                            sprintf("%.1f", as.numeric(TabellData$KIOpp))),
+                N = TabellData$Ngr)
+          } else {
+            if (as.numeric(input$sammenlign) == 1) {
+              Tabell1 <-
+                dplyr::tibble(
+                  Sykehus = TabellData$grtxt, gj.sn. = as.numeric(TabellData$PlotMatrise[1,]),
+                  KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[1,])), '-',
+                              sprintf("%.1f", as.numeric(TabellData$KIOpp[1,]))),
+                  gj.sn. = as.numeric(TabellData$PlotMatrise[2,]),
+                  KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[2,])), '-',
+                              sprintf("%.1f", as.numeric(TabellData$KIOpp[2,]))),
+                  N = TabellData$Ngr, .name_repair = "minimal")
+            } else {
+              if (as.numeric(input$sammenlign) == 2) {
+                Tabell1 <-
+                  dplyr::tibble(
+                    Sykehus = TabellData$grtxt, gj.sn. = as.numeric(TabellData$PlotMatrise[1,]),
+                    KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[1,])), '-',
+                                sprintf("%.1f", as.numeric(TabellData$KIOpp[1,]))),
+                    gj.sn. = as.numeric(TabellData$PlotMatrise[2,]),
+                    KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[2,])), '-',
+                                sprintf("%.1f", as.numeric(TabellData$KIOpp[2,]))),
+                    gj.sn. = as.numeric(TabellData$PlotMatrise[3,]),
+                    KI = paste0(sprintf("%.1f", as.numeric(TabellData$KINed[3,])), '-',
+                                sprintf("%.1f", as.numeric(TabellData$KIOpp[3,]))),
+                    N = TabellData$Ngr, .name_repair = "minimal")
+              }
+            }
+          }
+          write.csv2(Tabell1, file, row.names = F, fileEncoding = 'latin1')
+        }
+      )
+
+      output$lastNedBilde <- downloadHandler(
+        filename = function(){
+          fs::path_sanitize(paste0(input$valgtVar, Sys.time(), '.', input$bildeformat))
+        },
+
+        content = function(file){
+          nnrr::nnrrPlotGjsnPrePostGrVar(plotparams = tabellReager(),
+                                         outfile=file)
+        }
+      )
 
       # shiny::observe({
       #   if (rapbase::isRapContext()) {

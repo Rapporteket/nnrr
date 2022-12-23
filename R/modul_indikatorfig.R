@@ -12,14 +12,14 @@ indikatorfig_UI <- function(id){
                  id = ns("id_indikator_panel"),
                  selectInput(inputId = ns("valgtVar"), label = "Velg indikator",
                              choices = c("Andel tverrfaglig behandlet" = "nnrr_tverrfaglig_behandling",
-                                        "Klinisk viktig endring i ODI" = "nnrr_bedret_funksjon",
-                                        "Andel med minimal funksjonsnedsettelse" = "nnrr_funksjons_nedsettelse",
-                                        "Bedring av smerte i hvile" = "nnrr_bedring_smerte_hvile",
-                                        "Bedring av smerte i aktivitet" = "nnrr_bedring_smerte_aktiv",
-                                        "Andel tilbake i jobb" = "nnrr_jobb_ny_v1",
-                                        "Andel tilbake i jobb el. lavere grad sykemelding" = "nnrr_jobb_ny_v2",
-                                        "Pasientopplevd bedring av behandling" = "nnrr_bedring_av_behandling",
-                                        "Andel fornøyd med behandling" = "nnrr_misfornoeyd"
+                                         "Klinisk viktig endring i ODI" = "nnrr_bedret_funksjon",
+                                         "Andel med minimal funksjonsnedsettelse" = "nnrr_funksjons_nedsettelse",
+                                         "Bedring av smerte i hvile" = "nnrr_bedring_smerte_hvile",
+                                         "Bedring av smerte i aktivitet" = "nnrr_bedring_smerte_aktiv",
+                                         "Andel tilbake i jobb" = "nnrr_jobb_ny_v1",
+                                         "Andel tilbake i jobb el. lavere grad sykemelding" = "nnrr_jobb_ny_v2",
+                                         "Pasientopplevd bedring av behandling" = "nnrr_bedring_av_behandling",
+                                         "Andel fornøyd med behandling" = "nnrr_misfornoeyd"
                              )
                  ),
                  uiOutput(outputId = ns('tilAar_ui')),
@@ -78,7 +78,7 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
 
       tabellReager <- reactive({
         indikatordata <- nnrr::nnrrBeregnIndikator(RegData = RegData,
-                                                ind_id = input$valgtVar)
+                                                   ind_id = input$valgtVar)
         TabellData <- indikatordata$indikator
         TabellData <- TabellData[which(TabellData$year <= as.numeric(req(input$tilAar))), ]
         indikatordata$indikator <- TabellData
@@ -91,22 +91,46 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
                                 lavDG=NA, inkl_konf=F)
       }, width = 700, height = 700)
 
-      output$tabell <- DT::renderDT({
-        indikatordata = tabellReager()
-        tabell <- indikatordata$indikator %>%
-          dplyr::group_by(SykehusNavn, year) %>%
-          dplyr::summarise(Antall = sum(var),
-                           N = sum(denominator),
-                           Andel = Antall/N*100)
-        # antall <-
-        #
-        # %>%
-        #   janitor::adorn_totals()
+      # output$tabell <- DT::renderDT({
+      #   indikatordata = tabellReager()
+      #   tabell <- indikatordata$indikator %>%
+      #     dplyr::group_by(SykehusNavn, year) %>%
+      #     dplyr::summarise(Antall = sum(var),
+      #                      N = sum(denominator),
+      #                      Andel = Antall/N*100)
+      #   # antall <-
+      #   #
+      #   # %>%
+      #   #   janitor::adorn_totals()
+      #
+      # })
 
-      })
+      output$tabell  <- DT::renderDataTable(
+        server = FALSE,
+        DT::datatable(
+          {tabellReager()$indikator %>%
+              dplyr::group_by(SykehusNavn, year) %>%
+              dplyr::summarise(Antall = sum(var),
+                               N = sum(denominator),
+                               Andel = Antall/N*100)},
 
+          extensions = 'Buttons',
+          rownames = FALSE,
 
+          options = list(
+            paging = TRUE,
+            pageLength = 40,
+            searching = TRUE,
+            fixedColumns = TRUE,
+            autoWidth = TRUE,
+            ordering = TRUE,
+            dom = 'tB',
+            buttons = c('copy', 'csv', 'excel')
+          ),
 
+          class = "display"
+        ) %>% DT::formatRound(columns = "Andel", digits = 1)
+      )
 
 
     }

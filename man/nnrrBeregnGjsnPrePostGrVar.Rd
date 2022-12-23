@@ -13,7 +13,6 @@ nnrrBeregnGjsnPrePostGrVar(
   minald = 0,
   maxald = 120,
   erMann = 99,
-  outfile = "",
   sammenlign = 1,
   enhetsUtvalg = 0,
   gr_var = "SykehusNavn"
@@ -35,8 +34,6 @@ nnrrBeregnGjsnPrePostGrVar(
 \item{maxald}{- alder, til og med}
 
 \item{erMann}{- kjønn, 1-menn, 0-kvinner, default 99, dvs. begge}
-
-\item{outfile}{- navn på fil figuren skrives til, default '' dvs. skriv til skjerm}
 
 \item{gr_var}{Grupperingsvariabel}
 }

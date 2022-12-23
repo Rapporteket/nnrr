@@ -10,33 +10,36 @@ tidsvisning_UI <- function(id){
   shiny::sidebarLayout(
     sidebarPanel(
       id = ns("id_panel"),
-      selectInput(inputId = ns("valgtVar"),
-                  label = "Velg variabel",
-                  choices =   c("Tverrfaglig behandlet" = "tverrfaglig_behandlet",
-                                "Individuell oppfølging" = "individuell_oppfolging",
-                                "FABQ11" = "fabq11",
-                                "Utfylt oppfølging 6 mnd" = "Oppfolging_utfylt_6mnd",
-                                "Utfylt oppfølging 12 mnd" = "Oppfolging_utfylt_12mnd",
-                                "Opplevd nytte av behandling 6 mnd" = "opplevd_nytte_beh_6mnd",
-                                "Opplevd nytte av behandling 12 mnd" = "opplevd_nytte_beh_12mnd",
-                                "Funksjonsbedring 6 mnd" = "odi_klinisk_viktig_6mnd",
-                                "Funksjonsbedring 12 mnd" = "odi_klinisk_viktig_12mnd",
-                                "Klinisk bedring av smerte i hvile 6 mnd" = "bedring_smerte_hvile_6mnd",
-                                "Klinisk bedring av smerte i hvile 12 mnd" = "bedring_smerte_hvile_12mnd",
-                                "Klinisk bedring av smerte i aktivitet 6 mnd" = "bedring_smerte_aktiv_6mnd",
-                                "Klinisk bedring av smerte i aktivitet 12 mnd" = "bedring_smerte_aktiv_12mnd",
-                                "Fornøyd med behandling 6 mnd" = "fornoyd_6mnd",
-                                "Fornøyd med behandling 12 mnd" = "fornoyd_12mnd",
-                                "Hopkins symptom checklist" = "HSCL10.Score",
-                                "Smertevarighet > 2 år" = "smerter_2aar"
-                  )),
-      dateRangeInput(inputId=ns("datovalg"),
-                     label = "Dato fra og til",
-                     min = '2014-01-01',
-                     language = "nb",
-                     max = Sys.Date(),
-                     start  = lubridate::floor_date(lubridate::today() - lubridate::years(1), unit = "year"),
-                     end = Sys.Date(), separator = " til "),
+      selectInput(
+        inputId = ns("valgtVar"),
+        label = "Velg variabel",
+        choices = c("Tverrfaglig behandlet" = "tverrfaglig_behandlet",
+                    "Individuell oppfølging" = "individuell_oppfolging",
+                    "FABQ11" = "fabq11",
+                    "Utfylt oppfølging 6 mnd" = "Oppfolging_utfylt_6mnd",
+                    "Utfylt oppfølging 12 mnd" = "Oppfolging_utfylt_12mnd",
+                    "Opplevd nytte av behandling 6 mnd" = "opplevd_nytte_beh_6mnd",
+                    "Opplevd nytte av behandling 12 mnd" = "opplevd_nytte_beh_12mnd",
+                    "Funksjonsbedring 6 mnd" = "odi_klinisk_viktig_6mnd",
+                    "Funksjonsbedring 12 mnd" = "odi_klinisk_viktig_12mnd",
+                    "Klinisk bedring av smerte i hvile 6 mnd" = "bedring_smerte_hvile_6mnd",
+                    "Klinisk bedring av smerte i hvile 12 mnd" = "bedring_smerte_hvile_12mnd",
+                    "Klinisk bedring av smerte i aktivitet 6 mnd" = "bedring_smerte_aktiv_6mnd",
+                    "Klinisk bedring av smerte i aktivitet 12 mnd" = "bedring_smerte_aktiv_12mnd",
+                    "Fornøyd med behandling 6 mnd" = "fornoyd_6mnd",
+                    "Fornøyd med behandling 12 mnd" = "fornoyd_12mnd",
+                    "Hopkins symptom checklist" = "HSCL10.Score",
+                    "Smertevarighet > 2 år" = "smerter_2aar"
+        )),
+      dateRangeInput(
+        inputId=ns("datovalg"),
+        label = "Dato fra og til",
+        min = '2014-01-01',
+        language = "nb",
+        max = Sys.Date(),
+        start  = lubridate::floor_date(lubridate::today() -
+                                         lubridate::years(1), unit = "year"),
+        end = Sys.Date(), separator = " til "),
       selectInput(inputId = ns("tidsenhet"),
                   label = "Velg tidsenhet",
                   choices = c('Aar', 'Mnd', 'Kvartal', 'Halvaar'),
@@ -162,27 +165,27 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session){
                fornoyd_12mnd = "dato_oppfolg2",
                HSCL10.Score = "Besoksdato",
                smerter_2aar = "Besoksdato"
-               )
+        )
       })
 
       tabellReager <- reactive({
         TabellData <- nnrr::nnrrBeregnAndelTid(RegData = RegData,
-                                              valgtVar=input$valgtVar,
-                                              datovar = datovar(),
-                                              datoFra=input$datovalg[1],
-                                              datoTil=input$datovalg[2],
-                                              minald=as.numeric(input$alder[1]),
-                                              maxald=as.numeric(input$alder[2]),
-                                              erMann=as.numeric(input$erMann),
-                                              reshID=reshID,
-                                              tidsenhet=input$tidsenhet,
-                                              tverrfaglig = as.numeric(input$tverrfaglig),
-                                              minHSCL = input$HSCL[1],
-                                              maxHSCL = input$HSCL[2],
-                                              medikamenter = input$medikamenter,
-                                              smerte = as.numeric(input$smerte),
-                                              tolk = as.numeric(input$tolk),
-                                              enhetsUtvalg=input$enhetsUtvalg)
+                                               valgtVar=input$valgtVar,
+                                               datovar = datovar(),
+                                               datoFra=input$datovalg[1],
+                                               datoTil=input$datovalg[2],
+                                               minald=as.numeric(input$alder[1]),
+                                               maxald=as.numeric(input$alder[2]),
+                                               erMann=as.numeric(input$erMann),
+                                               reshID=reshID,
+                                               tidsenhet=input$tidsenhet,
+                                               tverrfaglig = as.numeric(input$tverrfaglig),
+                                               minHSCL = input$HSCL[1],
+                                               maxHSCL = input$HSCL[2],
+                                               medikamenter = input$medikamenter,
+                                               smerte = as.numeric(input$smerte),
+                                               tolk = as.numeric(input$tolk),
+                                               enhetsUtvalg=input$enhetsUtvalg)
       })
 
       output$Figur1 <- renderPlot({
@@ -201,63 +204,95 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session){
 
         utdata <- tabellReager()
         if (input$enhetsUtvalg == 1) {
-          Tabell_tid <- dplyr::tibble(Tidsperiode = utdata$Tidtxt, Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
-                               N = utdata$NTid$NTidHoved, Andel = utdata$Andeler$AndelHoved, Konf.int.nedre = utdata$KonfInt$Konf[1,],
-                               Konf.int.ovre = utdata$KonfInt$Konf[2,], Antall2 = round(utdata$Andeler$AndelRest*utdata$NTid$NTidRest/100),
-                               N2 = utdata$NTid$NTidRest, Andel2 = utdata$Andeler$AndelRest, Konf.int.nedre2 = utdata$KonfInt$KonfRest[1,],
-                               Konf.int.ovre2 = utdata$KonfInt$KonfRest[2,])
-          names(Tabell_tid) <- c('Tidsperiode', 'Antall', 'N', 'Andel (%)', 'KI_nedre', 'KI_ovre', 'Antall', 'N', 'Andel (%)',
+          Tabell_tid <-
+            dplyr::tibble(
+              Tidsperiode = utdata$Tidtxt,
+              Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
+              N = utdata$NTid$NTidHoved,
+              Andel = utdata$Andeler$AndelHoved,
+              Konf.int.nedre = utdata$KonfInt$Konf[1,],
+              Konf.int.ovre = utdata$KonfInt$Konf[2,],
+              Antall2 = round(utdata$Andeler$AndelRest*utdata$NTid$NTidRest/100),
+              N2 = utdata$NTid$NTidRest,
+              Andel2 = utdata$Andeler$AndelRest,
+              Konf.int.nedre2 = utdata$KonfInt$KonfRest[1,],
+              Konf.int.ovre2 = utdata$KonfInt$KonfRest[2,])
+          names(Tabell_tid) <- c('Tidsperiode', 'Antall', 'N', 'Andel (%)',
+                                 'KI_nedre', 'KI_ovre', 'Antall', 'N', 'Andel (%)',
                                  'KI_nedre', 'KI_ovre')
           Tabell_tid %>% knitr::kable("html", digits = c(0,0,0,1,1,1,0,0,1,1,1)) %>%
             kableExtra::kable_styling("hover", full_width = F) %>%
             kableExtra::add_header_above(c(" ", "Din avdeling" = 5, "Landet forøvrig" = 5))
         } else {
-          Tabell_tid <- dplyr::tibble(Tidsperiode = utdata$Tidtxt,
-                               Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
-                               N = utdata$NTid$NTidHoved, 'Andel (%)'= utdata$Andeler$AndelHoved, KI_nedre = utdata$KonfInt$Konf[1,],
-                               KI_ovre = utdata$KonfInt$Konf[2,])
+          Tabell_tid <-
+            dplyr::tibble(
+              Tidsperiode = utdata$Tidtxt,
+              Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
+              N = utdata$NTid$NTidHoved,
+              'Andel (%)'= utdata$Andeler$AndelHoved,
+              KI_nedre = utdata$KonfInt$Konf[1,],
+              KI_ovre = utdata$KonfInt$Konf[2,])
           Tabell_tid %>%
             knitr::kable("html", digits = c(0,0,0,1,1,1)) %>%
             kableExtra::kable_styling("hover", full_width = F)
         }
       }
 
-      #
-      # output$lastNed <- downloadHandler(
-      #   filename = function(){
-      #     paste0(input$valgtVar, Sys.time(), '.csv')
-      #   },
-      #
-      #   content = function(file){
-      #     TabellData <- tabellReager()
-      #     if (input$enhetsUtvalg == 1) {
-      #       Tabell1 <- dplyr::tibble("Kategori" = TabellData$GruppeTekst,
-      #                                "Antall i kategori" = round(unname(TabellData$Andeler[1,])*unname(TabellData$N[,1])/100),
-      #                                "Antall totalt" = unname(TabellData$N[,1]),
-      #                                "Andel (%)" = unname(TabellData$Andeler[1,]),
-      #                                "Antall i kategori (resten)" = round(unname(TabellData$Andeler[2,])*unname(TabellData$N[,2])/100),
-      #                                "Antall totalt (resten)" = unname(TabellData$N[,2]),
-      #                                "Andel (%) (resten)" = unname(TabellData$Andeler[2,]))
-      #     } else {
-      #       Tabell1 <- dplyr::tibble("Kategori" = TabellData$GruppeTekst,
-      #                                "Antall i kategori" = round(unname(TabellData$Andeler[1,])*unname(TabellData$N[,1])/100),
-      #                                "Antall totalt" = unname(TabellData$N[,1]),
-      #                                "Andel (%)" = unname(TabellData$Andeler[1,]))
-      #     }
-      #     write.csv2(Tabell1, file, row.names = F, fileEncoding = 'latin1')
-      #   }
-      # )
-      #
-      # output$lastNedBilde <- downloadHandler(
-      #   filename = function(){
-      #     paste0(input$valgtVar, Sys.time(), '.', input$bildeformat)
-      #   },
-      #
-      #   content = function(file){
-      #     nnrr::nnrrSoyleplot(plotdata = tabellReager(),
-      #                         outfile=file)
-      #   }
-      # )
+
+      output$lastNed <- downloadHandler(
+        filename = function(){
+          fs::path_sanitize(paste0(input$valgtVar, Sys.time(), '.csv'))
+        },
+
+        content = function(file){
+          utdata <- tabellReager()
+          if (input$enhetsUtvalg == 1) {
+            Tabell_tid <-
+              dplyr::tibble(
+                Tidsperiode = utdata$Tidtxt,
+                Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
+                N = utdata$NTid$NTidHoved,
+                Andel = utdata$Andeler$AndelHoved,
+                Konf.int.nedre = utdata$KonfInt$Konf[1,],
+                Konf.int.ovre = utdata$KonfInt$Konf[2,],
+                Antall2 = round(utdata$Andeler$AndelRest*utdata$NTid$NTidRest/100),
+                N2 = utdata$NTid$NTidRest,
+                Andel2 = utdata$Andeler$AndelRest,
+                Konf.int.nedre2 = utdata$KonfInt$KonfRest[1,],
+                Konf.int.ovre2 = utdata$KonfInt$KonfRest[2,])
+            # names(Tabell_tid) <- c('Tidsperiode', 'Antall', 'N', 'Andel (%)',
+            #                        'KI_nedre', 'KI_ovre', 'Antall', 'N', 'Andel (%)',
+            #                        'KI_nedre', 'KI_ovre')
+            # Tabell_tid %>% knitr::kable("html", digits = c(0,0,0,1,1,1,0,0,1,1,1)) %>%
+            #   kableExtra::kable_styling("hover", full_width = F) %>%
+            #   kableExtra::add_header_above(c(" ", "Din avdeling" = 5, "Landet forøvrig" = 5))
+          } else {
+            Tabell_tid <-
+              dplyr::tibble(
+                Tidsperiode = utdata$Tidtxt,
+                Antall = round(utdata$Andeler$AndelHoved*utdata$NTid$NTidHoved/100),
+                N = utdata$NTid$NTidHoved,
+                'Andel (%)'= utdata$Andeler$AndelHoved,
+                KI_nedre = utdata$KonfInt$Konf[1,],
+                KI_ovre = utdata$KonfInt$Konf[2,])
+            # Tabell_tid %>%
+            #   knitr::kable("html", digits = c(0,0,0,1,1,1)) %>%
+            #   kableExtra::kable_styling("hover", full_width = F)
+          }
+          write.csv2(Tabell_tid, file, row.names = F, fileEncoding = 'latin1')
+        }
+      )
+
+      output$lastNedBilde <- downloadHandler(
+        filename = function(){
+          fs::path_sanitize(paste0(input$valgtVar, Sys.time(), '.', input$bildeformat))
+        },
+
+        content = function(file){
+          nnrr::nnrrTidsplot(plotdata = tabellReager(),
+                             outfile=file, inkl_konf = as.numeric(input$inkl_konf))
+        }
+      )
 
       # shiny::observe({
       #   if (rapbase::isRapContext()) {
