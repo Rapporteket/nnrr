@@ -48,7 +48,7 @@ library(lubridate)
 # 105821 <- 'Levanger'
 # 103736 <- 'Drammen'
 # 700138 <- 'Stavern???'
-reshID <- 700138
+reshID <- 102959
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)

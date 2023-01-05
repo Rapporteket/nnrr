@@ -44,8 +44,8 @@ icd10 <- read.table('C:/GIT/nnrr/doc/icd10.csv', sep=';', header=T, stringsAsFac
 RegData <- nnrr::nnrrHentRegData()
 
 RegDataAll <- RegData
-RegData <- RegData[which(RegData$Aar >= 2015 & RegData$Aar <= rap_aar), ]
-Oppf_data <- RegDataAll[which(RegDataAll$aar_oppfolg>= 2015 & RegDataAll$aar_oppfolg <= rap_aar), ]
+RegData <- RegData[which(RegData$Aar >= 2018 & RegData$Aar <= rap_aar), ]
+Oppf_data <- RegDataAll[which(RegDataAll$aar_oppfolg>= 2018 & RegDataAll$aar_oppfolg <= rap_aar), ]
 Oppf_data$Aar <- Oppf_data$aar_oppfolg
 
 rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post', 'pasientsvar_post2'))
