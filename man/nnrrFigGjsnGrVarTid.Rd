@@ -24,7 +24,7 @@ nnrrFigGjsnGrVarTid(
   decreasing = F,
   legPlass = "top",
   minstekravTxt = "Min.",
-  maalTxt = "Mål",
+  maalTxt = "M<U+00E5>l",
   graaUt = NA,
   width = 800,
   height = 700,

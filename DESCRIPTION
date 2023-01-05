@@ -1,18 +1,26 @@
 Package: nnrr
 Type: Package
 Title: Resultatrapporter for Norsk nakke- og ryggregister
-Version: 0.1
+Version: 0.7
 Date: 2016-09-28
 Author: Kevin Thon
 Maintainer: Kevin Thon <kevin.thon@skde.no>
-Description: Pakke for generering av resultatrapporter for NNRR. Trenger skde-tools (>=0.15).
+Description: Pakke for generering av resultatrapporter for NNRR.
 License: GPL2
 LazyData: TRUE
 Encoding: UTF-8
-Depends: R (>= 3.0.2), rapbase, tidyverse, lubridate
+Depends: R (>= 4.1.0)
 Imports:
-  xtable
-RoxygenNote: 7.1.1
-Suggests: knitr,
-    rmarkdown
+  xtable,
+  tidyverse,
+  lubridate,
+  shinyjs,
+  janitor,
+  DT,
+  kableExtra
+Remotes:
+  Rapporteket/rapbase@*release,
+  Rapporteket/rapFigurer
+RoxygenNote: 7.2.2
+Suggests:
 VignetteBuilder: knitr

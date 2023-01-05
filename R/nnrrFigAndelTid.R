@@ -19,8 +19,21 @@
 #'
 #' @export
 #'
-nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='2014-01-01', datoTil='2050-12-31', enhetsUtvalg=1, datovar="Besoksdato",
-                               minald=0, maxald=130, erMann=99, outfile='', reshID, tidsenhet="Kvartal", inkl_konf=0, maal = NA, maalnivaatxt=NA)
+nnrrFigAndelTid <- function(RegData,
+                            valgtVar="tverrfaglig_behandlet",
+                            datoFra='2014-01-01',
+                            datoTil='2050-12-31',
+                            enhetsUtvalg=1,
+                            datovar="Besoksdato",
+                            minald=0,
+                            maxald=130,
+                            erMann=99,
+                            outfile='',
+                            reshID,
+                            tidsenhet="Kvartal",
+                            inkl_konf=0,
+                            maal = NA,
+                            maalnivaatxt=NA)
 {
 
   # Sykehustekst avhengig av bruker og brukervalg
@@ -240,7 +253,7 @@ nnrrFigAndelTid <- function(RegData, valgtVar="tverrfaglig_behandlet", datoFra='
         points(xskala, AndelRest, pch="'", cex=2, col=fargeRest)	#}
         text(xskala, AndelRest, pos=3, NTidRest, cex=0.9, col=fargeRest)
         legend('top', border=NA, c(paste0(shtxt, ' (N=', NHovedRes, ')'),
-                                       paste0(smltxt, ' (N=', NSmlRes, ')')),
+                                   paste0(smltxt, ' (N=', NSmlRes, ')')),
                bty='n', lty=c(1,1), ncol=1, cex=cexleg,
                col=c(fargeHoved, fargeRest), lwd=c(3,3))
         # legend('topleft', border=NA, c(paste0(shtxt, ' (N=', NHovedRes, ')'),

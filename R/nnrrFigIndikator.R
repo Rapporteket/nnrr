@@ -11,7 +11,7 @@
 nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = NA, maal = NA, skriftStr=1.3, pktStr=1.4,
                              legPlass='top', minstekravTxt='Min.', maalTxt='Mål', graaUt=NA, decreasing=F, outfile = '',
                              lavDG=NA, width=800, height=700, inkl_konf=F, maalretn='hoy')
-  {
+{
 
   # tittel='testtittel'; terskel=30; minstekrav = NA; maal = 30; skriftStr=1.3; pktStr=1.4;
   # legPlass='top'; minstekravTxt='Min.'; maalTxt='Mål'; graaUt=NA; decreasing=F; outfile = '';
@@ -21,7 +21,7 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
 
   Tabell <- indikatordata %>% dplyr::group_by(SykehusNavn, Aar) %>%
     dplyr::summarise(Antall = sum(Teller),
-                     N = n(),
+                     N = dplyr::n(),
                      Andel = Antall/N*100)
 
 
@@ -35,7 +35,7 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
   N[is.na(N)] <- 0
 
   # Andeler, inkludert nasjonalt
-  andeler <- bind_cols(AntTilfeller[,1], AntTilfeller[,-1]/N[,-1] * 100)
+  andeler <- dplyr::bind_cols(AntTilfeller[,1], AntTilfeller[,-1]/N[,-1] * 100)
 
   # Fjern år med færre registreringer enn terskelverdi og sykehus med for lav dekningsgrad
   andeler[N < terskel] <- NA
@@ -52,7 +52,9 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
   N <- N[rekkefolge, ]
 
   # Skjul også tidligere år hvis siste år er sensurert pga. for få reg.
-  andeler[as.vector(N[, dim(andeler)[2]]<terskel), 2:3] <- NA
+  # andeler[as.vector(N[, dim(andeler)[2]]<terskel), 2:3] <- NA
+  andeler[as.vector(N[, dim(andeler)[2]]<terskel), 2:(dim(andeler)[2]-1)] <- NA
+
 
   # Beregn konfidensintervaller
   KI <- binomkonf(purrr::as_vector(AntTilfeller[rekkefolge, dim(andeler)[2]]),
@@ -198,17 +200,31 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
   #   #        legend=names(N), ncol = dim(andeler)[2])
   #
   # } else {
-    if (!inkl_konf) {
-      mtext( c(NA, purrr::as_vector(N[,2]), names(N)[2], NA, NA), side=4, line=2.5, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
-      mtext( c(NA, purrr::as_vector(N[,3]), names(N)[3], NA, NA), side=4, line=5, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
-      mtext( c(NA, purrr::as_vector(N[,4]), names(N)[4], NA, NA), side=4, line=7.5, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
+  if (!inkl_konf) {
+    if (dim(N)[2] == 4) {
+      mtext( c(NA, purrr::as_vector(N[,2]), names(N)[2], NA, NA), side=4,
+             line=2.5, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
+      mtext( c(NA, purrr::as_vector(N[,3]), names(N)[3], NA, NA), side=4,
+             line=5, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
+      mtext( c(NA, purrr::as_vector(N[,4]), names(N)[4], NA, NA), side=4,
+             line=7.5, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
       mtext( 'N', side=4, line=5.0, las=1, at=max(ypos), col=1, cex=cexgr*.7, adj = 1)
     }
-    # else {
-    #   mtext( '(N)', side=2, line=0.3, las=1, at=max(ypos)+diff(ypos)[1], col=1, cex=cexgr, adj = 1)
-    # }
+    if (dim(N)[2] == 3) {
+      mtext( c(NA, purrr::as_vector(N[,2]), names(N)[2], NA, NA), side=4,
+             line=3, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
+      mtext( c(NA, purrr::as_vector(N[,3]), names(N)[3], NA, NA), side=4,
+             line=6, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
+      mtext( 'N', side=4, line=4.0, las=1, at=max(ypos), col=1, cex=cexgr*.7, adj = 1)
+    }
 
-    par(xpd=TRUE)
+  }
+  # else {
+  #   mtext( '(N)', side=2, line=0.3, las=1, at=max(ypos)+diff(ypos)[1], col=1, cex=cexgr, adj = 1)
+  # }
+
+  par(xpd=TRUE)
+  if (dim(N)[2] == 4) {
     points(y=ypos, x=purrr::as_vector(andeler[,2]),cex=pktStr) #'#4D4D4D'
     points(y=ypos, x=purrr::as_vector(andeler[,3]),cex=pktStr,pch= 19)
     par(xpd=FALSE)
@@ -221,9 +237,10 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
              lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
              legend=names(N[,-1]), ncol = dim(andeler)[2]-1)
     }
-  # }
+  }
 
-    text(x=0, y=ypos, labels = pst_txt, cex=0.75, pos=4)#
-    if ( outfile != '') {dev.off()}
+
+  text(x=0, y=ypos, labels = pst_txt, cex=0.75, pos=4)#
+  if ( outfile != '') {dev.off()}
 
 }

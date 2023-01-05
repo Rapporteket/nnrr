@@ -6,12 +6,18 @@
 \usage{
 nnrrUtvalg(
   RegData,
-  datoFra,
-  datoTil,
-  minald,
-  maxald,
-  erMann,
+  datoFra = "2000-01-01",
+  datoTil = "2100-01-01",
+  minald = 0,
+  maxald = 120,
+  erMann = 99,
   datovar = "Besoksdato",
+  tverrfaglig = 99,
+  minHSCL = 1,
+  maxHSCL = 4,
+  medikamenter = NA,
+  smerte = NA,
+  tolk = 99,
   fargepalett = "BlaaRapp"
 )
 }
