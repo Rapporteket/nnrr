@@ -1,6 +1,36 @@
 rm(list=ls())
 library(nnrr)
 
+######### Tabeller Kjetil 05.01.2023  ########################################
+
+RegData <- nnrr::nnrrHentRegData()
+
+RegData %>%
+  dplyr::filter(Aar > 2019) %>%
+  dplyr::group_by(SykehusNavn, Aar) %>%
+  dplyr::summarise(
+    var = paste0(sum(Interpreter, na.rm = T), " av ", sum(!is.na(Interpreter)))
+  ) %>% tidyr::spread(key = Aar, value = var, fill = "") %>%
+
+
+RegData %>%
+  dplyr::filter(Aar > 2019) %>%
+  dplyr::group_by(SykehusNavn, Aar) %>%
+  dplyr::summarise(
+    var = paste0(sum(NationalInterpreter, na.rm = T), " av ", sum(!is.na(NationalInterpreter)))
+  ) %>% tidyr::spread(key = Aar, value = var, fill = "")
+
+RegData %>%
+  dplyr::filter(Aar > 2019) %>%
+  dplyr::group_by(SykehusNavn, Aar) %>%
+  dplyr::summarise(
+    var = length(intersect(NationalCountry, 1:7))
+  ) %>% tidyr::spread(key = Aar, value = var, fill = "")
+
+
+
+
+
 ########## Utlevering hianor 02.12.2022 #######################################
 # pasientsvar_pre <- read.table('C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_red.csv',
 #                               sep=';', header=T, stringsAsFactors = F)

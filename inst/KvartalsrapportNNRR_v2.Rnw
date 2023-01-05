@@ -92,7 +92,8 @@ Norsk nakke- og ryggregister
 \vspace{1pt}\vspace{-\baselineskip}
 \rule{1.0\textwidth}{1pt}\par   % Horisontal linje
 \vspace{0.5cm}
-\includegraphics[width=1.0\textwidth]{\Sexpr{system.file(file='smertebilde.PNG', package='nnrr')}} % Inkluder bilde
+% \includegraphics[width=1.0\textwidth]{\Sexpr{system.file(file='smertebilde.PNG', package='nnrr')}} % Inkluder bilde
+\includegraphics[width=1.0\textwidth]{C:/GIT/nnrr/inst/smertebilde.PNG}
 \vspace{1pt}\vspace{-\baselineskip}
 {\color{moerkgraa} \small Illustrasjonsbilde}
 \end{center}
@@ -111,15 +112,15 @@ Norsk nakke- og ryggregister
 \textsc{For sykehus:}
 
 \textbf{\Sexpr{shtxt}}\\
-\end{minipage}
-\\ \\
-\noindent
-\begin{minipage}[t]{6cm}
-\flushleft
-\textsc{Besøksdato pasient:}
-
-\Sexpr{format(as.Date(datoFra), "%d. %B %Y")} til \Sexpr{format(as.Date(datoTil), "%d. %B %Y")}\\
-\end{minipage}
+% \end{minipage}
+% \\ \\
+% \noindent
+% \begin{minipage}[t]{6cm}
+% \flushleft
+% \textsc{Besøksdato pasient:}
+%
+% \Sexpr{format(as.Date(datoFra), "%d. %B %Y")} til \Sexpr{format(as.Date(datoTil), "%d. %B %Y")}\\
+% \end{minipage}
 
 \vfill
 
@@ -132,7 +133,7 @@ Norsk nakke- og ryggregister
 \begin{minipage}[t]{6cm}
 \flushright
 \normalsize
-Templatversjon I, 2020
+Templatversjon III, 2023
 \end{minipage}
 \end{titlepage}
 
