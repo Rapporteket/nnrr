@@ -1,6 +1,6 @@
 \documentclass[norsk,a4paper]{article} % ,twoside
 \usepackage[norsk]{babel}
-\usepackage[utf8x]{inputenc}
+% \usepackage[utf8x]{inputenc}
 \usepackage{subfig}
 \usepackage{pdfpages}
 \usepackage{booktabs}
@@ -18,7 +18,7 @@
 % \tikzexternalize
 
 
-\title{Figurer og tabeller til 2021 årsrapport for NNRR}
+\title{Figurer og tabeller til 2022 årsrapport for NNRR}
 \author{NNRR}
 
 %setter grå skrift fremfort sort
@@ -48,16 +48,20 @@ RegData <- nnrr::nnrrHentRegData()
 RegDataAll <- RegData
 RegData <- RegData[which(RegData$Aar >= rap_aar & RegData$Aar <= rap_aar), ]
 
-icd10 <- read.table('~/.ssh/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+# icd10 <- read.table('~/.ssh/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+icd10 <- read.table(system.file(file='extdata/icd10.csv', package='nnrr'),
+                    sep=';', header=T, stringsAsFactors = F,
+                    fileEncoding = 'UTF-8')
+system.file(file='extdata/icd10.csv', package='nnrr')
 
 figstr <- 0.61
 tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 
-figfolder <- "~/.ssh/nnrr/figurer_aarsrapp_2022/"
+figfolder <- "C:/GIT/nnrr/inst/figurer_aarsrapp_2021/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
-tabfolder <- "~/.ssh/nnrr/tabeller_aarsrapp_2021/"
+tabfolder <- "C:/GIT/nnrr/inst/tabeller_aarsrapp_2021/"
 if (!dir.exists(tabfolder)) {
   dir.create(tabfolder)
 }

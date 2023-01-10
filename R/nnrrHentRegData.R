@@ -33,7 +33,8 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
     pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
   }
 
-  # icd10 <- read.table('C:/GIT/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+  # icd10 <- read.table('C:/GIT/data/nnrr/icd10.csv', sep=';',
+  #                     header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
   legeskjema$regstatus <- 1
   pasientsvar_pre$regstatus <- 1
   pasientsvar_post$regstatus <- 1

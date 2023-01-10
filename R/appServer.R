@@ -40,6 +40,9 @@ appServer <- function(input, output, session) {
   indikatorfigServer("indikatorfig_id",
                      RegData = RegData, userRole = userRole, hvd_session = session)
 
+  datadump_Server("datadump_id", reshID = userReshId,
+                  RegData = RegData, userRole = userRole, hvd_session = session)
+
   # Administrative tabeller
   # nnrr::admtab_server("admtabell", SkjemaOversikt)
   #
