@@ -66,9 +66,11 @@ datadump_Server <- function(id, RegData, userRole, hvd_session, reshID){
               input$dumptype,
               "pasientsvar_pre" = readr::read_csv2(
                 'C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_v2.csv'),
-              "legeskjema" = read.table(
-                'C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-12-09_1116.csv', sep=';',
-                header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F),
+              "legeskjema" = readr::read_csv2(
+                'C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-12-09_1116.csv'),
+              # "legeskjema" = read.table(
+              #   'C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-12-09_1116.csv', sep=';',
+              #   header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F),
               "pasientsvar_post" =  read.table(
                 'C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+maneder+etter+behandling_2022-12-09_1116.csv',
                 sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F),
@@ -83,7 +85,8 @@ datadump_Server <- function(id, RegData, userRole, hvd_session, reshID){
           if (userRole != 'SC') {
             dumpdata <- dumpdata[dumpdata$UnitId %in% reshID, ]
           }
-          write.csv2(dumpdata, file, row.names = F, na = '', fileEncoding = 'Latin1')
+          # write.csv2(dumpdata, file, row.names = F, na = '', fileEncoding = 'Latin1')
+          readr::write_excel_csv2(dumpdata, file)
         }
       )
 
