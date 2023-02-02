@@ -1,6 +1,6 @@
 \documentclass[a4paper]{article} % ,twoside
 \usepackage[norsk]{babel}
-% \usepackage[utf8x]{inputenc}
+\usepackage[utf8x]{inputenc}
 \usepackage{subfig}
 \usepackage{pdfpages}
 \usepackage{booktabs}
@@ -47,8 +47,8 @@ library(lubridate)
 # 4212982 <- 'Ålesund'
 # 105821 <- 'Levanger'
 # 103736 <- 'Drammen'
-# 700138 <- 'Stavern???'
-reshID <- 102959
+# 700138 <- 'Stavern'
+reshID <- 700138
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
@@ -64,7 +64,7 @@ shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
 figstr <- 0.61
 # tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 
-figfolder <- "C:/GIT/nnrr/inst/figfolder/"
+figfolder <- "~/nnrr/inst/figfolder/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
@@ -92,7 +92,7 @@ Norsk nakke- og ryggregister
 \vspace{1pt}\vspace{-\baselineskip}
 \rule{1.0\textwidth}{1pt}\par   % Horisontal linje
 \vspace{0.5cm}
-% \includegraphics[width=1.0\textwidth]{\Sexpr{system.file(file='smertebilde.PNG', package='nnrr')}} % Inkluder bilde
+\includegraphics[width=1.0\textwidth]{\Sexpr{system.file(file='smertebilde.PNG', package='nnrr')}} % Inkluder bilde
 % \includegraphics[width=1.0\textwidth]{C:/GIT/nnrr/inst/smertebilde.PNG}
 \vspace{1pt}\vspace{-\baselineskip}
 {\color{moerkgraa} \small Illustrasjonsbilde}
@@ -112,15 +112,15 @@ Norsk nakke- og ryggregister
 \textsc{For sykehus:}
 
 \textbf{\Sexpr{shtxt}}\\
-% \end{minipage}
-% \\ \\
-% \noindent
-% \begin{minipage}[t]{6cm}
-% \flushleft
-% \textsc{Besøksdato pasient:}
-%
-% \Sexpr{format(as.Date(datoFra), "%d. %B %Y")} til \Sexpr{format(as.Date(datoTil), "%d. %B %Y")}\\
-% \end{minipage}
+\end{minipage}
+\\ \\
+\noindent
+\begin{minipage}[t]{6cm}
+\flushleft
+\textsc{Besøksdato pasient:}
+
+\Sexpr{format(as.Date(datoFra), "%d. %B %Y")} til \Sexpr{format(as.Date(datoTil), "%d. %B %Y")}\\
+\end{minipage}
 
 \vfill
 
