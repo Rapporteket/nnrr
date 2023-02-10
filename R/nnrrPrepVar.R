@@ -24,6 +24,24 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- RegData$Variabel
   }
 
+  if (valgtVar=='mestringsorientert_samtale') {
+    tittel <- "Mestringsorientert samtale"
+    RegData <- RegData[RegData$TreatmentMasteryOrientedConversation %in% 1:2, ]
+    RegData$Variabel <- RegData$TreatmentMasteryOrientedConversation
+    RegData$Variabel[RegData$Variabel == 2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='ind_raad_livsstil') {
+    tittel <- c("Individuell rådgivning vedrørende", "livsstil og/eller medikamenter")
+    RegData <- RegData[RegData$TreatmentCouncellingLifeStyleAndMedication %in% 1:2, ]
+    RegData$Variabel <- RegData$TreatmentCouncellingLifeStyleAndMedication
+    RegData$Variabel[RegData$Variabel == 2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
   if (valgtVar == "VentetidFraHenvisning_kat") {
     RegData$Variabel <- RegData[, "VentetidFraHenvisningTilBesok"]
     RegData$Variabel[RegData$Variabel < 0] <- NA
