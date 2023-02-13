@@ -42,6 +42,24 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
 
+  if (valgtVar=='kartlagt_funksjon') {
+    tittel <- c("Kartlagt funksjonsevne relatert", "til arbeid og utdannelse")
+    RegData$Variabel <- RegData$TreatmentAbilityToWorkFunctionLevel
+    RegData <- RegData[RegData$Variabel %in% 1:2, ]
+    RegData$Variabel[RegData$Variabel == 2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='gjennomgang_billedfunn') {
+    tittel <- c("Gjennomgang av billedfunn")
+    RegData$Variabel <- RegData$RadiologicalFExplainedPatient
+    RegData <- RegData[RegData$Variabel %in% 1:2, ]
+    RegData$Variabel[RegData$Variabel == 2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
   if (valgtVar == "VentetidFraHenvisning_kat") {
     RegData$Variabel <- RegData[, "VentetidFraHenvisningTilBesok"]
     RegData$Variabel[RegData$Variabel < 0] <- NA

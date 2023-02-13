@@ -21,6 +21,7 @@ nnrrUtvalg <- function(RegData,
                        medikamenter = NA,
                        smerte = NA,
                        tolk = 99,
+                       iArbeid = 99,
                        fargepalett='BlaaRapp')
 {
   # Definerer intersect-operator
@@ -57,11 +58,14 @@ nnrrUtvalg <- function(RegData,
   indTolk <- if (tolk %in% c(0,1)) {
     which(RegData$Interpreter %in% tolk)
   } else indAlle
+  indEmployed = if (iArbeid %in% 0:1) {
+    which(RegData$IsEmployed == iArbeid)
+  } else indAlle
 
 
 
   indMed <- indAld %i% indDato %i% indKj %i% indTverr %i% indHSCL %i%
-    indMedikament %i% indSmerte %i% indTolk
+    indMedikament %i% indSmerte %i% indTolk %i% indEmployed
   RegData <- RegData[indMed,]
 
   utvalgTxt <- c(paste0(datotxt,
@@ -83,7 +87,9 @@ nnrrUtvalg <- function(RegData,
                    paste0("Varighet av nåværende smerter: ",
                           paste(RegData$PainDurationNow[match(smerte, RegData$SmerteNum)], collapse = ", " ))}
                  },
-                 if (tolk %in% c(0,1)) {paste0("Tolk: ", c("Nei", "Ja")[tolk+1])}
+                 if (tolk %in% c(0,1)) {paste0("Tolk: ", c("Nei", "Ja")[tolk+1])},
+                 if (iArbeid %in% 0:1) {paste0('Har arbeidsforhold: ',
+                                              c('Nei', 'Ja')[iArbeid+1])}
   )
 
 

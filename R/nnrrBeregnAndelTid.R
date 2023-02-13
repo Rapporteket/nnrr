@@ -34,7 +34,8 @@ nnrrBeregnAndelTid <- function(RegData,
                                maxHSCL = 4,
                                medikamenter = NULL,
                                smerte = NULL,
-                               tolk = 99)
+                               tolk = 99,
+                               iArbeid = 99)
 {
   datotxt <- switch(datovar,
                     Besoksdato = "intervensjon",
@@ -63,7 +64,7 @@ nnrrBeregnAndelTid <- function(RegData,
                            maxald=maxald, erMann=erMann, datovar=datovar,
                            tverrfaglig=tverrfaglig, minHSCL = minHSCL,
                            maxHSCL = maxHSCL, medikamenter = medikamenter,
-                           smerte = smerte, tolk=tolk)
+                           smerte = smerte, tolk=tolk, iArbeid = iArbeid)
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
 
