@@ -1,6 +1,50 @@
 rm(list=ls())
 library(nnrr)
 
+
+######### Utlevering John Bjørneboe 14.02.2023  ########################################
+pasientsvar_pre <-
+  readr::read_csv2(
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
+legeskjema <-
+  readr::read_csv2(
+    '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv')
+pasientsvar_post <-
+  readr::read_csv2(
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2023-02-02_0917.csv')
+pasientsvar_post2 <-
+  readr::read_csv2(
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2023-02-02_0918.csv')
+
+flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <- names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post <- pasientsvar_post[!(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <- names(table(pasientsvar_post2$HovedskjemaGUID))[table(pasientsvar_post2$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post2 <- pasientsvar_post2[!(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'))
+RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_post'),
+                 all.x = TRUE)
+RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'),
+                 all.x = TRUE)
+
+RegData$FormDate <- as.Date(RegData$FormDate, format="%d.%m.%Y")
+
+RegData <- RegData[which(RegData$FormDate >= "2021-01-01" & RegData$FormDate <= "2022-12-31"), ]
+
+write.csv2(RegData, "~/mydata/nnrr/nnrrdata2021_22.csv", row.names = F,
+           fileEncoding = "Latin1", na = "")
+
 ######### Tabeller Kjetil 05.01.2023  ########################################
 
 RegData <- nnrr::nnrrHentRegData()
