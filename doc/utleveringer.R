@@ -1,6 +1,41 @@
 rm(list=ls())
 library(nnrr)
 
+########## Utlevering hianor 15.02.2023 #######################################
+kobling <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-16_0840.csv')
+kobling <- kobling[match(unique(kobling$PasientGUID), kobling$PasientGUID), ]
+pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
+# legeskjema <- read.table('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv',
+#                          sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+legeskjema <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv')
+# pasientsvar_post <- read.table('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2023-02-02_0917.csv',
+#                                sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
+pasientsvar_post <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2023-02-02_0917.csv')
+
+legeskjema <- legeskjema[which(as.Date(legeskjema$S1b_DateOfCompletion, format="%d.%m.%Y") >= "2016-01-01"), ]
+pasientsvar_pre <- pasientsvar_pre[pasientsvar_pre$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+pasientsvar_post <- pasientsvar_post[pasientsvar_post$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+
+ikkemed <- c("BackSurgery", "NeckSurgery", "PelvisSurgery", "Radiological_None", "RadiologicalUS_CT", "RadiologicalUS_MR",
+             "RadiologicalUS_Radikulgraphy", "RadiologicalUS_Discography", "RadiologicalUS_LS_C_Columna",
+             "RadiologicalUS_FlexionExtention", "RadiologicalF_Normal", "RadiologicalF_DiscHernitation",
+             "RadiologicalF_CentralSpinalCord", "RadiologicalF_RecesStenosis", "RadiologicalF_Spondylolisthesis2018",
+             "RadiologicalF_Spondylolisthesis", "RadiologicalF_Scoliosis", "RadiologicalF_Scoliosis_Subcategory",
+             "RadiologicalF_Modicchanges", "RadiologicalF_Modicchanges1", "RadiologicalF_Modicchanges2",
+             "RadiologicalF_Modicchanges3", "RadiologicalF_ModicchangesUnspecified", "RadiologicalF_Other",
+             "OtherSupplementaryDiagnostic_DiagnosticInjection", "OtherSupplementaryDiagnostic_Radikulgraphy",
+             "RadiologicalUS_DiagnosticBlock", "OtherSupplementaryDiagnostic_Emg", "OtherSupplementaryDiagnostic_Nevrografi")
+legeskjema <- legeskjema[, -which(names(legeskjema) %in% ikkemed)]
+
+kobling <- kobling[kobling$PasientGUID %in%
+                     unique(c(legeskjema$PasientGUID, pasientsvar_pre$PasientGUID, pasientsvar_post$PasientGUID)), ]
+
+# write.csv2(legeskjema, "~/mydata/nnrr/skjema1b_15022023.csv", row.names = F, fileEncoding = "Latin1")
+# write.csv2(pasientsvar_post, "~/mydata/nnrr/skjema2_15022023.csv", row.names = F, fileEncoding = "Latin1")
+readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/skjema1a_15022023.csv")
+readr::write_csv2(legeskjema, "~/mydata/nnrr/skjema1b_15022023.csv")
+readr::write_csv2(pasientsvar_post, "~/mydata/nnrr/skjema2_15022023.csv")
+readr::write_csv2(kobling, "~/mydata/nnrr/nnrr_kobling.csv")
 
 ######### Utlevering John Bjørneboe 14.02.2023  ########################################
 pasientsvar_pre <-
