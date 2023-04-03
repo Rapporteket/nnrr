@@ -48,20 +48,21 @@ RegData <- nnrr::nnrrHentRegData()
 RegDataAll <- RegData
 RegData <- RegData[which(RegData$Aar >= rap_aar & RegData$Aar <= rap_aar), ]
 
-# icd10 <- read.table('~/.ssh/data/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
-icd10 <- read.table(system.file(file='extdata/icd10.csv', package='nnrr'),
-                    sep=';', header=T, stringsAsFactors = F,
-                    fileEncoding = 'UTF-8')
-system.file(file='extdata/icd10.csv', package='nnrr')
+icd10 <- read.table('~/mydata/nnrr/icd10.csv', sep=';',
+                    header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+# icd10 <- read.table(system.file(file='extdata/icd10.csv', package='nnrr'),
+#                     sep=';', header=T, stringsAsFactors = F,
+#                     fileEncoding = 'UTF-8')
+# system.file(file='extdata/icd10.csv', package='nnrr')
 
 figstr <- 0.61
 tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
 
-figfolder <- "C:/GIT/nnrr/inst/figurer_aarsrapp_2021/"
+figfolder <- "~/mydata/nnrr/figurer_aarsrapp_2022/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
-tabfolder <- "C:/GIT/nnrr/inst/tabeller_aarsrapp_2021/"
+tabfolder <- "~/mydata/nnrr/tabeller_aarsrapp_2022/"
 if (!dir.exists(tabfolder)) {
   dir.create(tabfolder)
 }
