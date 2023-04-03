@@ -17,7 +17,9 @@ Imports:
   shinyjs,
   janitor,
   DT,
-  kableExtra
+  kableExtra,
+  rapbase,
+  rapFigurer
 Remotes:
   Rapporteket/rapbase@*release,
   Rapporteket/rapFigurer
