@@ -18,6 +18,7 @@ nnrrUtvalg(
   medikamenter = NA,
   smerte = NA,
   tolk = 99,
+  iArbeid = 99,
   fargepalett = "BlaaRapp"
 )
 }

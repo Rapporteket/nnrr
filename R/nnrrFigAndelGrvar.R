@@ -49,19 +49,25 @@ nnrrFigAndelGrvar <- function(RegData, valgtVar="opplevd_nytte_beh",
   ind <- list(Hoved=which(RegData$UnitId == reshID), Rest=which(RegData$UnitId != reshID))
 
   if (enhetsUtvalg==1) {
-    tabell_hoved <- RegData[ind$Hoved, ] %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
-                                                                                          N = n(),
-                                                                                          Andel = Antall/N*100)
-    tabell_rest <- RegData[ind$Rest, ] %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
-                                                                                        N = n(),
-                                                                                        Andel = Antall/N*100)
+    tabell_hoved <- RegData[ind$Hoved, ] %>%
+      dplyr::group_by(grvar, .drop = FALSE) %>%
+      dplyr::summarise(Antall = sum(Variabel),
+                       N = dplyr::n(),
+                       Andel = Antall/N*100)
+    tabell_rest <- RegData[ind$Rest, ] %>%
+      dplyr::group_by(grvar, .drop = FALSE) %>%
+      dplyr::summarise(Antall = sum(Variabel),
+                       N = dplyr::n(),
+                       Andel = Antall/N*100)
     tabell_hoved$Andel[tabell_hoved$N == 0] <- 0
     tabell_rest$Andel[tabell_rest$N == 0] <- 0
-    plottab <- tibble(hoved=tabell_hoved$Andel, rest=tabell_rest$Andel)
+    plottab <- dplyr::tibble(hoved=tabell_hoved$Andel, rest=tabell_rest$Andel)
   } else {
-    tabell_hoved <- RegData %>% group_by(grvar, .drop = FALSE) %>% summarise(Antall = sum(Variabel),
-                                                                             N = n(),
-                                                                             Andel = Antall/N*100)
+    tabell_hoved <- RegData %>%
+      dplyr::group_by(grvar, .drop = FALSE) %>%
+      dplyr::summarise(Antall = sum(Variabel),
+                       N = dplyr::n(),
+                       Andel = Antall/N*100)
   }
 
   #-----------Figur---------------------------------------
@@ -81,11 +87,13 @@ nnrrFigAndelGrvar <- function(RegData, valgtVar="opplevd_nytte_beh",
   ymax <- 3*length(grtxt)*1.2
 
   if (enhetsUtvalg==1) {
-    pos <- barplot(t(as.matrix(plottab)), beside = T, horiz = T, col = farger[c(3,4)], border = NA, ylim = c(0, ymax),
+    pos <- barplot(t(as.matrix(plottab)), beside = T, horiz = T,
+                   col = farger[c(3,4)], border = NA, ylim = c(0, ymax),
                    xlab = "Andel (%)")
 
-    legend('top', rev(c(paste0(shtxt, ", N=", sum(tabell_hoved$N)), paste0("Landet for øvrig", ", N=", sum(tabell_rest$N)))), bty='n',
-           fill=rev(farger[c(3,4)]), border=NA, ncol=1, cex=1, xpd = T)
+    legend('top', rev(c(paste0(shtxt, ", N=", sum(tabell_hoved$N)),
+                        paste0("Landet for øvrig", ", N=", sum(tabell_rest$N)))),
+           bty='n', fill=rev(farger[c(3,4)]), border=NA, ncol=1, cex=1, xpd = T)
   }
 
   paste0(tabell_hoved$Antall, " av ", tabell_hoved$N)

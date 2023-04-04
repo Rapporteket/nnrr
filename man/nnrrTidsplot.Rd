@@ -10,7 +10,9 @@ nnrrTidsplot(
   fargepalett = "BlaaRapp",
   inkl_konf = 1,
   maal = NA,
-  maalnivaatxt = NA
+  maalnivaatxt = "Høy måloppnåelse",
+  moderat = NA,
+  moderatTxt = "Moderat måloppnåelse"
 )
 }
 \arguments{

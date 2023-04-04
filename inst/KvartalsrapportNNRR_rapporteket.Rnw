@@ -29,45 +29,43 @@ knitr::opts_knit$set(root.dir = './')
 @
 
 <<LastData, include=FALSE, cache=FALSE>>=
-# setwd('c:/GIT/nnrr/doc/')
-rm(list=ls())
 library(nnrr)
-library(tidyverse)
-library(lubridate)
 
-# RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
-# 102959 <- 'Haukeland'
-# 104293 <- 'St. Olavs'
-# 109834 <- 'OUS'
-# 601032 <- 'UNN-Tromsø'
-# 700735 <- 'UNN-Harstad'
-# 102169 <- 'Sandnessjøen'
-# 114174 <- 'Kristiansand'
-# 4211588 <- 'Stavanger'
-# 4212982 <- 'Ålesund'
-# 105821 <- 'Levanger'
-# 103736 <- 'Drammen'
-# 700138 <- 'Stavern'
-reshID <- 700138
-
-datoTil <- Sys.Date()
-datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
+datoTil <- datoTil %>% as.Date() %>%
+  lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
 datoFra <- (datoTil + lubridate::days(1)) %m-% lubridate::years(1)
 
 datoTil <- as.character(datoTil)
 datoFra <- as.character(datoFra)
 
-RegData <- nnrr::nnrrHentRegData()
+# RegData <- nnrr::nnrrHentRegData()
 
 shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
+if (valgtShus[1] == '') {
+  shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
+  shtxt_flervalg <- shtxt
+} else {
+  if (length(valgtShus)==1) {
+    reshID<-as.numeric(valgtShus[1])
+    shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
+    shtxt_flervalg <- shtxt
+  } else {
+    shtxt <- as.character(RegData$SykehusNavn[match(as.numeric(valgtShus), RegData$UnitId)])
+    shtxt_flervalg <- 'valgte sykehus'
+  }
+}
+
+RegData$SykehusNavn <- as.character(RegData$SykehusNavn)
+if (length(valgtShus) > 1) {
+  RegData$UnitId[RegData$UnitId %in% as.numeric(valgtShus)] <- 99
+  RegData$SykehusNavn[RegData$UnitId == 99] <- 'Ditt utvalg'
+  reshID <- 99
+}
+
 
 figstr <- 0.61
-# tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+figfolder <- paste0(tempdir(), "/")
 
-figfolder <- "~/nnrr/inst/figfolder/"
-if (!dir.exists(figfolder)) {
-  dir.create(figfolder)
-}
 @
 
 \begin{document}
@@ -162,7 +160,7 @@ Hver enhet vil hvert kvartal få rapport på sine data. Her kommer dette kvartal
 
 <<'Tab 1', results='asis', echo=FALSE>>=
 
-datoFra_sistkvartal <- floor_date(as.Date(datoTil), unit="month") %m-% months(2)
+datoFra_sistkvartal <- lubridate::floor_date(as.Date(datoTil), unit="month") %m-% months(2)
 
 aux <- RegData[RegData$Besoksdato >= datoFra_sistkvartal & RegData$Besoksdato <= datoTil, ]
 
@@ -312,24 +310,6 @@ plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra
 nnrr::nnrrTidsplot(plotdata = plotdata,
                    outfile=outfile,
                    inkl_konf = 0, maal = 90, moderat = 80)
-
-# outfile <- paste0(figfolder, "Oppfolging_utfylt_6mnd.pdf")
-# valgtVar <- "Oppfolging_utfylt_6mnd"
-# plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-#                                      minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-#                                      tidsenhet="Kvartal", datovar = "dato_oppfolg")
-# nnrr::nnrrTidsplot(plotdata = plotdata,
-#                    outfile=outfile,
-#                    inkl_konf = 0)
-#
-# outfile <- paste0(figfolder, "Oppfolging_utfylt_12mnd.pdf")
-# valgtVar <- "Oppfolging_utfylt_12mnd"
-# plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-#                                      minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-#                                      tidsenhet="Kvartal", datovar = "dato_oppfolg2")
-# nnrr::nnrrTidsplot(plotdata = plotdata,
-#                    outfile=outfile,
-#                    inkl_konf = 0)
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_6mnd.pdf")
 valgtVar <- "opplevd_nytte_beh_6mnd"

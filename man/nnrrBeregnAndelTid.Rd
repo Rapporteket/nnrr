@@ -24,7 +24,8 @@ nnrrBeregnAndelTid(
   maxHSCL = 4,
   medikamenter = NULL,
   smerte = NULL,
-  tolk = 99
+  tolk = 99,
+  iArbeid = 99
 )
 }
 \arguments{
