@@ -1,7 +1,7 @@
 rm(list=ls())
 library(nnrr)
 
-######### Utlevering John Bjørneboe 14.02.2023  ########################################
+######### Utlevering John Bjørneboe mars 2023  ########################################
 pasientsvar_pre <-
   readr::read_csv2(
     '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-03-16_1113.csv')
