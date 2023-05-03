@@ -45,6 +45,18 @@ write.csv2(RegData, "~/mydata/nnrr/nnrrdata2021_22_v2.csv", row.names = F,
            fileEncoding = "Latin1", na = "")
 
 ########## Utlevering hianor 15.02.2023 #######################################
+kobling <- readr::read_csv2('C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-16_0840.csv',
+                            col_select = c("Fødselsnummer", "PasientGUID"))
+pasguid <- readr::read_csv2('C:/GIT/data/nnrr/PasientGUID 1.1.16-31.12.22 duplicates removed.csv',
+                            col_names = "pguid")
+
+kobling <- kobling[match(pasguid$pguid, kobling$PasientGUID), ]
+kobling <- kobling[!is.na(kobling$PasientGUID), ]
+setdiff(pasguid$pguid, kobling$PasientGUID)
+readr::write_csv2(kobling, "C:/GIT/data/nnrr/nnrr_kobling_v2.csv")
+
+
+########## Utlevering hianor 15.02.2023 #######################################
 kobling <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-16_0840.csv')
 kobling <- kobling[match(unique(kobling$PasientGUID), kobling$PasientGUID), ]
 pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
