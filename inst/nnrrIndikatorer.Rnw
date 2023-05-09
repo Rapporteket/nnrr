@@ -6,6 +6,7 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage{amssymb}
+\usepackage{lscape}
 \usepackage[a4paper]{geometry}
 \usepackage[pdftex, colorlinks, linkcolor=lysblaa, urlcolor=lysblaa]{hyperref}
 \usepackage{array}
@@ -554,82 +555,17 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel oppfølgings
 @
 
 
-<<'Andel mestringsorientert samtale', results='asis', echo=FALSE>>=
-aux <- RegData %>%
-  filter(regstatus == 1) %>%
-  filter(TreatmentMasteryOrientedConversation %in% 1:2)
 
-aux$Teller <- aux$TreatmentMasteryOrientedConversation
-aux$Teller[aux$Teller == 2] <- 0
 
-######### Indikator #####################################################################
-indikator <- aux[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
-names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
-indikator$Nevner <- 1
-indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
 
-# indikator$ind_id <- "nnrr_misfornoeyd"
-# Indikatorer <- bind_rows(Indikatorer, indikator)
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Teller')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med eller nøytral til behandlingen'), include.rownames=FALSE)
 
-#########################################################################################
-@
 
-<<'Fig. Andel mestringsorientert samtale', include=FALSE, echo=FALSE, eval=T>>=
-outfile <- "mestringsorientert_samtale.pdf"
-outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'), outfile=outfile)
-if (format_ut != "pdf") {
-  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'), outfile=outfile)
-}
-@
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}mestringsorientert_samtale.pdf}
-\caption{mestringsorientert\_samtale.pdf}
-\end{figure}
 
-<<'Andel utredet ved HelseIArbeid', results='asis', echo=FALSE>>=
-aux <- RegData %>%
-  filter(regstatus == 1)
 
-aux$Teller <- as.numeric(aux$ParticipantHelseIArbeid)
 
-######### Indikator #####################################################################
-indikator <- aux[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
-names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
-indikator$Nevner <- 1
-indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
-indikator <- indikator %>% filter(Aar >= 2022)
 
-# indikator$ind_id <- "nnrr_misfornoeyd"
-# Indikatorer <- bind_rows(Indikatorer, indikator)
-
-tabell1 <- nnrrIndikatorTabell(indikator, indikator = 'Teller')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med eller nøytral til behandlingen'), include.rownames=FALSE)
-
-#########################################################################################
-@
-
-<<'Fig. Andel utredet ved HelseIArbeid', include=FALSE, echo=FALSE, eval=T>>=
-outfile <- "helseiarbeid.pdf"
-outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, c('Andel utredet ved ', 'Helse i Arbeid'), outfile=outfile)
-if (format_ut != "pdf") {
-  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, c('Andel utredet ved ', 'Helse i Arbeid'), outfile=outfile)
-}
-@
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}helseiarbeid.pdf}
-\caption{helseiarbeid.pdf}
-\end{figure}
 
 
 <<'Nokkeltall NNRR', results='asis', echo=FALSE, message=FALSE>>=

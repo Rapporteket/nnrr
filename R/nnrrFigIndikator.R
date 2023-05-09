@@ -1,7 +1,6 @@
 #' Gi en visuell fremstilling av registerets indikatorer over tid
 #'
 #' @param indikatordata En dataramme med følgende kolonner:
-#'                 - ReshId
 #'                 - Aar
 #'                 - Teller
 #'                 - Sykehusnavn
@@ -82,11 +81,11 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
     andeler$SykehusNavn[dim(andeler)[1]] <- paste0('(N, ', names(andeler)[dim(andeler)[2]], ')')
     KI <- cbind(c(NA, NA), KI, c(NA, NA))
   } else {
-    andeler <- rbind(andeler, c(NA,NA,NA))
+    andeler <- rbind(andeler, NA)
     andeler$SykehusNavn[dim(andeler)[1]] <- ''
   }
 
-  andeler <- rbind(c(NA,NA), andeler, c(NA,NA))
+  andeler <- rbind(NA, andeler, NA)
   andeler$SykehusNavn[dim(andeler)[1]] <- ''
   andeler$SykehusNavn[1] <- ' '
 

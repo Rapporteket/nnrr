@@ -113,6 +113,9 @@ nnrrPreprosess <- function(RegData)
   RegData$FamilyStatus[RegData$FamilyStatus==0] <- 99
   RegData$FamilyStatus <- factor(RegData$FamilyStatus, levels = c(1:3,99),
                                  labels = c('Gift/Reg. partner','Samboende', 'Enslig', 'Ikke svart'))
+  RegData$UtdanningHoy <- NA
+  RegData$UtdanningHoy[RegData$EducationLevel %in% 1:3] <- 0
+  RegData$UtdanningHoy[RegData$EducationLevel %in% 4:5] <- 1
   RegData$EducationLevel[RegData$EducationLevel==0] <- 99
   RegData$EducationLevel <- factor(RegData$EducationLevel, levels = c(1:5,99),
                                    labels = c('Grunnskole 7-10 år, framhaldskole eller folkehøyskole'
@@ -126,6 +129,9 @@ nnrrPreprosess <- function(RegData)
   RegData$PainDurationNow <- factor(RegData$PainDurationNow, levels = c(1:5,99),
                                  labels = c('Ingen smerter', 'Mindre enn 3 måneder', '3 til 12 måneder',
                                             '1-2 år', 'Mer enn 2', 'Ikke svart'))
+  RegData$VentetidFraHenvisningTilTilbud_kat <-
+    cut(RegData$VentetidFraHenvisningTilTilbud, breaks = c(0,30,60,90,180,365, 100000),
+        labels = )
 
   # RegData$NeckSurgery[RegData$NeckSurgery==0] <- 99
   RegData$NeckSurgery <- factor(RegData$NeckSurgery, levels = c(1:3),
