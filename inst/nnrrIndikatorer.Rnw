@@ -68,7 +68,7 @@ map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
 
 # kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
-format_ut <- ".pdf"
+format_ut <- ".svg"
 figfolder <- "~/mydata/nnrr/indikatorer_2022/"
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)

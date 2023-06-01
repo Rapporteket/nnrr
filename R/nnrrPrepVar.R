@@ -62,7 +62,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
 
   if (valgtVar == "VentetidFraHenvisning_kat") {
     RegData$Variabel <- RegData[, "VentetidFraHenvisningTilBesok"]
-    RegData$Variabel[RegData$Variabel < 0] <- NA
+    RegData$Variabel[RegData$Variabel <= 0] <- NA
     RegData <- RegData[!is.na(RegData$Variabel), ]
     tittel <- 'Ventetid fra henvisning til besøk'
     # gr <- c(seq(0, 180, 30), 100000)
@@ -76,7 +76,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   if (valgtVar=='ventetid_krav') {
     tittel <- "Ventetid 50 dager eller mindre"
     RegData <- RegData[!is.na(RegData$VentetidFraHenvisningTilBesok) &
-                         RegData$VentetidFraHenvisningTilBesok >= 0, ]
+                         RegData$VentetidFraHenvisningTilBesok > 0, ]
     RegData$Variabel <- 0
     # RegData$Variabel[RegData$VentetidFraHenvisningTilBesok > 50] <- 0
     RegData$Variabel[RegData$VentetidFraHenvisningTilBesok <= 50] <- 1

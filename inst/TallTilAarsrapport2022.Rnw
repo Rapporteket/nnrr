@@ -1582,7 +1582,7 @@ aux <- aux[aux$ant_besvart_uhi >= 3, ]
 aux$Teller <- 0
 aux$Teller[aux$ant_hoy_uhi >=3] <- 1
 
-table(aux$indikator, useNA = 'ifany')
+# table(aux$indikator, useNA = 'ifany')
 
 indikator <- aux[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
@@ -1995,19 +1995,104 @@ nnrrStabelGrvar(plotMatrise=plotdata,
 
 
 <<'Fig. Tid fra henvisning til behandling', include=FALSE, echo=FALSE, eval=T>>=
+outfile<-paste0(figfolder, 'VentetidFraHenvisning_fordeling.pdf')
+valgtVar <- "VentetidFraHenvisning_kat"
+plotdata <- nnrr::nnrrBeregnAndeler(
+  RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=0,
+  minald=0, maxald=130, erMann=99, reshID=reshID)
+nnrr::nnrrSoyleplot(plotdata = plotdata,
+                    outfile=outfile)
+
+outfile <- paste0(figfolder, "ventetid_krav.pdf")
+valgtVar <- "ventetid_krav"
+plotdata <- nnrr::nnrrBeregnAndelTid(
+  RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=0,
+  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+  tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
 
 
+
+indikator <- RegDataAll %>%
+  filter(VentetidFraHenvisningTilBesok > 0) %>%
+  filter(Aar <= rap_aar) %>%
+  mutate(Teller = if_else(VentetidFraHenvisningTilBesok > 50, 0, 1)) %>%
+  select("UnitId", "Aar", "Teller", "SykehusNavn") %>%
+  mutate(Nevner = 1) %>%
+  rename(ReshId = UnitId)
+
+outfile <- paste0(figfolder, "ventetid_under_50_shusvis.pdf")
+nnrrFigIndikator(indikator, c('Andel pasienter med ventetid',
+                              '50 dager eller mindre'), outfile=outfile)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigIndikator(indikator, 'Andel kvinner', outfile=outfile)
+}
+
+
+plotdata <- RegDataAll %>%
+  filter(VentetidFraHenvisningTilBesok > 0) %>%
+  filter(Aar == rap_aar) %>%
+  summarise(gj.sn.ventetid = mean(VentetidFraHenvisningTilBesok),
+            sd.ventetid = sd(VentetidFraHenvisningTilBesok),
+            N = n(),
+            KI_ned = gj.sn.ventetid - 1.96*sd.ventetid/sqrt(N),
+            KI_opp = gj.sn.ventetid + 1.96*sd.ventetid/sqrt(N),
+            .by = c(SykehusNavn, Aar)) %>%
+  arrange(desc(gj.sn.ventetid))
+
+aux <- plotdata$gj.sn.ventetid
+# names(aux) <- paste0(plotdata$SykehusNavn, " (N=", plotdata$N, ")")
+# names(aux) <- plotdata$SykehusNavn
+
+outfile <- paste0(figfolder, "gj.sn.ventetid.pdf")
+FigTypUt <- rapFigurer::figtype(outfile=outfile, pointsizePDF=11,
+                                fargepalett='BlaaOff')
+# oldpar_mar <- par()$mar
+# oldpar_fig <- par()$fig
+# oldpar_oma <- par()$oma
+par('mar'=c(5.1, 8.1, 5.1, 3.1))
+xmax <- 1.1*max(plotdata$KI_opp)
+farger <- FigTypUt$farger
+ypos <- barplot(aux, las=1,
+                xlim=c(0,xmax),
+                horiz=T, col = farger[3],
+                border=NA, xlab = 'Gjennomsnittstid',
+                main = c("Gjennomsnittlig ventetid fra", "henvisning til besøk"))
+mtext( plotdata$SykehusNavn, side=2, line=0.2, las=1, at=ypos, col=1, cex=1.2)
+arrows(x0=plotdata$KI_ned, y0=ypos, x1=plotdata$KI_opp, y1=ypos,
+       length=0.5/max(ypos), code=3, angle=90, lwd=1.5, col=farger[1])
+text(x = 0, y = ypos, sprintf('%.1f', plotdata$gj.sn.ventetid), adj = 0, cex = 0.8)
+mtext( plotdata$N, side=4, line=2, las=1, at=ypos, col=1, cex=1.0, adj = 1)
+mtext( 'N', side=4, line=2, las=1, at=max(ypos)+1, col=1, cex=1.0, adj = 1)
+
+
+if ( outfile != '') {dev.off()}
 @
 
 
 
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}VentetidFraHenvisning_fordeling.pdf}
+\caption{VentetidFraHenvisning\_fordeling.pdf.}
+\end{figure}
 
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}ventetid_under_50_shusvis.pdf}
+\caption{ventetid\_under\_50\_shusvis.pdf. Gjelder \Sexpr{rap_aar}}
+\end{figure}
 
 
-
-
-
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}gj.sn.ventetid.pdf}
+\caption{gj.sn.ventetid.pdf. Gjelder \Sexpr{rap_aar}}
+\end{figure}
 
 \end{document}

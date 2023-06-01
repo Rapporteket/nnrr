@@ -24,13 +24,15 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
                      Andel = Antall/N*100)
 
 
-  AntTilfeller <- tidyr::spread(Tabell[, -c(4,5)], 'Aar', 'Antall')
-  AntTilfeller <- dplyr::bind_cols(SykehusNavn=c(AntTilfeller$SykehusNavn, "Nasjonalt"),
-                                   dplyr::bind_rows(AntTilfeller[,-1], colSums(AntTilfeller[,-1], na.rm = T)))
+  AntTilfeller <- tidyr::spread(Tabell[, -c(4,5)], 'Aar', 'Antall') %>%
+    janitor::adorn_totals(name = "Nasjonalt") %>% as_tibble()
+  # AntTilfeller <- dplyr::bind_cols(SykehusNavn=c(AntTilfeller$SykehusNavn, "Nasjonalt"),
+  #                                  dplyr::bind_rows(AntTilfeller[,-1], colSums(AntTilfeller[,-1], na.rm = T)))
 
-  N <- tidyr::spread(Tabell[, -c(3,5)], 'Aar', 'N')
-  N <- dplyr::bind_cols(SykehusNavn=c(N$SykehusNavn, "Nasjonalt"),
-                        dplyr::bind_rows(N[,-1], colSums(N[,-1], na.rm = T)))
+  N <- tidyr::spread(Tabell[, -c(3,5)], 'Aar', 'N') %>%
+    janitor::adorn_totals(name = "Nasjonalt") %>% as_tibble()
+  # N <- dplyr::bind_cols(SykehusNavn=c(N$SykehusNavn, "Nasjonalt"),
+  #                       dplyr::bind_rows(N[,-1], colSums(N[,-1], na.rm = T)))
   N[is.na(N)] <- 0
 
   # Andeler, inkludert nasjonalt
@@ -211,6 +213,11 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
       mtext( c(NA, purrr::as_vector(N[,3]), names(N)[3], NA, NA), side=4,
              line=6, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
       mtext( 'N', side=4, line=4.0, las=1, at=max(ypos), col=1, cex=cexgr*.7, adj = 1)
+    }
+    if (dim(N)[2] == 2) {
+      mtext( c(NA, purrr::as_vector(N[,2]), names(N)[2], NA, NA), side=4,
+             line=3, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
+      mtext( 'N', side=4, line=3, las=1, at=max(ypos), col=1, cex=cexgr*.7, adj = 1)
     }
 
   }
