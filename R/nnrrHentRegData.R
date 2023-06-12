@@ -14,7 +14,7 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
 
   pasientsvar_pre <-
     readr::read_csv2(
-      '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-05-09_1311.csv')
+      '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-06-01_1206.csv')
   legeskjema <-
     readr::read_csv2(
       '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-06-01_1206.csv')
