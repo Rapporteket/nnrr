@@ -609,9 +609,9 @@ dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
 
 map_dg2 <- data.frame(enhet=c("Sandnessjøen", "St Olavs", "Harstad", "Tromsø",
                               "Stavanger", "Oslo", "Møre og Romsdal", "Kristiansand",
-                              "Haukeland", "Drammen", "Levanger"),
+                              "Haukeland", "Drammen", "Levanger", "Stavern"),
                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
-                                  4212982, 114174, 102959, 103736, 105821))
+                                  4212982, 114174, 102959, 103736, 105821, 700138))
 
 dg_ny <- readr::read_csv2("~/mydata/nnrr/Dekningsgrad 2021 NNRR.csv",
                           locale = readr::locale(encoding = "Latin1"))
@@ -621,6 +621,17 @@ dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
 dg_ny$year <- 2021
 names(dg_ny)[2:3] <- c("denominator", "var")
 dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
+
+dg_2022 <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2022.csv",
+                          locale = readr::locale(encoding = "Latin1"))
+dg_2022$reshid <- map_dg2$avdresh[match(dg_2022$Enhet, map_dg2$enhet)]
+dg_2022$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_2022$reshid, map_resh_orgnr$resh)]
+dg_2022 <- dg_2022[!is.na(dg_2022$orgnr), ]
+dg_2022$year <- 2022
+names(dg_2022)[c(2,5)] <- c("denominator", "var")
+dg_2022 <- dg_2022[,c("orgnr", "year", "var", "denominator")]
+
+dg_ny <- dplyr::bind_rows(dg_ny, dg_2022)
 
 # dg$shus2 <- qmongrdata::SykehusNavnStruktur$SykehusNavn[match(dg$orgnr, qmongrdata::SykehusNavnStruktur$OrgNrShus)]
 #

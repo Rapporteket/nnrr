@@ -66,6 +66,7 @@ tabfolder <- "~/mydata/nnrr/tabeller_aarsrapp_2022/"
 if (!dir.exists(tabfolder)) {
   dir.create(tabfolder)
 }
+annetformat = ".svg"
 @
 
 \begin{document}
@@ -144,6 +145,10 @@ utdanning[, -dim(utdanning)[2]] <- apply(tmp, 2, function(x){paste0(x, "%")})
 print(xtable::xtable(utdanning, digits=0, align=c('l', rep('R{0.7in}', ncol(utdanning))), caption = paste0("Avdelingsvis oversikt over utdanningsnivå ", rap_aar), include.rownames=FALSE,
                      sanitize.text.function = identity), size = "\\scriptsize")
 
+write.csv2(utdanning,
+           paste0(tabfolder, "tab_utdanning.csv"), row.names = T,
+           fileEncoding = "Latin1")
+
 Utdanning_hoy <- RegDataAll %>%
   filter(!is.na(UtdanningHoy)) %>%
   filter(Aar <= rap_aar) %>%
@@ -159,6 +164,10 @@ Utdanning_hoy <- RegDataAll %>%
 outfile <- "UtdanningHoy.pdf"
 outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(Utdanning_hoy, c('Andel pasienter med',  'høyere utdanning'), outfile=outfile)
+if (!is.na(annetformat)) {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
+  nnrrFigIndikator(Utdanning_hoy, c('Andel pasienter med',  'høyere utdanning'), outfile=outfile)
+}
 @
 
 \begin{figure}[ht]
@@ -208,7 +217,7 @@ reshID <- 0
 enhetsUtvalg <- 0
 preprosess <- F
 hentData <- F
-annetformat = ".svg" #".wmf"
+#".wmf"
 
 valgtVar <- "FamilyStatus"
 outfile <- paste0(figfolder, "Sivilstatus.pdf")
@@ -236,45 +245,74 @@ if (!is.na(annetformat)) {
 % \addtolength{\voffset}{4.0cm}
 
 <<'Tab 2', results='asis', echo=FALSE>>=
-
-tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
-                    "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
+tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore",
+                    "NdiScore", "HSCL10.Score", "FABQScore1", "FABQScore2",
+                    "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
   dplyr::filter(Aar == rap_aar) %>%
-  dplyr::group_by (SykehusNavn) %>%
-  dplyr::summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
+  dplyr::summarise(Gj.snitt.odi = sum(OdiScore, na.rm = T),
                    N.odi = sum(!is.na(OdiScore)),
-                   Gj.snitt.ndi = mean(NdiScore, na.rm = T),
+                   Gj.snitt.ndi = sum(NdiScore, na.rm = T),
                    N.ndi = sum(!is.na(NdiScore)),
-                   Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+                   Gj.snitt.hscl10 = sum(HSCL10.Score, na.rm = T),
                    N.hscl10 = sum(!is.na(HSCL10.Score)),
-                   Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
+                   Gj.snitt.fabq.fysisk = sum(FABQScore1, na.rm = T),
                    N.FABQScore1 = sum(!is.na(FABQScore1)),
-                   Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
+                   Gj.snitt.fabq.arbeid = sum(FABQScore2, na.rm = T),
                    N.FABQScore2 = sum(!is.na(FABQScore2)),
-                   Gj.snitt.eq5d = mean(Score_EQ5DL, na.rm = T),
-                   N.eq5d = sum(!is.na(Score_EQ5DL)),
-                   Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
-                   N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
+                   Gj.snitt.eq5d = sum(Score_EQ5DL[Score_EQ5DL != -1]),
+                   N.eq5d = sum(Score_EQ5DL != -1),
+                   Gj.snitt.eq5d.vas = sum(Eq5d_L_spm6, na.rm = T),
+                   N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)),
+                   .by = SykehusNavn) %>%
+  arrange(SykehusNavn) %>%
+  janitor::adorn_totals(name = "Totalt") %>%
+  mutate(Gj.snitt.odi = Gj.snitt.odi/N.odi,
+         Gj.snitt.ndi = Gj.snitt.ndi/N.ndi,
+         Gj.snitt.hscl10 = Gj.snitt.hscl10/N.hscl10,
+         Gj.snitt.fabq.fysisk = Gj.snitt.fabq.fysisk/N.FABQScore1,
+         Gj.snitt.fabq.arbeid, Gj.snitt.fabq.arbeid/N.FABQScore2,
+         Gj.snitt.eq5d = Gj.snitt.eq5d/N.eq5d,
+         Gj.snitt.eq5d.vas = Gj.snitt.eq5d.vas/N.eq5d.vas)
 
-tot <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
-                   "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
-  dplyr::filter(Aar == rap_aar) %>%
-  dplyr::summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
-                   N.odi = sum(!is.na(OdiScore)),
-                   Gj.snitt.ndi = mean(NdiScore, na.rm = T),
-                   N.ndi = sum(!is.na(NdiScore)),
-                   Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
-                   N.hscl10 = sum(!is.na(HSCL10.Score)),
-                   Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
-                   N.FABQScore1 = sum(!is.na(FABQScore1)),
-                   Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
-                   N.FABQScore2 = sum(!is.na(FABQScore2)),
-                   Gj.snitt.eq5d = mean(Score_EQ5DL, na.rm = T),
-                   N.eq5d = sum(!is.na(Score_EQ5DL)),
-                   Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
-                   N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
 
-tab2 <- dplyr::bind_rows(tab2, data.frame(SykehusNavn='Totalt', tot))
+# tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
+#                     "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
+#   dplyr::filter(Aar == rap_aar) %>%
+#   dplyr::group_by (SykehusNavn) %>%
+#   dplyr::summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
+#                    N.odi = sum(!is.na(OdiScore)),
+#                    Gj.snitt.ndi = mean(NdiScore, na.rm = T),
+#                    N.ndi = sum(!is.na(NdiScore)),
+#                    Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+#                    N.hscl10 = sum(!is.na(HSCL10.Score)),
+#                    Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
+#                    N.FABQScore1 = sum(!is.na(FABQScore1)),
+#                    Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
+#                    N.FABQScore2 = sum(!is.na(FABQScore2)),
+#                    Gj.snitt.eq5d = mean(Score_EQ5DL, na.rm = T),
+#                    N.eq5d = sum(!is.na(Score_EQ5DL)),
+#                    Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
+#                    N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
+#
+# tot <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
+#                    "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
+#   dplyr::filter(Aar == rap_aar) %>%
+#   dplyr::summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
+#                    N.odi = sum(!is.na(OdiScore)),
+#                    Gj.snitt.ndi = mean(NdiScore, na.rm = T),
+#                    N.ndi = sum(!is.na(NdiScore)),
+#                    Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+#                    N.hscl10 = sum(!is.na(HSCL10.Score)),
+#                    Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
+#                    N.FABQScore1 = sum(!is.na(FABQScore1)),
+#                    Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
+#                    N.FABQScore2 = sum(!is.na(FABQScore2)),
+#                    Gj.snitt.eq5d = mean(Score_EQ5DL, na.rm = T),
+#                    N.eq5d = sum(!is.na(Score_EQ5DL)),
+#                    Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
+#                    N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
+#
+# tab2 <- dplyr::bind_rows(tab2, data.frame(SykehusNavn='Totalt', tot))
 tab2$Gj.snitt.odi <- paste0(round(tab2$Gj.snitt.odi, 1), ' (', tab2$N.odi, ')')
 tab2$Gj.snitt.ndi <- paste0(round(tab2$Gj.snitt.ndi, 1), ' (', tab2$N.ndi, ')')
 tab2$Gj.snitt.hscl10 <- paste0(round(tab2$Gj.snitt.hscl10, 2), ' (', tab2$N.hscl10, ')')
@@ -283,13 +321,30 @@ tab2$Gj.snitt.fabq.arbeid <- paste0(round(tab2$Gj.snitt.fabq.arbeid, 1), ' (', t
 tab2$Gj.snitt.eq5d <- paste0(round(tab2$Gj.snitt.eq5d, 2), ' (', tab2$N.eq5d, ')')
 tab2$Gj.snitt.eq5d.vas <- paste0(round(tab2$Gj.snitt.eq5d.vas, 1), ' (', tab2$N.eq5d.vas, ')')
 
-print(xtable::xtable(tab2[, c("SykehusNavn", "Gj.snitt.odi", "Gj.snitt.ndi", "Gj.snitt.hscl10")], digits=0, align=c('l', 'l', rep('r', 3)),
-                     caption = paste0('Pasientrapporterte scoringer. Oswestry funksjons-score (odi) hvor $<$22\\% normal/minimal, 22-40\\% moderat nedsatt, 41-60\\% betydelig, $>$61\\% særlig uttalt. Funksjonsnedsettelse ved nakkeplager (ndi) 0-4 normal, 5-14 mild, 15-24 moderat, 25-34 uttalt, $>$34 særlig uttalt. Psykisk symptomtrykk (hscl 10) hvor $\\geq$ 1.85 indikerer betydelige plager. Antall aktuelle i parentes. Gjelder ', rap_aar)), include.rownames=FALSE)
+print(xtable::xtable(
+  tab2[, c("SykehusNavn", "Gj.snitt.odi", "Gj.snitt.ndi", "Gj.snitt.hscl10")],
+  digits=0, align=c('l', 'l', rep('r', 3)),
+  caption = paste0('Pasientrapporterte scoringer. Oswestry funksjons-score
+                                      (odi) hvor $<$22\\% normal/minimal, 22-40\\% moderat nedsatt,
+                                      41-60\\% betydelig, $>$61\\% særlig uttalt. Funksjonsnedsettelse
+                                      ved nakkeplager (ndi) 0-4 normal, 5-14 mild, 15-24 moderat,
+                                      25-34 uttalt, $>$34 særlig uttalt. Psykisk symptomtrykk (hscl 10)
+                                      hvor $\\geq$ 1.85 indikerer betydelige plager. Antall aktuelle i
+                                      parentes. Gjelder ', rap_aar)),
+  include.rownames=FALSE)
 
 print(xtable::xtable(tab2[, c("SykehusNavn", "Gj.snitt.fabq.fysisk",
                               "Gj.snitt.fabq.arbeid", "Gj.snitt.eq5d", "Gj.snitt.eq5d.vas")],
                      digits=0, align=c('l', 'l', rep('r', 4)),
-                     caption = paste0('Unngåelsesadferd fysisk (fabq.fysisk) $<$14 ubetydelig, 14 -16 moderat, $\\geq$17 høy. Unngåelsesadferd arbeid (fabq.arbeid) $<$20 ubetydelig, 20-24 moderat, $\\geq$25 høy. Livskvalitet (eq5d) $>$0.75 normal, 0.6-0.74 moderat nedsatt, 0.4-0.59 betydelig nedsatt, $<$0.4 særlig uttalt nedsatt helse/helserelatert livskvalitet. Gradering egen helse (eq5d.vas) 100-90\\% god helse, 80-89 lett nedsatt, 60-79 moderat nedsatt, $<$60 betydelig nedsatt helse. Antall aktuelle i parentes. Gjelder ', rap_aar)), include.rownames=FALSE)
+                     caption = paste0('Unngåelsesadferd fysisk (fabq.fysisk) $<$14 ubetydelig,
+                                      14 -16 moderat, $\\geq$17 høy. Unngåelsesadferd arbeid
+                                      (fabq.arbeid) $<$20 ubetydelig, 20-24 moderat, $\\geq$25 høy.
+                                      Livskvalitet (eq5d) $>$0.75 normal, 0.6-0.74 moderat nedsatt,
+                                      0.4-0.59 betydelig nedsatt, $<$0.4 særlig uttalt nedsatt
+                                      helse/helserelatert livskvalitet. Gradering egen helse (eq5d.vas)
+                                      100-90\\% god helse, 80-89 lett nedsatt, 60-79 moderat nedsatt,
+                                      $<$60 betydelig nedsatt helse. Antall aktuelle i parentes.
+                                      Gjelder ', rap_aar)), include.rownames=FALSE)
 
 write.csv2(tab2[, c("SykehusNavn", "Gj.snitt.fabq.fysisk",
                     "Gj.snitt.fabq.arbeid", "Gj.snitt.eq5d",
@@ -1368,7 +1423,8 @@ print(xtable::xtable(tab17, digits=0, align=c('l',rep('R{0.6in}', ncol(tab17))),
 Tabell_Tverrfaglig <- nnrrIndikatorTabell(RegData, indikator = 'Tverrfaglig_vurdering')
 print(xtable::xtable(Tabell_Tverrfaglig, digits=c(0,0,0,0,0,1), caption='Andel som har blitt vurdert av to eller flere yrkesgrupper ved konsultasjon.'), include.rownames=FALSE)
 
-# write.csv2(Tabell_Tverrfaglig, paste0(tabfolder, "tab_tverrfagl_vurdert.csv"), row.names = F, fileEncoding = "Latin1")
+write.csv2(Tabell_Tverrfaglig, paste0(tabfolder, "tab_tverrfagl_vurdert.csv"), row.names = F, fileEncoding = "Latin1")
+
 
 Tabell_enfaglig <- RegData[, c("SykehusNavn", "FirstMedExamDoctor", "FirstMedExamNurse",
                                "FirstMedExamPhys", "FirstMedExamOther",
@@ -1593,7 +1649,7 @@ nnrrFigIndikator(indikator, c('Andel pasienter med 3 eller flere helseplager',
                               'besvart med en del eller alvorlig plaget'), outfile=outfile)
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigIndikator(indikator, 'Andel kvinner', outfile=outfile)
+  nnrrFigIndikator(indikator, 'Andel pasienter med 3 eller flere helseplager', outfile=outfile)
 }
 
 
@@ -1957,6 +2013,10 @@ print(xtable::xtable(
   caption=paste0("Antall vurdert av ulike faggrupper i ", rap_aar)),
   include.rownames = F)
 
+write.csv2(aux,
+           paste0(tabfolder, "vurdert_faggrupper.csv"), row.names = F,
+           fileEncoding = "Latin1")
+
 @
 
 % \end{landscape}
@@ -2028,7 +2088,8 @@ nnrrFigIndikator(indikator, c('Andel pasienter med ventetid',
                               '50 dager eller mindre'), outfile=outfile)
 if (!is.na(annetformat)) {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigIndikator(indikator, 'Andel kvinner', outfile=outfile)
+  nnrrFigIndikator(indikator, c('Andel pasienter med ventetid',
+                                '50 dager eller mindre'), outfile=outfile)
 }
 
 
