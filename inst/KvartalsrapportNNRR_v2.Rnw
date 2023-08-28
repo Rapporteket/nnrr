@@ -11,6 +11,7 @@
 \usepackage{array}
 \usepackage{hyphsubst}
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newif\ifinkl
 
 \title{Kvartalsrapport for NNRR}
 \author{NNRR}
@@ -49,6 +50,9 @@ library(lubridate)
 # 103736 <- 'Drammen'
 # 700138 <- 'Stavern'
 reshID <- 700138
+Inkl_i_rapp <- ifelse(reshID %in% c(114174, 104293, 109834, 700138),
+                      "\\inkltrue", "\\inklfalse")
+
 
 datoTil <- Sys.Date()
 datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
@@ -141,6 +145,7 @@ Templatversjon III, 2023
 
 
 \section{Bakgrunn}
+\Sexpr{Inkl_i_rapp}
 
 Norsk nakke- og ryggregister (NNRR) er et tjenesteregister som inkluderer pasienter med smerter i nakke eller rygg som behandles ved de spesialiserte tverrfaglige nakke- og ryggpoliklinikkene ved sykehusene. Totalt er det 16 potensielle poliklinikker. Når alle disse er tilknyttet vil registeret vil ha en komplett oversikt over slik utredning og behandling i Norge. I 2019 leverte kun fire poliklinikker til registeret, mens i 2022 er totalt 12 poliklinikker tilknyttet. Resterende tverrfaglige nakke- og ryggpoliklinikker vil knyttes til fortløpende. \\ \\
 
@@ -247,6 +252,27 @@ nnrr::nnrrTidsplot(plotdata = plotdata,
                    outfile=outfile, maal = 30,
                    maalnivaatxt = "Mål",
                    inkl_konf = 0)
+
+outfile <- paste0(figfolder, "andel_tverrfaglig_tolk.pdf")
+valgtVar <- "andel_tverrfaglig_tolk"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", maal = 30, maalnivaatxt = "Mål")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile, maal = 30,
+                   maalnivaatxt = "Mål",
+                   inkl_konf = 0)
+
+outfile <- paste0(figfolder, "andel_tverrfaglig_ikkenorsk.pdf")
+valgtVar <- "andel_tverrfaglig_ikkenorsk"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", maal = 30, maalnivaatxt = "Mål")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile, maal = 30,
+                   maalnivaatxt = "Mål",
+                   inkl_konf = 0)
+
 
 outfile <- paste0(figfolder, "individuell_oppfolging.pdf")
 valgtVar <- "individuell_oppfolging"
@@ -465,6 +491,21 @@ nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_12mnd", datoFra=datoFra, 
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}andel_tverrfaglig.pdf}
 \caption{Andel pasienter anbefalt tverrfaglig behandling (individuelt eller i gruppe) i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
 \end{figure}
+
+
+\ifinkl
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}andel_tverrfaglig_tolk.pdf}
+\caption{Andel pasienter med tolk som er anbefalt tverrfaglig behandling (individuelt eller i gruppe) i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}andel_tverrfaglig_ikkenorsk.pdf}
+\caption{Andel ikke-norske pasienter som er anbefalt tverrfaglig behandling (individuelt eller i gruppe) i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
+\end{figure}
+\fi
 
 \begin{figure}[ht]
 \centering

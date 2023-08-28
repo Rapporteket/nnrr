@@ -33,6 +33,30 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
 
+  if (valgtVar=='andel_tverrfaglig_tolk') {
+    tittel <- c("Andel tverrfaglig behandlet blant", "pasienter som mottar tolk")
+    RegData <- RegData[RegData$NationalInterpreter %in% 1, ]
+    RegData <- RegData[RegData$regstatus==1, ]
+    RegData$Variabel <- 0
+    RegData$Variabel[RegData$Treatment_GroupInterdisciplinary2018 != 0 |
+                       RegData$Treatment_GroupInterdisciplinary != 0] <- 1
+    RegData$Variabel[RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='andel_tverrfaglig_ikkenorsk') {
+    tittel <- c("Andel tverrfaglig behandlet blant", "ikke-norske pasienter")
+    RegData <- RegData[RegData$NationalCountry %in% 2:7, ]
+    RegData <- RegData[RegData$regstatus==1, ]
+    RegData$Variabel <- 0
+    RegData$Variabel[RegData$Treatment_GroupInterdisciplinary2018 != 0 |
+                       RegData$Treatment_GroupInterdisciplinary != 0] <- 1
+    RegData$Variabel[RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
   if (valgtVar=='ind_raad_livsstil') {
     tittel <- c("Individuell rådgivning vedrørende", "livsstil og/eller medikamenter")
     RegData <- RegData[RegData$TreatmentCouncellingLifeStyleAndMedication %in% 1:2, ]
