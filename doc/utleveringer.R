@@ -1,7 +1,7 @@
 rm(list=ls())
 library(nnrr)
 
-########## Utlevering hianor 15.02.2023 #######################################
+########## Utlevering hianor 28.08.2023 #######################################
 library(dplyr)
 
 kobling <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-08-24_1104_fnr.csv')
