@@ -1,7 +1,7 @@
 rm(list=ls())
 library(nnrr)
 
-########## Utlevering hianor 28.08.2023 #######################################
+########## Utlevering hianor 28.08.2023 og 31.08 (med 12 mnd-data) #######################################
 library(dplyr)
 
 kobling <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-08-24_1104_fnr.csv')
@@ -13,10 +13,13 @@ pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskje
 legeskjema <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-08-24_1039.csv') %>%
   filter(PasientGUID %in% pasientliste$PasientGUID)
 pasientsvar_post <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2023-08-24_1039.csv')
+pasientsvar_post2 <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2023-08-24_1040.csv')
 
-legeskjema <- legeskjema[which(as.Date(legeskjema$S1b_DateOfCompletion, format="%d.%m.%Y") >= "2016-01-01"), ]
+legeskjema <- legeskjema[which(as.Date(legeskjema$S1b_DateOfCompletion, format="%d.%m.%Y") >= "2016-01-01" &
+                                 as.Date(legeskjema$S1b_DateOfCompletion, format="%d.%m.%Y") <= "2023-01-15"), ]
 pasientsvar_pre <- pasientsvar_pre[pasientsvar_pre$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
 pasientsvar_post <- pasientsvar_post[pasientsvar_post$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+pasientsvar_post2 <- pasientsvar_post2[pasientsvar_post2$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
 
 ikkemed <- c("BackSurgery", "NeckSurgery", "PelvisSurgery", "Radiological_None", "RadiologicalUS_CT", "RadiologicalUS_MR",
              "RadiologicalUS_Radikulgraphy", "RadiologicalUS_Discography", "RadiologicalUS_LS_C_Columna",
@@ -35,13 +38,13 @@ legeskjema <- merge(legeskjema, pasientliste[, c("PasientGUID", "pseudonym")],
                          by = "PasientGUID")
 pasientsvar_post <- merge(pasientsvar_post, pasientliste[, c("PasientGUID", "pseudonym")],
                          by = "PasientGUID")
+pasientsvar_post2 <- merge(pasientsvar_post2, pasientliste[, c("PasientGUID", "pseudonym")],
+                          by = "PasientGUID")
 
-readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/skjema1a_2808023.csv")
-readr::write_csv2(legeskjema, "~/mydata/nnrr/skjema1b_2808023.csv")
-readr::write_csv2(pasientsvar_post, "~/mydata/nnrr/skjema2_2808023.csv")
-
-
-
+readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/pasientsvar_pre_3108023.csv")
+readr::write_csv2(legeskjema, "~/mydata/nnrr/legeskjema_3108023.csv")
+readr::write_csv2(pasientsvar_post, "~/mydata/nnrr/pasientsvar_post6mnd_3108023.csv")
+readr::write_csv2(pasientsvar_post, "~/mydata/nnrr/pasientsvar_post12mnd_3108023.csv")
 
 
 ######### Utlevering John Bjørneboe mars 2023  ########################################
