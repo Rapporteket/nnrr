@@ -137,6 +137,16 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
 
+  if (valgtVar=='fabq11_v2') {
+    tittel <- "FABQ11"
+    RegData <- RegData[RegData$regstatus==1, ]
+    RegData <- RegData[!is.na(RegData$FabQ11), ]
+    RegData$Variabel <- 1
+    RegData$Variabel[RegData$FabQ11 %in% 0:2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
   if (valgtVar=='Oppfolging_utfylt_6mnd') {
     tittel <- "Utfylt oppfølging"
     RegData <- RegData[RegData$regstatus==1, ]
@@ -176,7 +186,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='odi_klinisk_viktig') {
-    tittel <- "Funksjonsbedring 6 mnd"
+    tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
     RegData$Variabel <- 0
     RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post) >= 10] <- 1
@@ -185,7 +195,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='odi_klinisk_viktig_6mnd') {
-    tittel <- "Funksjonsbedring 6 mnd"
+    tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
     RegData$Variabel <- 0
     RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post)/RegData$OdiScore >= .3] <- 1
@@ -194,7 +204,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='odi_klinisk_viktig_12mnd') {
-    tittel <- "Funksjonsbedring 12 mnd"
+    tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post2), ]
     RegData$Variabel <- 0
     RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post2)/RegData$OdiScore >= .3] <- 1
@@ -203,7 +213,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='bedring_smerte_hvile_6mnd') {
-    tittel <- "Klinisk bedring av smerte i hvile 6 mnd"
+    tittel <- "Klinisk bedring av smerte i hvile"
     RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
                                     !is.na(PainExperiencesNoActivity_post) & PainExperiencesNoActivity != 0)
     RegData$pstEndringSmerteHvile <- (RegData$PainExperiencesNoActivity -
@@ -215,7 +225,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='bedring_smerte_hvile_12mnd') {
-    tittel <- "Klinisk bedring av smerte i hvile 12 mnd"
+    tittel <- "Klinisk bedring av smerte i hvile"
     RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post2 == 1 & !is.na(PainExperiencesNoActivity) &
                                            !is.na(PainExperiencesNoActivity_post2) & PainExperiencesNoActivity != 0)
     RegData$pstEndringSmerteHvile <- (RegData$PainExperiencesNoActivity -
@@ -227,7 +237,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='bedring_smerte_aktiv_6mnd') {
-    tittel <- "Klinisk bedring av smerte i aktivitet 6 mnd"
+    tittel <- "Klinisk bedring av smerte i aktivitet"
     RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
                                     !is.na(PainExperiencesActivity_post) & PainExperiencesActivity != 0)
     RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
@@ -239,7 +249,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='bedring_smerte_aktiv_12mnd') {
-    tittel <- "Klinisk bedring av smerte i aktivitet 12 mnd"
+    tittel <- "Klinisk bedring av smerte i aktivitet"
     RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post2 == 1 & !is.na(PainExperiencesActivity) &
                                            !is.na(PainExperiencesActivity_post2) & PainExperiencesActivity != 0)
     RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
@@ -262,7 +272,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='fornoyd_6mnd') {
-    tittel <- "Fornøyd med behandling 6 mnd"
+    tittel <- "Fornøyd med behandling"
     RegData <- RegData[which(RegData$regstatus==1 & RegData$regstatus_post==1 &
                                RegData$TreatmentSatisfaction != 0 &
                                !is.na(RegData$TreatmentSatisfaction)), ]
@@ -273,7 +283,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='fornoyd_12mnd') {
-    tittel <- "Fornøyd med behandling 12 mnd"
+    tittel <- "Fornøyd med behandling"
     RegData <- RegData[which(RegData$regstatus==1 & RegData$regstatus_post2==1 &
                                RegData$TreatmentSatisfaction_post2 != 0 &
                                !is.na(RegData$TreatmentSatisfaction_post2)), ]

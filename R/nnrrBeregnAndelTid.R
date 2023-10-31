@@ -42,10 +42,16 @@ nnrrBeregnAndelTid <- function(RegData,
                     dato_oppfolg = "6-mnd oppfølging",
                     dato_oppfolg2 = "12-mnd oppfølging"
   )
-  xaksetxt <- switch(tidsenhet, Aar=paste0("År for ", datotxt),
+  xaksetxt <- switch(tidsenhet,
+                     Aar=paste0("År for ", datotxt),
                      Mnd=paste0("År og måned for ", datotxt),
                      Kvartal=paste0("År og kvartal for ", datotxt),
                      Halvaar=paste0("År og halvår for ", datotxt))
+  xaksetxt2 <- switch(tidsenhet,
+                      Aar="År for oppfølging",
+                      Mnd="År og måned for oppfølging",
+                      Kvartal="År og kvartal for oppfølging",
+                      Halvaar="År og halvår for oppfølging")
 
   # Sykehustekst avhengig av bruker og brukervalg
   if (enhetsUtvalg==0) {
@@ -143,9 +149,11 @@ nnrrBeregnAndelTid <- function(RegData,
 
   # FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett)
   # farger <- FigTypUt$farger
+  tittel2 <- tittel
   tittel <-  c(tittel, shtxt)
 
   utData <- list(tittel = tittel,
+                 tittel2 = tittel2,
                  utvalgTxt = utvalgTxt,
                  Andeler = list(AndelHoved=AndelHoved, AndelRest=AndelRest),
                  Tidtxt = Tidtxt,
@@ -159,7 +167,8 @@ nnrrBeregnAndelTid <- function(RegData,
                  AndelHovedGjsn=AndelHovedGjsn,
                  AndelRestGjsn=AndelRestGjsn,
                  maal=maal,
-                 xaksetxt=xaksetxt)
+                 xaksetxt=xaksetxt,
+                 xaksetxt2=xaksetxt2)
   return(invisible(utData))
 }
 

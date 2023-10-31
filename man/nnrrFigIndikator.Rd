@@ -27,7 +27,6 @@ nnrrFigIndikator(
 }
 \arguments{
 \item{indikatordata}{En dataramme med følgende kolonner:
-- ReshId
 - Aar
 - Teller
 - Sykehusnavn}
