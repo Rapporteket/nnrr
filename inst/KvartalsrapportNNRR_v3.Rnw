@@ -49,7 +49,7 @@ library(lubridate)
 # 105821 <- 'Levanger'
 # 103736 <- 'Drammen'
 # 700138 <- 'Stavern'
-reshID <- 700138
+reshID <- 601032
 Inkl_i_rapp <- ifelse(reshID %in% c(114174, 104293, 109834, 700138),
                       "\\inkltrue", "\\inklfalse")
 
@@ -499,6 +499,13 @@ nnrrFigAndelGrvar(RegData, valgtVar=valgtVar, datoFra=datoFra,
                   minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
                   grtittel="Behandling i spesialisthelsetjenesten")
 
+outfile <- paste0(figfolder, "fornoyd_gruppert.pdf")
+nnrrFigAndelGrvar_6og12mnd(RegData, valgtVar1 = "fornoyd_6mnd",
+                  valgtVar2 = "fornoyd_12mnd", datoFra=datoFra,
+                  datoTil=datoTil, enhetsUtvalg=1,
+                  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
+                  grtittel="Behandling i spesialisthelsetjenesten")
+
 outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert_6mnd.pdf")
 nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_6mnd", datoFra=datoFra,
                   datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
@@ -508,6 +515,15 @@ nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_6mnd", datoFra=datoFra,
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert_12mnd.pdf")
 nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_12mnd",
+                  datoFra=datoFra, datoTil=datoTil,
+                  enhetsUtvalg=1, datovar="dato_oppfolg2",
+                  minald=0, maxald=130, erMann=99, outfile=outfile,
+                  reshID=reshID, grvar="beh_spes_v3",
+                  grtittel="Behandling i spesialisthelsetjenesten")
+
+outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert.pdf")
+nnrrFigAndelGrvar_6og12mnd(RegData, valgtVar1="opplevd_nytte_beh_6mnd",
+                  valgtVar2="opplevd_nytte_beh_12mnd",
                   datoFra=datoFra, datoTil=datoTil,
                   enhetsUtvalg=1, datovar="dato_oppfolg2",
                   minald=0, maxald=130, erMann=99, outfile=outfile,
@@ -606,16 +622,22 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \end{figure}
 
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert_6mnd.pdf}
-\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 6 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
-\end{figure}
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert_6mnd.pdf}
+% \caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 6 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
+% \end{figure}
+%
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert_12mnd.pdf}
+% \caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 12 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
+% \end{figure}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert_12mnd.pdf}
-\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 12 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert.pdf}
+\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 6 og 12 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
 \end{figure}
 
 \clearpage
@@ -656,16 +678,24 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_gruppert_6mnd.pdf}
-\caption{Andel pasienter som 6 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
-\end{figure}
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_gruppert_6mnd.pdf}
+% \caption{Andel pasienter som 6 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
+% \end{figure}
+%
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_gruppert_12mnd.pdf}
+% \caption{Andel pasienter som 12 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
+% \end{figure}
+
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_gruppert_12mnd.pdf}
-\caption{Andel pasienter som 12 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_gruppert.pdf}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
 \end{figure}
+
 
 \end{document}
