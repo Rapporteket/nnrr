@@ -1,6 +1,19 @@
 rm(list=ls())
 library(nnrr)
 
+########## Pasienter som mangler 6mnd-oppfølging 2021-2023 (halve) #######################################
+library(dplyr)
+RegData <- nnrr::nnrrHentRegData()
+mangler_oppf <- RegData %>%
+  filter(S1b_DateOfCompletion >= "2021-01-01",
+         S1b_DateOfCompletion < "2023-07-01",
+         regstatus == 1,
+         regstatus_post == 0) %>%
+  select(PasientGUID) %>%
+  readr::write_csv2("~/mydata/nnrr/mangler_oppf_per_07des2023.csv")
+
+
+
 ########## Utlevering hianor 28.08.2023 og 31.08 (med 12 mnd-data) #######################################
 library(dplyr)
 
