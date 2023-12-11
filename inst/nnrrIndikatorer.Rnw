@@ -39,7 +39,7 @@ library(tidyverse)
 library(lubridate)
 options(dplyr.summarise.inform = FALSE)
 
-rap_aar <- 2022
+rap_aar <- 2023
 
 icd10 <- read.table('~/mydata/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 RegData <- nnrr::nnrrHentRegData()
@@ -58,13 +58,15 @@ map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
                                           974795639, 974703300,
                                           974795477, 974733013,
                                           974754118, 974747138,
-                                          974631326, 974575396),
+                                          974631326, 974575396,
+                                          993562718),
                              resh = c(109834, 104293,
                                       102959,  601032,
                                       700735, 4211588,
                                       102169, 114174,
                                       105821, 4212982,
-                                      103736, 700138))
+                                      103736, 700138,
+                                      700701))
 
 # kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
