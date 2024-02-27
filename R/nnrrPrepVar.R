@@ -371,18 +371,18 @@ nnrrPrepVar <- function(RegData, valgtVar)
     # N <- dim(RegData)[1]
     AntVar <- apply(RegData[,c("Treatment_NoTreatment", "Treatment_FollowUpMunicipality", "Treatment_FollowUpFysioterapeut",
                                "Treatment_FollowUpManuellTerapeut", "Treatment_FollowUpKiropraktor", "Treatment_FollowUpPsykolog",
-                               "Treatment_FollowUpKommunalt", "Treatment_FollowUpMunicipalityOther")],
+                               "Treatment_FollowUpMunicipalityOther")],
                     2, function(x){sum(as.numeric(x), na.rm = T)})
     NVar<- apply(RegData[,c("Treatment_NoTreatment", "Treatment_FollowUpMunicipality", "Treatment_FollowUpFysioterapeut",
                             "Treatment_FollowUpManuellTerapeut", "Treatment_FollowUpKiropraktor", "Treatment_FollowUpPsykolog",
-                            "Treatment_FollowUpKommunalt", "Treatment_FollowUpMunicipalityOther")],
+                            "Treatment_FollowUpMunicipalityOther")],
                  2, function(x){length(which(!is.na(x)))})
     # NVar<-rep(N, length(AntVar))
     N <- max(NVar)
     grtxt <- c('Ingen behandling', 'Oppfølging av lege', 'Oppfølging av fysioterapeut',
                'Oppfølging av manuell terapeut',
                'Oppfølging av kiropraktor', 'Oppfølging av psykolog',
-               'Oppfølging i kommunehelsetjenesten', 'Arbeidsrettet oppfølging')
+               'Arbeidsrettet oppfølging')
     retn <- 'H'
 
   }
@@ -404,14 +404,14 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$Treatment_GroupInterdisciplinary3[RegData$Treatment_GroupInterdisciplinary2018==4 | RegData$Treatment_GroupInterdisciplinary==3] <- 1
 
     AntVar <- apply(RegData[,c("Treatment_TreatmentInSpecialistServices", "Treatment_FollowUpOperation",
-                               "Treatment_TreatmentOtherRehabCentre", "Treatment_TreatmentOwnSpecialistServices",
+                               "Treatment_TreatmentOtherRehabCentre",
                                "Treatment_ControlAfterReviewOrTreatment", "Treatment_IndividualFollowUp1to2Times",
                                "Treatment_InvidualInterdisciplinary1", "Treatment_InvidualInterdisciplinary2",
                                "Treatment_InvidualInterdisciplinary3", "Treatment_GroupInterdisciplinary1",
                                "Treatment_GroupInterdisciplinary2", "Treatment_GroupInterdisciplinary3")],
                     2, function(x){sum(as.numeric(x), na.rm = T)})
     NVar<- apply(RegData[,c("Treatment_TreatmentInSpecialistServices", "Treatment_FollowUpOperation",
-                            "Treatment_TreatmentOtherRehabCentre", "Treatment_TreatmentOwnSpecialistServices",
+                            "Treatment_TreatmentOtherRehabCentre",
                             "Treatment_ControlAfterReviewOrTreatment", "Treatment_IndividualFollowUp1to2Times",
                             "Treatment_InvidualInterdisciplinary1", "Treatment_InvidualInterdisciplinary2",
                             "Treatment_InvidualInterdisciplinary3", "Treatment_GroupInterdisciplinary1",
@@ -421,7 +421,6 @@ nnrrPrepVar <- function(RegData, valgtVar)
     N <- max(NVar)
     grtxt <- c('Behandling i\n spesialhelsetjenesten', 'Henvist til vurdering\n av operasjon',
                'Anbefaler henvisning til annet\n opptrenings /rehabiliteringssenter',
-               'Behandling som settes i verk\n i egen spesialisthelsetjeneste',
                'Kontroll etter vurdering \n eller behandling', 'Individuell oppfølging\n 1-2 ganger',
                'Individuell tverrfaglig \n behandling 1-3 ganger', 'Individuell tverrfaglig\n behandling 4-10 ganger',
                'Individuell tverrfaglig\n behandling mer enn 10 ganger', 'Tverrfaglig behandling\n i gruppe 1-3 ganger',

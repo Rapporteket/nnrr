@@ -22,10 +22,13 @@ nnrrPreprosess <- function(RegData)
     apply(RegData[, boolske_var], 2, as.logical)
   RegData$TreatmentOperation <- as.logical(RegData$TreatmentOperation)
 
-  RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion", "S1b_DateOfCompletion_pre",
-              "S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")] <-
-    dplyr::mutate_all(RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
-                           "S1b_DateOfCompletion_pre","S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")],
+  RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
+              "S1b_DateOfCompletion_pre", "S1b_DateOfCompletion_post",
+              "DateOfCompletion", "DateOfCompletion_post2")] <-
+    dplyr::mutate_all(RegData[, c("FormDate", "FormDate_pre", "FormDate_post",
+                                  "S1b_DateOfCompletion", "S1b_DateOfCompletion_pre",
+                                  "S1b_DateOfCompletion_post", "DateOfCompletion",
+                                  "DateOfCompletion_post2")],
                       list(~ as.Date(., format="%d.%m.%Y")))
   RegData$Besoksdato <- RegData$S1b_DateOfCompletion
 
@@ -105,7 +108,7 @@ nnrrPreprosess <- function(RegData)
   RegData$SykehusNavn[RegData$UnitId == 105821] <- 'Levanger'
   RegData$SykehusNavn[RegData$UnitId == 103736] <- 'Drammen'
   RegData$SykehusNavn[RegData$UnitId == 700138] <- 'Stavern'
-  RegData$SykehusNavn[RegData$UnitId == 700701] <- 'Nordlandssykehuset'
+  RegData$SykehusNavn[RegData$UnitId == 700701] <- 'NLSH'
 
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel')] <- 'EQ5D.VAS'
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel_post')] <- 'EQ5D.VAS_post'
@@ -157,7 +160,11 @@ nnrrPreprosess <- function(RegData)
                                                                                         'Alderspensjonist', 'Hjemmeværende',
                                                                                         'Sykemeldt', 'Arbeidsavklaringspenger',
                                                                                         'Permanent uførepensjon'))
-  RegData$Tverrfaglig_vurdering_antall <- rowSums(RegData[, c("FirstMedExamDoctor", "FirstMedExamNurse", "FirstMedExamPhys", "FirstMedExamOther")])
+  # RegData$Tverrfaglig_vurdering_antall <- rowSums(RegData[, c("FirstMedExamDoctor", "FirstMedExamNurse", "FirstMedExamPhys", "FirstMedExamOther")])
+  RegData$Tverrfaglig_vurdering_antall <-
+    rowSums(RegData[, c("TreatmentEvaluationByDoctor", "TreatmentEvaluationByPhysiotherapist",
+                        "TreatmentEvaluationByNurse", "TreatmentEvaluationByPsychologist",
+                        "TreatmentEvaluationBySocionom", "TreatmentEvaluationOther")])
   RegData$Tverrfaglig_vurdering <- 0
   RegData$Tverrfaglig_vurdering[RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
 
