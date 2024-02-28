@@ -19,11 +19,11 @@ nnrrFigGjsnGrVarTid <- function(RegData, valgtVar='PatientAge', tittel='', datoF
 
 {
 
-  # RegData<-RegDataAll; valgtVar='PatientAge'; tittel='Gjennomsnittsalder'; datoFra='2014-01-01'; datoTil='2019-12-31';
-  # minstekrav = NA; maal = NA; skriftStr=1.3; pktStr=1.4;
-  # minald=0; maxald=130; erMann=99; outfile=''; gr_var='SykehusNavn'; terskel=30;
-  # lavDG=""; decreasing=F; legPlass='top'; minstekravTxt='Min.'; maalTxt='Mål'; graaUt=NA;
-  # width=800; height=700; inkl_konf=F; maalretn='hoy'
+  RegData<-RegDataAll; valgtVar='PatientAge'; tittel='Gjennomsnittsalder'; datoFra='2014-01-01'; datoTil='2019-12-31';
+  minstekrav = NA; maal = NA; skriftStr=1.3; pktStr=1.4;
+  minald=0; maxald=130; erMann=99; outfile=''; gr_var='SykehusNavn'; terskel=30;
+  lavDG=""; decreasing=F; legPlass='top'; minstekravTxt='Min.'; maalTxt='Mål'; graaUt=NA;
+  width=800; height=700; inkl_konf=F; maalretn='hoy'
 
   RegData$Gr_var <- RegData[, gr_var]
 
@@ -62,11 +62,11 @@ nnrrFigGjsnGrVarTid <- function(RegData, valgtVar='PatientAge', tittel='', datoF
   gj.sn[gj.sn$Gr_var %in% lavDG, -1] <- NA
 
   # Ordne rekkefølge, stigende eller synkende
-  if (decreasing){
-    rekkefolge <- order(gj.sn[, dim(gj.sn)[2]], decreasing = decreasing, na.last = F)
-  } else {
-    rekkefolge <- order(gj.sn[, dim(gj.sn)[2]], decreasing = decreasing, na.last = F)
-  }
+  # if (decreasing){
+    rekkefolge <- order(gj.sn[[dim(gj.sn)[2]]], decreasing = decreasing, na.last = F)
+  # } else {
+  #   rekkefolge <- order(gj.sn[[dim(gj.sn)[2]]], decreasing = decreasing, na.last = F)
+  # }
 
   gj.sn <- gj.sn[rekkefolge, ]
   N <- N[rekkefolge, ]

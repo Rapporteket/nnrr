@@ -53,10 +53,6 @@ datasti <- if (rapbase::isRapContext()) {
 } else {"~/softlinks/mydata/nnrr/"}
 icd10 <- read.table(paste0(datasti, "icd10.csv"), sep=';',
                     header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
-# icd10 <- read.table(system.file(file='extdata/icd10.csv', package='nnrr'),
-#                     sep=';', header=T, stringsAsFactors = F,
-#                     fileEncoding = 'UTF-8')
-# system.file(file='extdata/icd10.csv', package='nnrr')
 
 figstr <- 0.61
 tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
