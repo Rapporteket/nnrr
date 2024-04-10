@@ -42,7 +42,7 @@ library(dplyr)
 library(tidyr)
 options(dplyr.summarise.inform = FALSE)
 
-rap_aar <- 2022
+rap_aar <- 2023
 
 RegData <- nnrr::nnrrHentRegData()
 RegDataAll <- RegData

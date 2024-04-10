@@ -17,16 +17,16 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
 
   pasientsvar_pre <-
     readr::read_csv2(
-        paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-02-07_1052.csv"))
+        paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-04-09_1333.csv"))
   legeskjema <-
     readr::read_csv2(
-      paste0(datasti, "DataDump_MRS-PROD_Behandlerskjema_2024-02-07_1052.csv"))
+      paste0(datasti, "DataDump_MRS-PROD_Behandlerskjema_2024-04-09_1333.csv"))
   pasientsvar_post <-
     readr::read_csv2(
-      paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-02-07_1052.csv"))
+      paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-04-09_1333.csv"))
   pasientsvar_post2 <-
     readr::read_csv2(
-      paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-02-07_1052.csv"))
+      paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-04-09_1333.csv"))
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){
