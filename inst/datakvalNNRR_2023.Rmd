@@ -161,6 +161,9 @@ enum_var1b <- enum_var1b[sapply((skjema1b[, enum_var1b]), class) != "character"]
 enum_var1a <- enum_var1a[sapply((skjema1a[, enum_var1a]), class) != "character"]
 enum_var2 <- enum_var2[sapply((skjema2[, enum_var2]), class) != "character"]
 
+skjema1a[, which(substr(names(skjema1a), 1, 4) == "UhiQ")] <-
+  skjema1a[, which(substr(names(skjema1a), 1, 4) == "UhiQ")] + 1
+
 skjema1a[, enum_var1a] <- apply(skjema1a[, enum_var1a], 2, function(x){as.numeric(!(x == 0 | is.na(x)))})
 skjema1b[, enum_var1b] <- apply(skjema1b[, enum_var1b], 2, function(x){as.numeric(!(x == 0 | is.na(x)))})
 skjema2[, enum_var2] <- apply(skjema2[, enum_var2], 2, function(x){as.numeric(!(x == 0 | is.na(x)))})

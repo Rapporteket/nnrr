@@ -6,18 +6,70 @@ library(tidyr)
 # RegData <- nnrr::nnrrHentRegData()
 pasientsvar_pre <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-03-14_1622.csv')
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-04-09_1333.csv')
 legeskjema <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-03-14_1622.csv')
+    '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-04-09_1333.csv')
+fnrfil <- readr::read_csv2(
+  '~/mydata/nnrr/validering2024/DataDump_MRS-PROD_Behandlerskjema_2024-04-12_1532.csv') %>%
+  dplyr::select(Fødselsnummer, PasientGUID) %>%
+  summarise(FNR = first(Fødselsnummer), .by = PasientGUID)
 pasientsvar_post <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-03-14_1622.csv')
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-04-09_1333.csv')
 pasientsvar_post2 <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-03-14_1622.csv')
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-04-09_1333.csv')
 filfolder <- "~/mydata/nnrr/validering2024/"
 fil1 <- paste0(filfolder, "Variabelliste.xlsx")
+
+### Trekk ut liste over pasienter:
+
+pasientsvar_post <- pasientsvar_post %>%
+  mutate(LastUpdate = as.Date(LastUpdate, format="%d.%m.%Y")) %>%
+  filter(LastUpdate == last(LastUpdate),
+         SkjemaGUID == first(SkjemaGUID),
+         .by = HovedskjemaGUID)
+pasientsvar_post2 <- pasientsvar_post2 %>%
+  mutate(LastUpdate = as.Date(LastUpdate, format="%d.%m.%Y")) %>%
+  filter(LastUpdate == last(LastUpdate),
+         SkjemaGUID == first(SkjemaGUID),
+         .by = HovedskjemaGUID)
+
+kobletdata <- merge(legeskjema[, c("PasientGUID", "SkjemaGUID", "FormStatus",
+                                   "FormDate", "S1b_DateOfCompletion")],
+                    pasientsvar_pre[, c("HovedskjemaGUID", "FormStatus")],
+                    by.x = "SkjemaGUID", by.y = "HovedskjemaGUID",
+                    suffixes = c('', '_pre')) %>%
+  dplyr::mutate(S1b_DateOfCompletion = as.Date(S1b_DateOfCompletion, format="%d.%m.%Y")) %>%
+  dplyr::filter(S1b_DateOfCompletion <= "2023-06-30",
+                S1b_DateOfCompletion >= "2022-07-01") %>%
+  merge(pasientsvar_post[, c("HovedskjemaGUID", "FormStatus")],
+        by.x = "SkjemaGUID", by.y = "HovedskjemaGUID",
+        suffixes = c('', '_post1'), all.x = TRUE) %>%
+  merge(pasientsvar_post2[, c("HovedskjemaGUID", "FormStatus")],
+        by.x = "SkjemaGUID", by.y = "HovedskjemaGUID",
+        suffixes = c('', '_post2'), all.x = TRUE)
+
+
+mangleroppf <- kobletdata %>%
+  mutate(FormStatus_post1 = as.numeric(!is.na(FormStatus_post1)),
+         FormStatus_post2 = as.numeric(!is.na(FormStatus_post2))) %>%
+  select(SkjemaGUID, PasientGUID, S1b_DateOfCompletion, FormStatus_post1, FormStatus_post2) %>%
+  dplyr::filter((FormStatus_post1 == 0) | (FormStatus_post2 == 0)) %>%
+  merge(fnrfil, by = "PasientGUID") %>%
+  select(FNR, S1b_DateOfCompletion, FormStatus_post1, FormStatus_post2) %>%
+  rename(FormStatus_6mnd =FormStatus_post1,
+         FormStatus_12mnd =FormStatus_post2)
+
+write.csv2(mangleroppf, "~/mydata/nnrr/validering2024/nnrr_mangleroppf_validering2024.csv",
+           row.names = F, fileEncoding = "Latin1")
+
+
+
+
+################################################################################
+
 
 varliste_forbehandl <- readxl::read_xlsx(fil1, sheet = 1)
 varliste_behandler <- readxl::read_xlsx(fil1, sheet = 2)
@@ -73,14 +125,14 @@ data_pre <- merge(data_forbehandl, data_behandl, by.x = "HovedskjemaGUID",
 pasientsvar_post6mnd <- pasientsvar_post[, c("HovedskjemaGUID", "FormDate", "DateOfCompletion")]
 
 data_pre <- merge(data_pre, pasientsvar_post6mnd,
-                       by = "HovedskjemaGUID",
-                       all.x = TRUE) %>%
+                  by = "HovedskjemaGUID",
+                  all.x = TRUE) %>%
   dplyr::mutate(Oppfolging = ifelse(is.na(DateOfCompletion), "Mangler_oppf", "Har_oppf"))
 
 katvar <- names(data_pre)[names(data_pre) %in%
-                                 kodebok$Variabelnavn[kodebok$Felttype %in% c("Avkrysning", "Enkeltvalg")]]
+                            kodebok$Variabelnavn[kodebok$Felttype %in% c("Avkrysning", "Enkeltvalg")]]
 ikkekat <- names(data_pre)[!(names(data_pre) %in%
-                                  kodebok$Variabelnavn[kodebok$Felttype %in% c("Avkrysning", "Enkeltvalg")])]
+                               kodebok$Variabelnavn[kodebok$Felttype %in% c("Avkrysning", "Enkeltvalg")])]
 
 oppsummert <- data_pre %>%
   pivot_longer(all_of(katvar),
@@ -93,16 +145,16 @@ oppsummert <- data_pre %>%
 
 
 oppsummert <- merge(oppsummert, kodebok_verdier[, c("Variabelnavn", "value", "label", "Felttype")],
-             by.x = c("variable", "value"),
-             by.y = c("Variabelnavn", "value"),
-             all.x = TRUE) %>%
+                    by.x = c("variable", "value"),
+                    by.y = c("Variabelnavn", "value"),
+                    all.x = TRUE) %>%
   dplyr::select(variable, value, label, Har_oppf, Mangler_oppf, har_oppf_prosent,
                 mangler_oppf_prosent, Felttype) %>%
   dplyr::mutate(Felttype = ifelse(is.na(Felttype), "Avkrysning", Felttype))
 
 
 numvar <- names(data_pre)[(names(data_pre) %in%
-                                    kodebok$Variabelnavn[kodebok$Felttype %in% c("Tall")])]
+                             kodebok$Variabelnavn[kodebok$Felttype %in% c("Tall")])]
 
 # oppsum_stat <- list(
 #   gj.sn = ~mean(.x, na.rm = TRUE),
@@ -142,6 +194,41 @@ write.csv2(oppsummert_num,
            "~/mydata/nnrr/validering2024/oppsummering_numeriske_var.csv",
            row.names = F,
            fileEncoding = "Latin1")
+
+
+###### Slå sammen kategorier ###################################################
+
+
+
+slaasammen <- read.csv2("~/mydata/nnrr/validering2024/oppsummering_kategoriske.csv",
+                        fileEncoding = "Latin1") %>%
+  filter(variable != "") %>%
+  mutate(label = case_when(
+    Felttype == "Avkrysning" & value == 0 ~ "Nei",
+    Felttype == "Avkrysning" & value == 1 ~ "Ja",
+    !is.na(label) ~ label
+  ))
+
+tmp <- slaasammen %>% filter(label != "Ikke utfylt" | is.na(label),
+                             label != "Ukjent" | is.na(label))
+dikotome <- tmp %>% filter(Slaa_sammen == "")
+
+
+
+slaattsammen <- slaasammen %>% filter(Slaa_sammen != "") %>%
+  summarise(label = paste0(label, collapse = ", "),
+            Har_oppf = sum(Har_oppf),
+            Mangler_oppf = sum(Mangler_oppf),
+            Felttype = Felttype[1],
+            .by = c(variable, Slaa_sammen))
+
+samlet <- dplyr::bind_rows(dikotome, slaattsammen)
+
+
+
+
+
+
 
 
 ########### 12 mnd #############################################################
