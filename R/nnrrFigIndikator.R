@@ -7,12 +7,27 @@
 #'
 #' @export
 #'
-nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = NA, maal = NA, skriftStr=1.3, pktStr=1.4,
-                             legPlass='top', minstekravTxt='Min.', maalTxt='Mål', graaUt=NA, decreasing=F, outfile = '',
-                             lavDG=NA, width=800, height=700, inkl_konf=F, maalretn='hoy')
+nnrrFigIndikator <- function(indikatordata,
+                             tittel='',
+                             terskel=30,
+                             minstekrav = NA,
+                             maal = NA,
+                             skriftStr=1.3,
+                             pktStr=1.4,
+                             legPlass='top',
+                             minstekravTxt='Min.',
+                             maalTxt='Mål',
+                             graaUt=NA,
+                             decreasing=F,
+                             outfile = '',
+                             lavDG=NA,
+                             width=800,
+                             height=700,
+                             inkl_konf=F,
+                             maalretn='hoy')
 {
 
-  # tittel='testtittel'; terskel=30; minstekrav = NA; maal = 30; skriftStr=1.3; pktStr=1.4;
+  # tittel='testtittel'; terskel=30; minstekrav = 85; maal = 95; skriftStr=1.3; pktStr=1.4;
   # legPlass='top'; minstekravTxt='Min.'; maalTxt='Mål'; graaUt=NA; decreasing=F; outfile = '';
   # lavDG=NA; width=800; height=700; inkl_konf=F; maalretn='hoy'
 
@@ -240,7 +255,20 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
              legend=names(N[,-1]), ncol = dim(andeler)[2]-1)
     }
   }
-
+  if (dim(N)[2] == 3) {
+    points(y=ypos, x=purrr::as_vector(andeler[,2]),cex=pktStr,pch= 19) #'#4D4D4D'
+    # points(y=ypos, x=purrr::as_vector(andeler[,3]),cex=pktStr,pch= 19)
+    par(xpd=FALSE)
+    # if (legPlass=='nede'){
+    #   legend(x=82, y=ypos[2]+1 ,xjust=0, cex=cexgr, bty='n', #bg='white', box.col='white',
+    #          lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+    #          legend=names(N) )}
+    if (legPlass=='top'){
+      legend('top', cex=0.9*cexgr, bty='n', #bg='white', box.col='white',y=max(ypos),
+             lwd=c(NA,NA), pch=c(19,15), pt.cex=c(1.2,1.8), col=c('black',farger[3]),
+             legend=names(N[,-1]), ncol = dim(andeler)[2]-1)
+    }
+  }
 
   text(x=0, y=ypos, labels = pst_txt, cex=0.75, pos=4)#
   if ( outfile != '') {dev.off()}

@@ -1751,7 +1751,9 @@ indikator$Nevner <- 1
 tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Teller') %>%
   arrange(-`Andel (%)`) %>% mutate(År = NA)
 tabell1$År[1] <- rap_aar
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel som mottar mestringsorientert samtale'), include.rownames=FALSE)
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1),
+                     caption='Andel som mottar mestringsorientert samtale'),
+      include.rownames=FALSE)
 
 #########################################################################################
 @
@@ -1759,10 +1761,14 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel som mottar m
 <<'Fig. Andel mestringsorientert samtale', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "mestringsorientert_samtale.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'), outfile=outfile)
+nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'),
+                   minstekrav = 85, maal = 95,
+                   outfile=outfile)
 if (annetformat != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'), outfile=outfile)
+  nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'),
+                   minstekrav = 85, maal = 95,
+                   outfile=outfile)
 }
 @
 

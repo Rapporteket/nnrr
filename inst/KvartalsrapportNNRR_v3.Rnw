@@ -50,7 +50,7 @@ library(lubridate)
 # 103736 <- 'Drammen'
 # 700138 <- 'Stavern'
 # 700701 <- 'Nordlandssykehuset'
-reshID <- 700701
+reshID <- 700138
 Inkl_i_rapp <- ifelse(reshID %in% c(114174, 104293, 109834, 700138),
                       "\\inkltrue", "\\inklfalse")
 

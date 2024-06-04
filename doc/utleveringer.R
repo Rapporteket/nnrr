@@ -1,6 +1,18 @@
 rm(list=ls())
 library(nnrr)
 
+#### Utlevering Kjetil - pasienter som mangler pasientskjema 08.05.2024 ########
+library(dplyr)
+
+pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-05-07_1256.csv')
+legeskjema <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-05-07_1255.csv')
+
+mangler_pasientskjema <- legeskjema %>%
+  filter(!(SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)) %>%
+  select(PasientGUID, SkjemaGUID, S1b_DateOfCompletion, FormStatus)
+
+readr::write_csv2(mangler_pasientskjema, "~/mydata/nnrr/mangler_pasientskjema.csv")
+
 ########## Utlevering hianor 22.04.2024 #######################################
 library(dplyr)
 

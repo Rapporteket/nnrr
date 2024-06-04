@@ -120,7 +120,7 @@ if (format_ut != "pdf") {
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tverrfagligbeh.pdf}
-% \caption{Andel tverrfaglig behandlet}
+\caption{\textbf{tverrfagligbeh.pdf}. Andel tverrfaglig behandlet}
 \end{figure}
 
 
@@ -201,19 +201,19 @@ Indikatorer <- bind_rows(Indikatorer, indikator)
 <<'Fig. min. funk. nedsettelse', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "minimal_funksjonsnedsettelse.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 30, minstekrav = 25)
+nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 40, minstekrav = 35)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 30, minstekrav = 25)
+  nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 40, minstekrav = 35)
 }
 
-outfile <- "minimal_funksjonsnedsettelse_v2.pdf"
-outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 50, minstekrav = 40)
-if (format_ut != "pdf") {
-  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 50, minstekrav = 40)
-}
+# outfile <- "minimal_funksjonsnedsettelse_v2.pdf"
+# outfile <- paste0(figfolder, outfile)
+# nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 50, minstekrav = 40)
+# if (format_ut != "pdf") {
+#   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
+#   nnrrFigIndikator(indikator, 'Andel med minimal funksjonsnedsettelse', outfile=outfile, maal = 50, minstekrav = 40)
+# }
 @
 
 <<'Indikator 7 & 8: andel med klinisk viktig endring i ODI/NDI, forts', results='asis', echo=FALSE>>=
@@ -234,20 +234,20 @@ datasett_indikator8minimal_funksjonsnedsettelseNDI <- aux[, c("UnitId", "Sykehus
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}ODI_KliniskViktig.pdf}
-% \caption{Andel tverrfaglig behandlet}
+\caption{\textbf{ODI\_KliniskViktig.pdf}. Klinisk viktig endring i ODI}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}minimal_funksjonsnedsettelse.pdf}
-% \caption{Andel tverrfaglig behandlet}
+\caption{\textbf{minimal\_funksjonsnedsettelse.pdf}. Andel med minimal funksjonsnedsettelse}
 \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}minimal_funksjonsnedsettelse_v2.pdf}
-\caption{Minimal funksjonsnedsettelse, versjon 2}
-\end{figure}
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}minimal_funksjonsnedsettelse_v2.pdf}
+% \caption{\textbf{minimal\_funksjonsnedsettelse\_v2.pdf}. Minimal funksjonsnedsettelse, versjon 2}
+% \end{figure}
 
 <<'Indikator 9: andel med klinisk viktig endring smerte', results='asis', echo=FALSE>>=
 
@@ -277,10 +277,10 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% e
 <<'Fig. Klinisk viktig bedring av smerte i hvil', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "klin_vikt_endr_smerte_passiv.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i hvile', outfile=outfile, maal = 30, minstekrav = 25)
+nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i hvile', outfile=outfile, maal = 35, minstekrav = 30)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i hvile', outfile=outfile, maal = 30, minstekrav = 25)
+  nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i hvile', outfile=outfile, maal = 35, minstekrav = 30)
 }
 @
 
@@ -312,10 +312,10 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% e
 <<'Fig. Klinisk viktig bedring av smerte aktiv', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "klin_vikt_endr_smerte_aktiv.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i aktivitet', outfile=outfile, maal = 30, minstekrav = 25)
+nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i aktivitet', outfile=outfile, maal = 35, minstekrav = 30)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i aktivitet', outfile=outfile, maal = 30, minstekrav = 25)
+  nnrrFigIndikator(indikator, 'Klinisk viktig bedring av smerte i aktivitet', outfile=outfile, maal = 35, minstekrav = 30)
 }
 
 @
@@ -323,13 +323,13 @@ if (format_ut != "pdf") {
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}klin_vikt_endr_smerte_passiv.pdf}
-% \caption{Andel tverrfaglig behandlet}
+\caption{\textbf{klin\_vikt\_endr\_smerte\_passiv.pdf}. Klinisk viktig bedring av smerte i hvile.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}klin_vikt_endr_smerte_aktiv.pdf}
-% \caption{Andel tverrfaglig behandlet}
+\caption{\textbf{klin\_vikt\_endr\_smerte\_aktiv.pdf}. Klinisk viktig bedring av smerte i aktivitet.}
 \end{figure}
 
 % <<'Indikator 10: andel tilbake i arbeid', results='asis', echo=FALSE>>=
@@ -408,10 +408,10 @@ Indikatorer <- bind_rows(Indikatorer, indikator)
 
 outfile <- "tilbake_i_arbeid_ny_v1.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 30, minstekrav = 25)
+nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 40, minstekrav = 30)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 30, minstekrav = 25)
+  nnrrFigIndikator(indikator, 'Andel tilbake i arbeid', outfile=outfile, maal = 40, minstekrav = 30)
 }
 
 
@@ -428,11 +428,11 @@ indikator$ind_id <- "nnrr_jobb_v2"
 outfile <- "tilbake_i_arbeid_ny_v2.pdf"
 outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, c('Andel tilbake i arbeid eller', 'med lavere andel sykemelding' ),
-                 outfile=outfile, maal = 30, minstekrav = 25)
+                 outfile=outfile, maal = 40, minstekrav = 30)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
   nnrrFigIndikator(indikator, c('Andel tilbake i arbeid eller', 'med lavere andel sykemelding' ),
-                   outfile=outfile, maal = 30, minstekrav = 25)
+                   outfile=outfile, maal = 40, minstekrav = 30)
 }
 
 # tmp <- aux[, c("Besoksdato", "IsEmployed", "S2_Working", "S2_Unemployed", "S2_SickLeave",
@@ -452,13 +452,13 @@ if (format_ut != "pdf") {
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tilbake_i_arbeid_ny_v1.pdf}
-\caption{Andel tilbake i arbeid etter 6 mnd, ny versjon.}
+\caption{\textbf{tilbake\_i\_arbeid\_ny\_v1.pdf}. Andel tilbake i arbeid etter 6 mnd, ny versjon.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tilbake_i_arbeid_ny_v2.pdf}
-\caption{Andel tilbake i arbeid, eller med lavere grad av sykemelding etter 6 mnd.}
+\caption{\textbf{tilbake\_i\_arbeid\_ny\_v2.pdf}. Andel tilbake i arbeid, eller med lavere grad av sykemelding etter 6 mnd.}
 \end{figure}
 
 
@@ -489,10 +489,10 @@ Indikatorer <- bind_rows(Indikatorer, indikator)
 <<'Fig. Nytte av behandling', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "nytte_av_behandling.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Pasientopplevd bedring av behandling', outfile=outfile, maal = 30, minstekrav = 25)
+nnrrFigIndikator(indikator, 'Pasientopplevd bedring av behandling', outfile=outfile, maal = 40, minstekrav = 30)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Pasientopplevd bedring av behandling', outfile=outfile, maal = 30, minstekrav = 25)
+  nnrrFigIndikator(indikator, 'Pasientopplevd bedring av behandling', outfile=outfile, maal = 40, minstekrav = 30)
 }
 
 tabell1 <- nnrrIndikatorTabell(aux, indikator = 'NytteAvBehandling')
@@ -504,7 +504,7 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Pasientrapportert 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}nytte_av_behandling.pdf}
-% \caption{Andel tverrfaglig behandlet}
+\caption{\textbf{nytte\_av\_behandling.pdf}. Pasientrapportert nytte av behandling.}
 \end{figure}
 
 
@@ -533,10 +533,10 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med
 <<'Fig. Fornoyd med behandling', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "fornoyd_med_behandling.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=80, maal = 90, maalretn = 'hoy')
+nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 95, maalretn = 'hoy')
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=80, maal = 90, maalretn = 'hoy')
+  nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 95, maalretn = 'hoy')
 }
 
 @
@@ -544,7 +544,7 @@ if (format_ut != "pdf") {
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fornoyd_med_behandling.pdf}
-% \caption{Andel tverrfaglig behandlet}
+\caption{\textbf{fornoyd\_med\_behandling.pdf}. Andel fornøyd med eller nøytral til behandling}
 \end{figure}
 
 
@@ -557,16 +557,54 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel oppfølgings
 @
 
 
+<<'Andel mestringsorientert samtale', results='asis', echo=FALSE>>=
+aux <- RegDataAll %>%
+  filter(regstatus == 1) %>%
+  filter(TreatmentMasteryOrientedConversation %in% 1:2)
 
+aux$Teller <- aux$TreatmentMasteryOrientedConversation
+aux$Teller[aux$Teller == 2] <- 0
 
+######### Indikator #####################################################################
+indikator <- aux[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
+names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
+indikator$Nevner <- 1
+indikator <- indikator %>% filter(Aar <= rap_aar)
+# indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
 
+# indikator$ind_id <- "nnrr_misfornoeyd"
+# Indikatorer <- bind_rows(Indikatorer, indikator)
 
+tabell1 <- aux %>%
+  filter(Aar == rap_aar) %>%
+  nnrrIndikatorTabell(indikator = 'Teller') %>%
+  arrange(-`Andel (%)`) %>% mutate(År = NA)
 
+tabell1$År[1] <- rap_aar
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel som mottar mestringsorientert samtale'), include.rownames=FALSE)
 
+#########################################################################################
+@
 
+<<'Fig. Andel mestringsorientert samtale', include=FALSE, echo=FALSE, eval=T>>=
+outfile <- "mestringsorientert_samtale.pdf"
+outfile <- paste0(figfolder, outfile)
+nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'),
+                   minstekrav = 85, maal = 95,
+                   outfile=outfile)
+if (format_ut != "pdf") {
+  outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
+  nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'),
+                   minstekrav = 85, maal = 95,
+                   outfile=outfile)
+}
+@
 
-
-
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}mestringsorientert_samtale.pdf}
+\caption{mestringsorientert\_samtale.pdf}
+\end{figure}
 
 
 
