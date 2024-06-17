@@ -557,7 +557,7 @@ print(xtable::xtable(tab7, align=c('l', 'l', rep('r', ncol(tab7)-1)),
 
 <<'Figurer: Behandlingsløype i kommunal- og spesialisthelsetjenesten', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
 
-valgtVar <- "beh_kommunalt"
+valgtVar <- "beh_kommunalt_v2"
 outfile <- paste0(figfolder, "beh_kommunalt.pdf")
 # nnrrFigAndeler(RegDataAll, valgtVar = valgtVar, enhetsUtvalg = 0, reshID = 0, outfile=outfile,
 #                datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"))
@@ -620,7 +620,7 @@ if (!is.na(annetformat)) {
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}beh_kommunalt.pdf}
-\caption{Behandlingsløp i kommunalhelsetjenesten}
+\caption{Behandlingsløp utenfor spesialisthelsetjenesten}
 \end{figure}
 
 \begin{figure}[ht]
@@ -1324,14 +1324,16 @@ if (!is.na(annetformat)) {
 tab13 <- RegData[, c("SykehusNavn", "Treatment_NoTreatment", "Treatment_FollowUpMunicipality",
                      "Treatment_FollowUpFysioterapeut", "Treatment_FollowUpManuellTerapeut",
                      "Treatment_FollowUpKiropraktor", "Treatment_FollowUpPsykolog",
+                     "Treatment_FollowupOtherLifeStyle",
                      "Treatment_FollowUpMunicipalityOther")] %>% group_by (SykehusNavn) %>%
   summarise('Ingen beh.' = sum(Treatment_NoTreatment),
             'Lege' = sum(Treatment_FollowUpMunicipality),
-            'Fysioterapeut' = sum(Treatment_FollowUpFysioterapeut),
-            'Manuell terapeut' = sum(Treatment_FollowUpManuellTerapeut),
+            'Fysio/manuell/psykomotorisk terapeut' = sum(Treatment_FollowUpFysioterapeut),
+            # 'Manuell terapeut' = sum(Treatment_FollowUpManuellTerapeut),
             'Kiropraktor' = sum(Treatment_FollowUpKiropraktor),
             'Psykolog' = sum(Treatment_FollowUpPsykolog),
             'Arbeidsrettet oppfølging' = sum(Treatment_FollowUpMunicipalityOther),
+            'Andre livsstilsrelaterte tilbud el. lign.' = sum(Treatment_FollowupOtherLifeStyle),
             N = n()) %>%
   janitor::adorn_totals() %>% ungroup()
 
@@ -1341,7 +1343,7 @@ tab13[, -c(1, dim(tab13)[2])] <- sapply(tab13[, -c(1, dim(tab13)[2])], function(
 tab13 <- tab13[tab13$N > 0, ]
 
 print(xtable::xtable(tab13, digits=0, align=c('l', 'l', rep('R{0.4in}', ncol(tab13)-1)),
-                     caption = 'Behandlingsløype i kommunalhelsetjenesten'),
+                     caption = 'Behandlingsløype utenfor spesialisthelsetjenesten'),
       include.rownames=FALSE, size = "\\scriptsize")
 
 write.csv2(tab13, paste0(tabfolder, "tab_behandling_kommtjeneste.csv"),

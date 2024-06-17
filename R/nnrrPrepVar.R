@@ -369,8 +369,12 @@ nnrrPrepVar <- function(RegData, valgtVar)
   if (valgtVar=='beh_kommunalt') {
     tittel <- c('Behandling i kommunalhelsetjenesten')
     # N <- dim(RegData)[1]
-    AntVar <- apply(RegData[,c("Treatment_NoTreatment", "Treatment_FollowUpMunicipality", "Treatment_FollowUpFysioterapeut",
-                               "Treatment_FollowUpManuellTerapeut", "Treatment_FollowUpKiropraktor", "Treatment_FollowUpPsykolog",
+    AntVar <- apply(RegData[,c("Treatment_NoTreatment",
+                               "Treatment_FollowUpMunicipality",
+                               "Treatment_FollowUpFysioterapeut",
+                               "Treatment_FollowUpManuellTerapeut",
+                               "Treatment_FollowUpKiropraktor",
+                               "Treatment_FollowUpPsykolog",
                                "Treatment_FollowUpMunicipalityOther")],
                     2, function(x){sum(as.numeric(x), na.rm = T)})
     NVar<- apply(RegData[,c("Treatment_NoTreatment", "Treatment_FollowUpMunicipality", "Treatment_FollowUpFysioterapeut",
@@ -383,6 +387,38 @@ nnrrPrepVar <- function(RegData, valgtVar)
                'Oppfølging av manuell terapeut',
                'Oppfølging av kiropraktor', 'Oppfølging av psykolog',
                'Arbeidsrettet oppfølging')
+    retn <- 'H'
+
+  }
+
+  if (valgtVar=='beh_kommunalt_v2') {
+    tittel <- c('Behandling utenfor spesialisthelsetjenesten')
+    # N <- dim(RegData)[1]
+    AntVar <- apply(RegData[,c("Treatment_NoTreatment",
+                               "Treatment_FollowUpMunicipality",
+                               "Treatment_FollowUpFysioterapeut",
+                               "Treatment_FollowUpKiropraktor",
+                               "Treatment_FollowUpPsykolog",
+                               "Treatment_FollowUpMunicipalityOther",
+                               "Treatment_FollowupOtherLifeStyle")],
+                    2, function(x){sum(as.numeric(x), na.rm = T)})
+    NVar<- apply(RegData[,c("Treatment_NoTreatment",
+                            "Treatment_FollowUpMunicipality",
+                            "Treatment_FollowUpFysioterapeut",
+                            "Treatment_FollowUpKiropraktor",
+                            "Treatment_FollowUpPsykolog",
+                            "Treatment_FollowUpMunicipalityOther",
+                            "Treatment_FollowupOtherLifeStyle")],
+                 2, function(x){length(which(!is.na(x)))})
+    # NVar<-rep(N, length(AntVar))
+    N <- max(NVar)
+    grtxt <- c('Ingen behandling',
+               'Oppfølging av lege',
+               'Oppfølging av Fysio/manuell/\n psykomotorisk terapeut',
+               'Oppfølging av kiropraktor',
+               'Oppfølging av psykolog',
+               'Arbeidsrettet oppfølging',
+               'Andre livstilsrelaterte\n tilbud el. lign.')
     retn <- 'H'
 
   }
