@@ -6,20 +6,20 @@ library(tidyr)
 # RegData <- nnrr::nnrrHentRegData()
 pasientsvar_pre <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-04-09_1333.csv')
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-06-04_0904.csv')
 legeskjema <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-04-09_1333.csv')
+    '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-06-04_0904.csv')
 fnrfil <- readr::read_csv2(
   '~/mydata/nnrr/validering2024/DataDump_MRS-PROD_Behandlerskjema_2024-04-12_1532.csv') %>%
   dplyr::select(Fødselsnummer, PasientGUID) %>%
   summarise(FNR = first(Fødselsnummer), .by = PasientGUID)
 pasientsvar_post <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-04-09_1333.csv')
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-06-04_0904.csv')
 pasientsvar_post2 <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-04-09_1333.csv')
+    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-06-04_0905.csv')
 filfolder <- "~/mydata/nnrr/validering2024/"
 fil1 <- paste0(filfolder, "Variabelliste.xlsx")
 
@@ -185,22 +185,22 @@ oppsummert_num <- merge(oppsummert_num1, oppsummert_num2, by = "name",
                         suffixes = c("_gjsn", "_stdav")) %>%
   merge(oppsummert_num3, by = "name")
 
-write.csv2(oppsummert,
-           "~/mydata/nnrr/validering2024/oppsummering_kategoriske_var.csv",
-           row.names = F,
-           fileEncoding = "Latin1")
-
-write.csv2(oppsummert_num,
-           "~/mydata/nnrr/validering2024/oppsummering_numeriske_var.csv",
-           row.names = F,
-           fileEncoding = "Latin1")
+# write.csv2(oppsummert,
+#            "~/mydata/nnrr/validering2024/oppsummering_kategoriske_var.csv",
+#            row.names = F,
+#            fileEncoding = "Latin1")
+#
+# write.csv2(oppsummert_num,
+#            "~/mydata/nnrr/validering2024/oppsummering_numeriske_var.csv",
+#            row.names = F,
+#            fileEncoding = "Latin1")
 
 
 ###### Slå sammen kategorier ###################################################
 
 
 
-slaasammen <- read.csv2("~/mydata/nnrr/validering2024/oppsummering_kategoriske.csv",
+slaasammen <- read.csv2("~/mydata/nnrr/validering2024/oppsummering_kategoriske_redigert_paindurationnow.csv",
                         fileEncoding = "Latin1") %>%
   filter(variable != "") %>%
   mutate(label = case_when(
@@ -224,9 +224,28 @@ slaattsammen <- slaasammen %>% filter(Slaa_sammen != "") %>%
 
 samlet <- dplyr::bind_rows(dikotome, slaattsammen)
 
+Utflatet <- merge(samlet[seq(1, nrow(samlet), 2), ], samlet[seq(2, nrow(samlet), 2), ],
+                  by = "variable", suffixes = c("_gr1", "_gr2"))
 
 
 
+# Utflatet %>%   mutate(
+#   newcol = map2(c(Har_oppf_gr1, Mangler_oppf_gr1), c(Har_oppf_gr1+Har_oppf_gr2, Mangler_oppf_gr1+Mangler_oppf_gr2), prop.test),
+#   pverdi = map_dbl(newcol, ~ .x[["p.value"]])) %>%
+#   select(-newcol)
+#
+#
+#
+#   pverdi = prop.test(c(Har_oppf_gr1, Mangler_oppf_gr1), c(Har_oppf_gr1+Har_oppf_gr2, Mangler_oppf_gr1+Mangler_oppf_gr2))$p.value )
+#
+
+# binom.test(n[i],N[i], alternative = 'two.sided', conf.level = konfnivaa)
+
+
+
+
+data.frame(kol1 = samlet$variable[seq(1, nrow(samlet)-1, 2)],
+           kol2 = samlet$variable[seq(2, nrow(samlet), 2)])
 
 
 

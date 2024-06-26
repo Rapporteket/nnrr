@@ -570,10 +570,10 @@ indikator <- aux[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")
 indikator$Nevner <- 1
 indikator <- indikator %>% filter(Aar <= rap_aar)
-# indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
+indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_orgnr$resh)]
 
-# indikator$ind_id <- "nnrr_misfornoeyd"
-# Indikatorer <- bind_rows(Indikatorer, indikator)
+indikator$ind_id <- "nnrr_mestringsorientert_samtale"
+Indikatorer <- bind_rows(Indikatorer, indikator)
 
 tabell1 <- aux %>%
   filter(Aar == rap_aar) %>%
@@ -612,6 +612,8 @@ if (format_ut != "pdf") {
 
 dg_ny <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2023.csv",
                           locale = readr::locale(encoding = "Latin1"))
+
+
 map_dg2 <- data.frame(enhet=c("Helgelandssykehuset, SandnessjÃ¸en",
                               "St. Olavs Hospital",
                               "UNN Harstad",
@@ -636,12 +638,16 @@ dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
 dg_ny$ind_id <- "nnrr_dg"
 dg_ny$context <- "caregiver"
 
+dg_gml <- readr::read_csv2("~/mydata/nnrr/nnrr_dg_shusviser_2022.csv",
+                          locale = readr::locale(encoding = "Latin1"))
+
 Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
 names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
 Indikatorer$context <- "caregiver"
 Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
 
-Indikatorer <- dplyr::bind_rows(Indikatorer, dg_ny)
+Indikatorer <- dplyr::bind_rows(Indikatorer, dg_ny) %>%
+  dplyr::bind_rows(dg_gml)
 
 write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
            row.names = F, fileEncoding = "UTF-8")

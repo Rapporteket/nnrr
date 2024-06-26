@@ -1,6 +1,9 @@
 rm(list=ls())
 library(nnrr)
 
+#### Utlevering Andreas Sandvik - 13.06.2024 ########
+
+
 #### Utlevering Kjetil - pasienter som mangler pasientskjema 08.05.2024 ########
 library(dplyr)
 
