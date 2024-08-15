@@ -2,7 +2,61 @@ rm(list=ls())
 library(nnrr)
 
 #### Utlevering Andreas Sandvik - 13.06.2024 ########
+library(dplyr)
+var_pre <- readxl::read_xlsx("~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
+                             sheet = 1)
+var_beh <- readxl::read_xlsx("~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
+                             sheet = 2)
+var_6mnd <- readxl::read_xlsx("~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
+                              sheet = 3)
+# pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-06-04_0904.csv') %>%
+#   select(var_pre$varnavn)
+# legeskjema <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-06-04_0904.csv') %>%
+#   select(var_beh$varnavn)
+# oppf6mnd <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-06-04_0904.csv') %>%
+#   select(var_6mnd$varnavn)
+pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1230_paspre.csv') %>%
+  select(var_pre$varnavn)
+legeskjema <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1222_behandler.csv') %>%
+  select(var_beh$varnavn)
+oppf6mnd <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1237_pas6mnd.csv') %>%
+  select(var_6mnd$varnavn)
 
+data_koblet <- merge(pasientsvar_pre %>% select(-Skjematype, -SkjemaGUID),
+                     legeskjema %>% select(-PasientGUID, -Skjematype),
+                     by.x = "HovedskjemaGUID", by.y = "SkjemaGUID",
+                     suffixes = c("_baseline", "_behandler")) %>%
+  merge(oppf6mnd %>% select(-PasientGUID, -Skjematype, -SkjemaGUID),
+        by = "HovedskjemaGUID", suffixes = c("", "_6mnd"))
+
+felles <- intersect(pasientsvar_pre$HovedskjemaGUID, legeskjema$SkjemaGUID) %>%
+  intersect(oppf6mnd$HovedskjemaGUID)
+pasientsvar_pre <- pasientsvar_pre %>% filter(HovedskjemaGUID %in% felles)
+oppf6mnd <- oppf6mnd %>% filter(HovedskjemaGUID %in% felles)
+legeskjema <- legeskjema %>% filter(SkjemaGUID %in% felles)
+
+# duplikat_guid <- data_koblet %>% summarise(N=n(), .by = HovedskjemaGUID) %>% filter(N>1)
+# duplikater <- data_koblet %>% filter(n()>1, .by = HovedskjemaGUID)
+
+data_koblet_filtrert <- data_koblet %>% #[match(unique(data_koblet$HovedskjemaGUID), data_koblet$HovedskjemaGUID), ] %>%
+  filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2021-02-01",
+         as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") <= "2023-12-31")
+
+pasientsvar_pre <- pasientsvar_pre %>%
+  filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2021-02-01",
+         as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") <= "2023-12-31")
+legeskjema <- legeskjema %>% filter(SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)
+oppf6mnd <- oppf6mnd %>% filter(HovedskjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)
+
+
+duplikater <- oppf6mnd %>% filter(n()>1, .by = HovedskjemaGUID) %>%
+  arrange(HovedskjemaGUID)
+
+readr::write_csv2(data_koblet_filtrert, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_data_koblet.csv")
+readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_pasientsvar_pre.csv")
+readr::write_csv2(legeskjema, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_behandlerskjema.csv")
+readr::write_csv2(oppf6mnd, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_pasientsvar_6md.csv")
+readr::write_csv2(duplikater, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_duplikat6mnd.csv")
 
 #### Utlevering Kjetil - pasienter som mangler pasientskjema 08.05.2024 ########
 library(dplyr)
@@ -45,13 +99,13 @@ pasientsvar_post <- pasientsvar_post[pasientsvar_post$HovedskjemaGUID %in% leges
 pasientsvar_post2 <- pasientsvar_post2[pasientsvar_post2$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
 
 pasientsvar_post <- pasientsvar_post %>% filter(as.Date(DateOfCompletion, format="%d.%m.%Y") ==
-                                     min(as.Date(DateOfCompletion, format="%d.%m.%Y")),
-                                   .by = HovedskjemaGUID) %>%
+                                                  min(as.Date(DateOfCompletion, format="%d.%m.%Y")),
+                                                .by = HovedskjemaGUID) %>%
   filter(SkjemaGUID == first(SkjemaGUID),
          .by = HovedskjemaGUID)
 pasientsvar_post2 <- pasientsvar_post2 %>% filter(as.Date(DateOfCompletion, format="%d.%m.%Y") ==
-                                                  min(as.Date(DateOfCompletion, format="%d.%m.%Y")),
-                                                .by = HovedskjemaGUID) %>%
+                                                    min(as.Date(DateOfCompletion, format="%d.%m.%Y")),
+                                                  .by = HovedskjemaGUID) %>%
   filter(SkjemaGUID == first(SkjemaGUID),
          .by = HovedskjemaGUID)
 
@@ -121,11 +175,11 @@ legeskjema <- legeskjema[, -which(names(legeskjema) %in% ikkemed)]
 pasientsvar_pre <- merge(pasientsvar_pre, pasientliste[, c("PasientGUID", "pseudonym")],
                          by = "PasientGUID")
 legeskjema <- merge(legeskjema, pasientliste[, c("PasientGUID", "pseudonym")],
-                         by = "PasientGUID")
+                    by = "PasientGUID")
 pasientsvar_post <- merge(pasientsvar_post, pasientliste[, c("PasientGUID", "pseudonym")],
-                         by = "PasientGUID")
-pasientsvar_post2 <- merge(pasientsvar_post2, pasientliste[, c("PasientGUID", "pseudonym")],
                           by = "PasientGUID")
+pasientsvar_post2 <- merge(pasientsvar_post2, pasientliste[, c("PasientGUID", "pseudonym")],
+                           by = "PasientGUID")
 
 readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/pasientsvar_pre_3108023.csv")
 readr::write_csv2(legeskjema, "~/mydata/nnrr/legeskjema_3108023.csv")
@@ -279,7 +333,7 @@ RegData %>%
   ) %>% tidyr::spread(key = Aar, value = var, fill = "") %>%
 
 
-RegData %>%
+  RegData %>%
   dplyr::filter(Aar > 2019) %>%
   dplyr::group_by(SykehusNavn, Aar) %>%
   dplyr::summarise(

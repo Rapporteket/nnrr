@@ -156,6 +156,7 @@ oppsummert <- merge(oppsummert, kodebok_verdier[, c("Variabelnavn", "value", "la
 numvar <- names(data_pre)[(names(data_pre) %in%
                              kodebok$Variabelnavn[kodebok$Felttype %in% c("Tall")])]
 
+res <- t.test(Eq5d_L_spm6 ~ Oppfolging, data = data_pre)
 # oppsum_stat <- list(
 #   gj.sn = ~mean(.x, na.rm = TRUE),
 #   std.avvik = ~sd(.x, na.rm = TRUE),
@@ -183,18 +184,31 @@ oppsummert_num3 <- data_pre %>%
 
 oppsummert_num <- merge(oppsummert_num1, oppsummert_num2, by = "name",
                         suffixes = c("_gjsn", "_stdav")) %>%
-  merge(oppsummert_num3, by = "name")
+  merge(oppsummert_num3, by = "name") #%>%
+  # mutate(std_pooled = sqrt(((Har_oppf_n-1)*Har_oppf_stdav^2 +
+  #          (Mangler_oppf_n-1)*Mangler_oppf_stdav^2)/(Har_oppf_n+Mangler_oppf_n-2)),
+  #        t1 = (Har_oppf_gjsn-Mangler_oppf_gjsn)/
+  #          (std_pooled*sqrt(1/Har_oppf_n + 1/Mangler_oppf_n)),
+  #        t2 = (Har_oppf_gjsn-Mangler_oppf_gjsn)/
+  #          sqrt(Har_oppf_stdav^2/Har_oppf_n + Mangler_oppf_stdav^2/Mangler_oppf_n),
+  #        df1 = Har_oppf_n + Mangler_oppf_n -2,
+  #        df2 = (Har_oppf_stdav^2/Har_oppf_n + Mangler_oppf_stdav^2/Mangler_oppf_n)^2/
+  #          ((Har_oppf_stdav^2/Har_oppf_n)^2/(Har_oppf_n-1) +
+  #             (Mangler_oppf_stdav^2/Mangler_oppf_n)^2/(Mangler_oppf_n-1)),
+  #        p1 = 2*pt(q = abs(t1), df = df1, lower.tail = FALSE),
+  #        p2 = 2*pt(q = abs(t2), df = df2, lower.tail = FALSE)
+  #        )
 
-# write.csv2(oppsummert,
-#            "~/mydata/nnrr/validering2024/oppsummering_kategoriske_var.csv",
-#            row.names = F,
-#            fileEncoding = "Latin1")
-#
-# write.csv2(oppsummert_num,
-#            "~/mydata/nnrr/validering2024/oppsummering_numeriske_var.csv",
-#            row.names = F,
-#            fileEncoding = "Latin1")
-
+for (m in 1:length(oppsummert_num$name)) {
+  res <- t.test( data_pre %>% filter(Oppfolging == "Har_oppf") %>%
+                   select(oppsummert_num$name[m]),
+                 data_pre %>% filter(Oppfolging == "Mangler_oppf") %>%
+                   select(oppsummert_num$name[m]))
+  # oppsummert_num$meandiff[m] <- res$statistic
+  oppsummert_num$p.verdi[m] <- res$p.value
+  oppsummert_num$konfint_lav[m] <- res$conf.int[1]
+  oppsummert_num$konfint_hoy[m] <- res$conf.int[2]
+}
 
 ###### Slå sammen kategorier ###################################################
 
@@ -228,26 +242,31 @@ Utflatet <- merge(samlet[seq(1, nrow(samlet), 2), ], samlet[seq(2, nrow(samlet),
                   by = "variable", suffixes = c("_gr1", "_gr2"))
 
 
+for (m in 1:dim(Utflatet)[1]){
+  aux <- matrix(c(Utflatet$Har_oppf_gr1[m], Utflatet$Mangler_oppf_gr1[m],
+                  Utflatet$Har_oppf_gr2[m], Utflatet$Mangler_oppf_gr2[m]),
+                ncol = 2)
+  testres <- fisher.test(aux)
+  Utflatet$odds.ratio[m] <- testres$estimate
+  Utflatet$p.verdi[m] <- testres$p.value
+  Utflatet$konfint_lav[m] <- testres$conf.int[1]
+  Utflatet$konfint_hoy[m] <- testres$conf.int[2]
+}
 
-# Utflatet %>%   mutate(
-#   newcol = map2(c(Har_oppf_gr1, Mangler_oppf_gr1), c(Har_oppf_gr1+Har_oppf_gr2, Mangler_oppf_gr1+Mangler_oppf_gr2), prop.test),
-#   pverdi = map_dbl(newcol, ~ .x[["p.value"]])) %>%
-#   select(-newcol)
-#
-#
-#
-#   pverdi = prop.test(c(Har_oppf_gr1, Mangler_oppf_gr1), c(Har_oppf_gr1+Har_oppf_gr2, Mangler_oppf_gr1+Mangler_oppf_gr2))$p.value )
-#
+oppsummert_kat <- Utflatet %>%
+  select(variable, label_gr1, label_gr2, Har_oppf_gr1, Mangler_oppf_gr1,
+         Har_oppf_gr2, Mangler_oppf_gr2, odds.ratio,
+         p.verdi, konfint_lav, konfint_hoy)
 
-# binom.test(n[i],N[i], alternative = 'two.sided', conf.level = konfnivaa)
+write.csv2(oppsummert_kat,
+           "~/mydata/nnrr/validering2024/oppsummering_kategoriske_var.csv",
+           row.names = F,
+           fileEncoding = "Latin1")
 
-
-
-
-data.frame(kol1 = samlet$variable[seq(1, nrow(samlet)-1, 2)],
-           kol2 = samlet$variable[seq(2, nrow(samlet), 2)])
-
-
+write.csv2(oppsummert_num,
+           "~/mydata/nnrr/validering2024/oppsummering_numeriske_var.csv",
+           row.names = F,
+           fileEncoding = "Latin1")
 
 
 ########### 12 mnd #############################################################
