@@ -15,18 +15,18 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
     "~/mydata/nnrr/"
   } else {"~/softlinks/mydata/nnrr/"}
 
-  pasientsvar_pre <-
-    readr::read_csv2(
-        paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-06-04_0904.csv"))
   legeskjema <-
     readr::read_csv2(
-      paste0(datasti, "DataDump_MRS-PROD_Behandlerskjema_2024-06-04_0904.csv"))
+        paste0(datasti, "data_2024-08-14_1222_beh.csv"))
+  pasientsvar_pre <-
+    readr::read_csv2(
+      paste0(datasti, "data_2024-08-14_1230_paspre.csv"))
   pasientsvar_post <-
     readr::read_csv2(
-      paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-06-04_0904.csv"))
+      paste0(datasti, "data_2024-08-14_1237_pas6mnd.csv"))
   pasientsvar_post2 <-
     readr::read_csv2(
-      paste0(datasti, "DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-06-04_0905.csv"))
+      paste0(datasti, "data_2024-08-14_1240_pas_12mnd.csv"))
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){

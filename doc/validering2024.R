@@ -3,23 +3,21 @@ library(nnrr)
 library(dplyr)
 library(tidyr)
 
-# RegData <- nnrr::nnrrHentRegData()
-pasientsvar_pre <-
-  readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-06-04_0904.csv')
+datasti <- "~/mydata/nnrr/"
+
 legeskjema <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-06-04_0904.csv')
-fnrfil <- readr::read_csv2(
-  '~/mydata/nnrr/validering2024/DataDump_MRS-PROD_Behandlerskjema_2024-04-12_1532.csv') %>%
-  dplyr::select(Fødselsnummer, PasientGUID) %>%
-  summarise(FNR = first(Fødselsnummer), .by = PasientGUID)
+    paste0(datasti, "data_2024-08-14_1222_beh.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0(datasti, "data_2024-08-14_1230_paspre.csv"))
 pasientsvar_post <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-06-04_0904.csv')
+    paste0(datasti, "data_2024-08-14_1237_pas6mnd.csv"))
 pasientsvar_post2 <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-06-04_0905.csv')
+    paste0(datasti, "data_2024-08-14_1240_pas_12mnd.csv"))
+
 filfolder <- "~/mydata/nnrr/validering2024/"
 fil1 <- paste0(filfolder, "Variabelliste.xlsx")
 
@@ -52,18 +50,18 @@ kobletdata <- merge(legeskjema[, c("PasientGUID", "SkjemaGUID", "FormStatus",
         suffixes = c('', '_post2'), all.x = TRUE)
 
 
-mangleroppf <- kobletdata %>%
-  mutate(FormStatus_post1 = as.numeric(!is.na(FormStatus_post1)),
-         FormStatus_post2 = as.numeric(!is.na(FormStatus_post2))) %>%
-  select(SkjemaGUID, PasientGUID, S1b_DateOfCompletion, FormStatus_post1, FormStatus_post2) %>%
-  dplyr::filter((FormStatus_post1 == 0) | (FormStatus_post2 == 0)) %>%
-  merge(fnrfil, by = "PasientGUID") %>%
-  select(FNR, S1b_DateOfCompletion, FormStatus_post1, FormStatus_post2) %>%
-  rename(FormStatus_6mnd =FormStatus_post1,
-         FormStatus_12mnd =FormStatus_post2)
-
-write.csv2(mangleroppf, "~/mydata/nnrr/validering2024/nnrr_mangleroppf_validering2024.csv",
-           row.names = F, fileEncoding = "Latin1")
+# mangleroppf <- kobletdata %>%
+#   mutate(FormStatus_post1 = as.numeric(!is.na(FormStatus_post1)),
+#          FormStatus_post2 = as.numeric(!is.na(FormStatus_post2))) %>%
+#   select(SkjemaGUID, PasientGUID, S1b_DateOfCompletion, FormStatus_post1, FormStatus_post2) %>%
+#   dplyr::filter((FormStatus_post1 == 0) | (FormStatus_post2 == 0)) %>%
+#   merge(fnrfil, by = "PasientGUID") %>%
+#   select(FNR, S1b_DateOfCompletion, FormStatus_post1, FormStatus_post2) %>%
+#   rename(FormStatus_6mnd =FormStatus_post1,
+#          FormStatus_12mnd =FormStatus_post2)
+#
+# write.csv2(mangleroppf, "~/mydata/nnrr/validering2024/nnrr_mangleroppf_validering2024.csv",
+#            row.names = F, fileEncoding = "Latin1")
 
 
 
