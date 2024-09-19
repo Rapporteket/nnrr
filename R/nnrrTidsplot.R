@@ -23,7 +23,9 @@ nnrrTidsplot <- function(plotdata, outfile='',
                          fargepalett="BlaaRapp",
                          inkl_konf = 1,
                          maal=NA,
-                         maalnivaatxt=NA) {
+                         maalnivaatxt="Høy måloppnåelse",
+                         moderat=NA,
+                         moderatTxt = "Moderat måloppnåelse") {
 
 
   tittel <- plotdata$tittel;
@@ -115,6 +117,12 @@ nnrrTidsplot <- function(plotdata, outfile='',
           text(x = length(Tidtxt), y = maal, labels = maalnivaatxt, adj = c(1,1), xpd=T)
         }
       }
+      if (!is.na(moderat)) {
+        lines(range(xskala),rep(moderat,2), col="yellow", lwd=2, lty=2)
+        if (!is.na(moderatTxt)) {
+          text(x = length(Tidtxt), y = moderat, labels = moderatTxt, adj = c(1,1), xpd=T)
+        }
+      }
       # if ( outfile != '') {dev.off()}
 
     } else {
@@ -171,6 +179,13 @@ nnrrTidsplot <- function(plotdata, outfile='',
         lines(range(xskala),rep(maal,2), col="green", lwd=2, lty=2)
         if (!is.na(maalnivaatxt)) {
           text(x = length(Tidtxt), y = maal, labels = maalnivaatxt, adj = c(1,1), xpd=T)
+        }
+      }
+
+      if (!is.na(moderat)) {
+        lines(range(xskala),rep(moderat,2), col="yellow", lwd=2, lty=2)
+        if (!is.na(moderatTxt)) {
+          text(x = length(Tidtxt), y = moderat, labels = moderatTxt, adj = c(1,1), xpd=T)
         }
       }
 

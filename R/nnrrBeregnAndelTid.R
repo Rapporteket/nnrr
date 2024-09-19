@@ -34,17 +34,24 @@ nnrrBeregnAndelTid <- function(RegData,
                                maxHSCL = 4,
                                medikamenter = NULL,
                                smerte = NULL,
-                               tolk = 99)
+                               tolk = 99,
+                               iArbeid = 99)
 {
   datotxt <- switch(datovar,
                     Besoksdato = "intervensjon",
                     dato_oppfolg = "6-mnd oppfølging",
                     dato_oppfolg2 = "12-mnd oppfølging"
   )
-  xaksetxt <- switch(tidsenhet, Aar=paste0("År for ", datotxt),
+  xaksetxt <- switch(tidsenhet,
+                     Aar=paste0("År for ", datotxt),
                      Mnd=paste0("År og måned for ", datotxt),
                      Kvartal=paste0("År og kvartal for ", datotxt),
                      Halvaar=paste0("År og halvår for ", datotxt))
+  xaksetxt2 <- switch(tidsenhet,
+                      Aar="År for oppfølging",
+                      Mnd="År og måned for oppfølging",
+                      Kvartal="År og kvartal for oppfølging",
+                      Halvaar="År og halvår for oppfølging")
 
   # Sykehustekst avhengig av bruker og brukervalg
   if (enhetsUtvalg==0) {
@@ -63,7 +70,7 @@ nnrrBeregnAndelTid <- function(RegData,
                            maxald=maxald, erMann=erMann, datovar=datovar,
                            tverrfaglig=tverrfaglig, minHSCL = minHSCL,
                            maxHSCL = maxHSCL, medikamenter = medikamenter,
-                           smerte = smerte, tolk=tolk)
+                           smerte = smerte, tolk=tolk, iArbeid = iArbeid)
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
 
@@ -142,9 +149,11 @@ nnrrBeregnAndelTid <- function(RegData,
 
   # FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett)
   # farger <- FigTypUt$farger
+  tittel2 <- tittel
   tittel <-  c(tittel, shtxt)
 
   utData <- list(tittel = tittel,
+                 tittel2 = tittel2,
                  utvalgTxt = utvalgTxt,
                  Andeler = list(AndelHoved=AndelHoved, AndelRest=AndelRest),
                  Tidtxt = Tidtxt,
@@ -158,7 +167,8 @@ nnrrBeregnAndelTid <- function(RegData,
                  AndelHovedGjsn=AndelHovedGjsn,
                  AndelRestGjsn=AndelRestGjsn,
                  maal=maal,
-                 xaksetxt=xaksetxt)
+                 xaksetxt=xaksetxt,
+                 xaksetxt2=xaksetxt2)
   return(invisible(utData))
 }
 

@@ -24,9 +24,69 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$VariabelGr <- RegData$Variabel
   }
 
+  if (valgtVar=='mestringsorientert_samtale') {
+    tittel <- "Mestringsorientert samtale"
+    RegData <- RegData[RegData$TreatmentMasteryOrientedConversation %in% 1:2, ]
+    RegData$Variabel <- RegData$TreatmentMasteryOrientedConversation
+    RegData$Variabel[RegData$Variabel == 2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='andel_tverrfaglig_tolk') {
+    tittel <- c("Andel tverrfaglig behandlet blant", "pasienter som mottar tolk")
+    RegData <- RegData[RegData$NationalInterpreter %in% 1, ]
+    RegData <- RegData[RegData$regstatus==1, ]
+    RegData$Variabel <- 0
+    RegData$Variabel[RegData$Treatment_GroupInterdisciplinary2018 != 0 |
+                       RegData$Treatment_GroupInterdisciplinary != 0] <- 1
+    RegData$Variabel[RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='andel_tverrfaglig_ikkenorsk') {
+    tittel <- c("Andel tverrfaglig behandlet blant", "ikke-norske pasienter")
+    RegData <- RegData[RegData$NationalCountry %in% 2:7, ]
+    RegData <- RegData[RegData$regstatus==1, ]
+    RegData$Variabel <- 0
+    RegData$Variabel[RegData$Treatment_GroupInterdisciplinary2018 != 0 |
+                       RegData$Treatment_GroupInterdisciplinary != 0] <- 1
+    RegData$Variabel[RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='ind_raad_livsstil') {
+    tittel <- c("Individuell rådgivning vedrørende", "livsstil og/eller medikamenter")
+    RegData <- RegData[RegData$TreatmentCouncellingLifeStyleAndMedication %in% 1:2, ]
+    RegData$Variabel <- RegData$TreatmentCouncellingLifeStyleAndMedication
+    RegData$Variabel[RegData$Variabel == 2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='kartlagt_funksjon') {
+    tittel <- c("Kartlagt funksjonsevne relatert", "til arbeid og utdannelse")
+    RegData$Variabel <- RegData$TreatmentAbilityToWorkFunctionLevel
+    RegData <- RegData[RegData$Variabel %in% 1:2, ]
+    RegData$Variabel[RegData$Variabel == 2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='gjennomgang_billedfunn') {
+    tittel <- c("Gjennomgang av billedfunn")
+    RegData$Variabel <- RegData$RadiologicalFExplainedPatient
+    RegData <- RegData[RegData$Variabel %in% 1:2, ]
+    RegData$Variabel[RegData$Variabel == 2] <- 0
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
   if (valgtVar == "VentetidFraHenvisning_kat") {
     RegData$Variabel <- RegData[, "VentetidFraHenvisningTilBesok"]
-    RegData$Variabel[RegData$Variabel < 0] <- NA
+    RegData$Variabel[RegData$Variabel <= 0] <- NA
     RegData <- RegData[!is.na(RegData$Variabel), ]
     tittel <- 'Ventetid fra henvisning til besøk'
     # gr <- c(seq(0, 180, 30), 100000)
@@ -40,7 +100,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   if (valgtVar=='ventetid_krav') {
     tittel <- "Ventetid 50 dager eller mindre"
     RegData <- RegData[!is.na(RegData$VentetidFraHenvisningTilBesok) &
-                         RegData$VentetidFraHenvisningTilBesok >= 0, ]
+                         RegData$VentetidFraHenvisningTilBesok > 0, ]
     RegData$Variabel <- 0
     # RegData$Variabel[RegData$VentetidFraHenvisningTilBesok > 50] <- 0
     RegData$Variabel[RegData$VentetidFraHenvisningTilBesok <= 50] <- 1
@@ -73,6 +133,16 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData <- RegData[!is.na(RegData$FabQ11), ]
     RegData$Variabel <- 0
     RegData$Variabel[RegData$FabQ11 %in% 0:2] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='fabq11_v2') {
+    tittel <- "FABQ11"
+    RegData <- RegData[RegData$regstatus==1, ]
+    RegData <- RegData[!is.na(RegData$FabQ11), ]
+    RegData$Variabel <- 1
+    RegData$Variabel[RegData$FabQ11 %in% 0:2] <- 0
     grtxt <- c("Nei", "Ja")
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
@@ -116,7 +186,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='odi_klinisk_viktig') {
-    tittel <- "Funksjonsbedring 6 mnd"
+    tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
     RegData$Variabel <- 0
     RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post) >= 10] <- 1
@@ -125,7 +195,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='odi_klinisk_viktig_6mnd') {
-    tittel <- "Funksjonsbedring 6 mnd"
+    tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
     RegData$Variabel <- 0
     RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post)/RegData$OdiScore >= .3] <- 1
@@ -134,7 +204,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='odi_klinisk_viktig_12mnd') {
-    tittel <- "Funksjonsbedring 12 mnd"
+    tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post2), ]
     RegData$Variabel <- 0
     RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post2)/RegData$OdiScore >= .3] <- 1
@@ -143,7 +213,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='bedring_smerte_hvile_6mnd') {
-    tittel <- "Klinisk bedring av smerte i hvile 6 mnd"
+    tittel <- "Klinisk bedring av smerte i hvile"
     RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
                                     !is.na(PainExperiencesNoActivity_post) & PainExperiencesNoActivity != 0)
     RegData$pstEndringSmerteHvile <- (RegData$PainExperiencesNoActivity -
@@ -155,7 +225,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='bedring_smerte_hvile_12mnd') {
-    tittel <- "Klinisk bedring av smerte i hvile 12 mnd"
+    tittel <- "Klinisk bedring av smerte i hvile"
     RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post2 == 1 & !is.na(PainExperiencesNoActivity) &
                                            !is.na(PainExperiencesNoActivity_post2) & PainExperiencesNoActivity != 0)
     RegData$pstEndringSmerteHvile <- (RegData$PainExperiencesNoActivity -
@@ -167,7 +237,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='bedring_smerte_aktiv_6mnd') {
-    tittel <- "Klinisk bedring av smerte i aktivitet 6 mnd"
+    tittel <- "Klinisk bedring av smerte i aktivitet"
     RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
                                     !is.na(PainExperiencesActivity_post) & PainExperiencesActivity != 0)
     RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
@@ -179,7 +249,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='bedring_smerte_aktiv_12mnd') {
-    tittel <- "Klinisk bedring av smerte i aktivitet 12 mnd"
+    tittel <- "Klinisk bedring av smerte i aktivitet"
     RegData <- RegData %>% dplyr::filter(regstatus_pre == 1 & regstatus_post2 == 1 & !is.na(PainExperiencesActivity) &
                                            !is.na(PainExperiencesActivity_post2) & PainExperiencesActivity != 0)
     RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
@@ -202,7 +272,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='fornoyd_6mnd') {
-    tittel <- "Fornøyd med behandling 6 mnd"
+    tittel <- "Fornøyd med behandling"
     RegData <- RegData[which(RegData$regstatus==1 & RegData$regstatus_post==1 &
                                RegData$TreatmentSatisfaction != 0 &
                                !is.na(RegData$TreatmentSatisfaction)), ]
@@ -213,7 +283,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='fornoyd_12mnd') {
-    tittel <- "Fornøyd med behandling 12 mnd"
+    tittel <- "Fornøyd med behandling"
     RegData <- RegData[which(RegData$regstatus==1 & RegData$regstatus_post2==1 &
                                RegData$TreatmentSatisfaction_post2 != 0 &
                                !is.na(RegData$TreatmentSatisfaction_post2)), ]
@@ -299,20 +369,56 @@ nnrrPrepVar <- function(RegData, valgtVar)
   if (valgtVar=='beh_kommunalt') {
     tittel <- c('Behandling i kommunalhelsetjenesten')
     # N <- dim(RegData)[1]
-    AntVar <- apply(RegData[,c("Treatment_NoTreatment", "Treatment_FollowUpMunicipality", "Treatment_FollowUpFysioterapeut",
-                               "Treatment_FollowUpManuellTerapeut", "Treatment_FollowUpKiropraktor", "Treatment_FollowUpPsykolog",
-                               "Treatment_FollowUpKommunalt", "Treatment_FollowUpMunicipalityOther")],
+    AntVar <- apply(RegData[,c("Treatment_NoTreatment",
+                               "Treatment_FollowUpMunicipality",
+                               "Treatment_FollowUpFysioterapeut",
+                               "Treatment_FollowUpManuellTerapeut",
+                               "Treatment_FollowUpKiropraktor",
+                               "Treatment_FollowUpPsykolog",
+                               "Treatment_FollowUpMunicipalityOther")],
                     2, function(x){sum(as.numeric(x), na.rm = T)})
     NVar<- apply(RegData[,c("Treatment_NoTreatment", "Treatment_FollowUpMunicipality", "Treatment_FollowUpFysioterapeut",
                             "Treatment_FollowUpManuellTerapeut", "Treatment_FollowUpKiropraktor", "Treatment_FollowUpPsykolog",
-                            "Treatment_FollowUpKommunalt", "Treatment_FollowUpMunicipalityOther")],
+                            "Treatment_FollowUpMunicipalityOther")],
                  2, function(x){length(which(!is.na(x)))})
     # NVar<-rep(N, length(AntVar))
     N <- max(NVar)
     grtxt <- c('Ingen behandling', 'Oppfølging av lege', 'Oppfølging av fysioterapeut',
                'Oppfølging av manuell terapeut',
                'Oppfølging av kiropraktor', 'Oppfølging av psykolog',
-               'Oppfølging i kommunehelsetjenesten', 'Arbeidsrettet oppfølging')
+               'Arbeidsrettet oppfølging')
+    retn <- 'H'
+
+  }
+
+  if (valgtVar=='beh_kommunalt_v2') {
+    tittel <- c('Behandling utenfor spesialisthelsetjenesten')
+    # N <- dim(RegData)[1]
+    AntVar <- apply(RegData[,c("Treatment_NoTreatment",
+                               "Treatment_FollowUpMunicipality",
+                               "Treatment_FollowUpFysioterapeut",
+                               "Treatment_FollowUpKiropraktor",
+                               "Treatment_FollowUpPsykolog",
+                               "Treatment_FollowUpMunicipalityOther",
+                               "Treatment_FollowupOtherLifeStyle")],
+                    2, function(x){sum(as.numeric(x), na.rm = T)})
+    NVar<- apply(RegData[,c("Treatment_NoTreatment",
+                            "Treatment_FollowUpMunicipality",
+                            "Treatment_FollowUpFysioterapeut",
+                            "Treatment_FollowUpKiropraktor",
+                            "Treatment_FollowUpPsykolog",
+                            "Treatment_FollowUpMunicipalityOther",
+                            "Treatment_FollowupOtherLifeStyle")],
+                 2, function(x){length(which(!is.na(x)))})
+    # NVar<-rep(N, length(AntVar))
+    N <- max(NVar)
+    grtxt <- c('Ingen behandling',
+               'Oppfølging av lege',
+               'Oppfølging av Fysio/manuell/\n psykomotorisk terapeut',
+               'Oppfølging av kiropraktor',
+               'Oppfølging av psykolog',
+               'Arbeidsrettet oppfølging',
+               'Andre livstilsrelaterte\n tilbud el. lign.')
     retn <- 'H'
 
   }
@@ -334,14 +440,14 @@ nnrrPrepVar <- function(RegData, valgtVar)
     RegData$Treatment_GroupInterdisciplinary3[RegData$Treatment_GroupInterdisciplinary2018==4 | RegData$Treatment_GroupInterdisciplinary==3] <- 1
 
     AntVar <- apply(RegData[,c("Treatment_TreatmentInSpecialistServices", "Treatment_FollowUpOperation",
-                               "Treatment_TreatmentOtherRehabCentre", "Treatment_TreatmentOwnSpecialistServices",
+                               "Treatment_TreatmentOtherRehabCentre",
                                "Treatment_ControlAfterReviewOrTreatment", "Treatment_IndividualFollowUp1to2Times",
                                "Treatment_InvidualInterdisciplinary1", "Treatment_InvidualInterdisciplinary2",
                                "Treatment_InvidualInterdisciplinary3", "Treatment_GroupInterdisciplinary1",
                                "Treatment_GroupInterdisciplinary2", "Treatment_GroupInterdisciplinary3")],
                     2, function(x){sum(as.numeric(x), na.rm = T)})
     NVar<- apply(RegData[,c("Treatment_TreatmentInSpecialistServices", "Treatment_FollowUpOperation",
-                            "Treatment_TreatmentOtherRehabCentre", "Treatment_TreatmentOwnSpecialistServices",
+                            "Treatment_TreatmentOtherRehabCentre",
                             "Treatment_ControlAfterReviewOrTreatment", "Treatment_IndividualFollowUp1to2Times",
                             "Treatment_InvidualInterdisciplinary1", "Treatment_InvidualInterdisciplinary2",
                             "Treatment_InvidualInterdisciplinary3", "Treatment_GroupInterdisciplinary1",
@@ -351,7 +457,6 @@ nnrrPrepVar <- function(RegData, valgtVar)
     N <- max(NVar)
     grtxt <- c('Behandling i\n spesialhelsetjenesten', 'Henvist til vurdering\n av operasjon',
                'Anbefaler henvisning til annet\n opptrenings /rehabiliteringssenter',
-               'Behandling som settes i verk\n i egen spesialisthelsetjeneste',
                'Kontroll etter vurdering \n eller behandling', 'Individuell oppfølging\n 1-2 ganger',
                'Individuell tverrfaglig \n behandling 1-3 ganger', 'Individuell tverrfaglig\n behandling 4-10 ganger',
                'Individuell tverrfaglig\n behandling mer enn 10 ganger', 'Tverrfaglig behandling\n i gruppe 1-3 ganger',

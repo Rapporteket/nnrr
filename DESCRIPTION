@@ -17,10 +17,12 @@ Imports:
   shinyjs,
   janitor,
   DT,
-  kableExtra
+  kableExtra,
+  rapbase,
+  rapFigurer
 Remotes:
   Rapporteket/rapbase@*release,
   Rapporteket/rapFigurer
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 Suggests:
 VignetteBuilder: knitr

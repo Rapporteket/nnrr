@@ -44,51 +44,49 @@ datadump_UI <- function(id){
   )
 }
 
-indikatorfigServer <- function(id, RegData, userRole, hvd_session, reshID){
+datadump_Server <- function(id, RegData, userRole, hvd_session, reshID){
   moduleServer(
     id,
 
     function(input, output, session) {
 
-      # datadump <- function(input, output, session, reshID, userRole, hvd_session){
-
       output$lastNed_dump <- downloadHandler(
         filename = function(){
-          paste0(input$dumptype, '_NRA', Sys.time(), '.csv')
+          fs::path_sanitize(paste0(input$dumptype, Sys.time(), '.csv'))
         },
         content = function(file){
           if (rapbase::isRapContext()) {
-            if (input$dumptype == c('alleVarNum_utflatet')) {
-              allevar <- nraHentTabell("alleVarNum")
-              basisdata <- allevar[allevar$ForlopsType1Num %in% 1:2, ]
-              basisdata <- basisdata[, colSums(is.na(basisdata)) != dim(basisdata)[1]]
-              oppfdata <- allevar[allevar$ForlopsType1Num %in% 3:4, ]
-              oppfdata <- oppfdata[, colSums(is.na(oppfdata)) != dim(oppfdata)[1]]
-              oppf1 <- oppfdata[oppfdata$ForlopsType1Num==3, ]
-              oppf5 <- oppfdata[oppfdata$ForlopsType1Num==4, ]
-              names(oppf1) <- paste0(names(oppf1), "_oppf1")
-              names(oppf5) <- paste0(names(oppf5), "_oppf5")
-              tmpData <- basisdata %>%
-                merge(oppf1, by.x = "ForlopsID", by.y = "KobletForlopsID_oppf1", all.x = T) %>%
-                merge(oppf5, by.x = "ForlopsID", by.y = "KobletForlopsID_oppf5", all.x = T)
+            if (input$dumptype == "nnrr_utflatet") {
+              tmpData <- RegData
             } else {
-              tmpData <- nraHentTabell(input$dumptype)
+              tmpData <- nnrrHentTabell(input$dumptype)
             }
           } else {
-            tmpData <- read.table(paste0('I:/nra/', input$dumptype, '2020-09-08.txt'),
-                                  header=TRUE, sep=";", encoding = 'UTF-8', stringsAsFactors = F)
+            tmpData <- switch (
+              input$dumptype,
+              "pasientsvar_pre" = readr::read_csv2(
+                'C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+for+behandling_2022-12-09_1116_v2.csv'),
+              "legeskjema" = readr::read_csv2(
+                'C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-12-09_1116.csv'),
+              # "legeskjema" = read.table(
+              #   'C:/GIT/data/nnrr/DataDump_MRS-PROD_Behandlerskjema_2022-12-09_1116.csv', sep=';',
+              #   header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F),
+              "pasientsvar_post" =  read.table(
+                'C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+6+maneder+etter+behandling_2022-12-09_1116.csv',
+                sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F),
+              "pasientsvar_post2" = read.table(
+                'C:/GIT/data/nnrr/DataDump_MRS-PROD_Pasientskjema+12+maneder+etter+behandling_2022-12-09_1116.csv',
+                sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F),
+              "nnrr_utflatet" = RegData
+            )
           }
-          dumpdata <- tmpData[which(as.Date(tmpData$HovedDato) >= input$datovalg[1] &
-                                      as.Date(tmpData$HovedDato) <= input$datovalg[2]), ]
+          dumpdata <- tmpData[which(as.Date(tmpData$S1b_DateOfCompletion, format="%d.%m.%Y") >= input$datovalg[1] &
+                                      as.Date(tmpData$S1b_DateOfCompletion, format="%d.%m.%Y") <= input$datovalg[2]), ]
           if (userRole != 'SC') {
-            dumpdata <- dumpdata[dumpdata$AvdRESH %in% reshID, ]
+            dumpdata <- dumpdata[dumpdata$UnitId %in% reshID, ]
           }
-          if (input$dumptype == "ForlopsOversikt") {
-            dumpdata <- apply(dumpdata, 2, as.character)
-            dumpdata <- as.data.frame(dumpdata)
-            dumpdata <- dumpdata[which(dumpdata$PasientID != ""), ]
-          }
-          write.csv2(dumpdata, file, row.names = F, na = '', fileEncoding = 'Latin1')
+          # write.csv2(dumpdata, file, row.names = F, na = '', fileEncoding = 'Latin1')
+          readr::write_excel_csv2(dumpdata, file)
         }
       )
 

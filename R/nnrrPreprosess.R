@@ -22,10 +22,13 @@ nnrrPreprosess <- function(RegData)
     apply(RegData[, boolske_var], 2, as.logical)
   RegData$TreatmentOperation <- as.logical(RegData$TreatmentOperation)
 
-  RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion", "S1b_DateOfCompletion_pre",
-              "S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")] <-
-    dplyr::mutate_all(RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
-                           "S1b_DateOfCompletion_pre","S1b_DateOfCompletion_post", "DateOfCompletion", "DateOfCompletion_post")],
+  RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
+              "S1b_DateOfCompletion_pre", "S1b_DateOfCompletion_post",
+              "DateOfCompletion", "DateOfCompletion_post2")] <-
+    dplyr::mutate_all(RegData[, c("FormDate", "FormDate_pre", "FormDate_post",
+                                  "S1b_DateOfCompletion", "S1b_DateOfCompletion_pre",
+                                  "S1b_DateOfCompletion_post", "DateOfCompletion",
+                                  "DateOfCompletion_post2")],
                       list(~ as.Date(., format="%d.%m.%Y")))
   RegData$Besoksdato <- RegData$S1b_DateOfCompletion
 
@@ -85,8 +88,8 @@ nnrrPreprosess <- function(RegData)
   RegData$NdiScore <- as.numeric(sapply(as.character(RegData$NdiScore), gsub, pattern = ",", replacement= "."))
   RegData$NdiScore_post <- as.numeric(sapply(as.character(RegData$NdiScore_post), gsub, pattern = ",", replacement= "."))
   RegData$NdiScore_post2 <- as.numeric(sapply(as.character(RegData$NdiScore_post2), gsub, pattern = ",", replacement= "."))
-  RegData$Eq5dScore <- as.numeric(sapply(as.character(RegData$Eq5dScore), gsub, pattern = ",", replacement= "."))
-  RegData$Eq5dScore_post <- as.numeric(sapply(as.character(RegData$Eq5dScore_post), gsub, pattern = ",", replacement= "."))
+  RegData$Eq5dScore_Old <- as.numeric(sapply(as.character(RegData$Eq5dScore_Old), gsub, pattern = ",", replacement= "."))
+  RegData$Eq5dScore_Old_post <- as.numeric(sapply(as.character(RegData$Eq5dScore_Old_post), gsub, pattern = ",", replacement= "."))
   RegData$Score_EQ5DL <- as.numeric(sapply(as.character(RegData$Score_EQ5DL), gsub, pattern = ",", replacement= "."))
   RegData$FABQScore1 <- as.numeric(sapply(as.character(RegData$FABQScore1), gsub, pattern = ",", replacement= "."))
   RegData$FABQScore2 <- as.numeric(sapply(as.character(RegData$FABQScore2), gsub, pattern = ",", replacement= "."))
@@ -105,6 +108,7 @@ nnrrPreprosess <- function(RegData)
   RegData$SykehusNavn[RegData$UnitId == 105821] <- 'Levanger'
   RegData$SykehusNavn[RegData$UnitId == 103736] <- 'Drammen'
   RegData$SykehusNavn[RegData$UnitId == 700138] <- 'Stavern'
+  RegData$SykehusNavn[RegData$UnitId == 700701] <- 'NLSH'
 
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel')] <- 'EQ5D.VAS'
   names(RegData)[which(names(RegData) == 'Eq5dHealthLevel_post')] <- 'EQ5D.VAS_post'
@@ -112,6 +116,9 @@ nnrrPreprosess <- function(RegData)
   RegData$FamilyStatus[RegData$FamilyStatus==0] <- 99
   RegData$FamilyStatus <- factor(RegData$FamilyStatus, levels = c(1:3,99),
                                  labels = c('Gift/Reg. partner','Samboende', 'Enslig', 'Ikke svart'))
+  RegData$UtdanningHoy <- NA
+  RegData$UtdanningHoy[RegData$EducationLevel %in% 1:3] <- 0
+  RegData$UtdanningHoy[RegData$EducationLevel %in% 4:5] <- 1
   RegData$EducationLevel[RegData$EducationLevel==0] <- 99
   RegData$EducationLevel <- factor(RegData$EducationLevel, levels = c(1:5,99),
                                    labels = c('Grunnskole 7-10 år, framhaldskole eller folkehøyskole'
@@ -125,6 +132,9 @@ nnrrPreprosess <- function(RegData)
   RegData$PainDurationNow <- factor(RegData$PainDurationNow, levels = c(1:5,99),
                                  labels = c('Ingen smerter', 'Mindre enn 3 måneder', '3 til 12 måneder',
                                             '1-2 år', 'Mer enn 2', 'Ikke svart'))
+  RegData$VentetidFraHenvisningTilTilbud_kat <-
+    cut(RegData$VentetidFraHenvisningTilTilbud, breaks = c(0,30,60,90,180,365, 100000),
+        labels = )
 
   # RegData$NeckSurgery[RegData$NeckSurgery==0] <- 99
   RegData$NeckSurgery <- factor(RegData$NeckSurgery, levels = c(1:3),
@@ -150,7 +160,11 @@ nnrrPreprosess <- function(RegData)
                                                                                         'Alderspensjonist', 'Hjemmeværende',
                                                                                         'Sykemeldt', 'Arbeidsavklaringspenger',
                                                                                         'Permanent uførepensjon'))
-  RegData$Tverrfaglig_vurdering_antall <- rowSums(RegData[, c("FirstMedExamDoctor", "FirstMedExamNurse", "FirstMedExamPhys", "FirstMedExamOther")])
+  # RegData$Tverrfaglig_vurdering_antall <- rowSums(RegData[, c("FirstMedExamDoctor", "FirstMedExamNurse", "FirstMedExamPhys", "FirstMedExamOther")])
+  RegData$Tverrfaglig_vurdering_antall <-
+    rowSums(RegData[, c("TreatmentEvaluationByDoctor", "TreatmentEvaluationByPhysiotherapist",
+                        "TreatmentEvaluationByNurse", "TreatmentEvaluationByPsychologist",
+                        "TreatmentEvaluationBySocionom", "TreatmentEvaluationOther")])
   RegData$Tverrfaglig_vurdering <- 0
   RegData$Tverrfaglig_vurdering[RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
 

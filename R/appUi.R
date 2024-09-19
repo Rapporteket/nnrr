@@ -63,6 +63,9 @@ appUi <- function() {
       shiny::tabPanel("Administrative tabeller",
                       h2("Administrative tabeller", align='center')
       ),
+      shiny::tabPanel("Kvartalsrapport",
+                      nnrr::samledok_UI(id = "samledok")
+      ),
       shiny::tabPanel("Abonnement",
                       h2("Kvartalsrapport", align='center')
       ),

@@ -1,20 +1,22 @@
-version: '3.3'
-
 services:
   db:
-    image: mysql:5.7
+    image: mysql:8
     command: --innodb-log-file-size=500M --innodb_strict_mode=0
     restart: "no"
+    volumes:
+      - ~/softlinks/mysql_db:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
 
   dev:
     depends_on:
       - db
-    image: rapporteket/nnrr-dev:test
+    image: rapporteket/nnrr-dev:main
     volumes:
       - ~/.ssh:/home/rstudio/.ssh
       - ~/.gitconfig:/home/rstudio/.gitconfig
+      - .:/home/rstudio/nnrr
+      - ~/softlinks/mydata:/home/rstudio/mydata
     ports:
       - "8787:8787"
       - "3838:3838"
@@ -22,8 +24,7 @@ services:
       - 8.8.8.8
     restart: "no"
     environment:
-      USERID: $$UID
-      PASSWORD: password
+      DISABLE_AUTH: "true"
       DB_HOST: db
       DB_USER: root
       DB_PASS: root

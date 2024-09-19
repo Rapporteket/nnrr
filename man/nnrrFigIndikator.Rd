@@ -14,7 +14,7 @@ nnrrFigIndikator(
   pktStr = 1.4,
   legPlass = "top",
   minstekravTxt = "Min.",
-  maalTxt = "M<U+00E5>l",
+  maalTxt = "Mål",
   graaUt = NA,
   decreasing = F,
   outfile = "",
@@ -27,7 +27,6 @@ nnrrFigIndikator(
 }
 \arguments{
 \item{indikatordata}{En dataramme med følgende kolonner:
-- ReshId
 - Aar
 - Teller
 - Sykehusnavn}

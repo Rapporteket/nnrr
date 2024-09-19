@@ -4,7 +4,7 @@
 \alias{tr_summarize_output}
 \title{Transponer output fra tidyr::summarize}
 \usage{
-tr_summarize_output(x)
+tr_summarize_output(x, kolnavn1 = "")
 }
 \value{
 tr_frame Den transponerte av inputen

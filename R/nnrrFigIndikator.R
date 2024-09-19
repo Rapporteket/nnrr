@@ -1,19 +1,33 @@
 #' Gi en visuell fremstilling av registerets indikatorer over tid
 #'
 #' @param indikatordata En dataramme med følgende kolonner:
-#'                 - ReshId
 #'                 - Aar
 #'                 - Teller
 #'                 - Sykehusnavn
 #'
 #' @export
 #'
-nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = NA, maal = NA, skriftStr=1.3, pktStr=1.4,
-                             legPlass='top', minstekravTxt='Min.', maalTxt='Mål', graaUt=NA, decreasing=F, outfile = '',
-                             lavDG=NA, width=800, height=700, inkl_konf=F, maalretn='hoy')
+nnrrFigIndikator <- function(indikatordata,
+                             tittel='',
+                             terskel=30,
+                             minstekrav = NA,
+                             maal = NA,
+                             skriftStr=1.3,
+                             pktStr=1.4,
+                             legPlass='top',
+                             minstekravTxt='Min.',
+                             maalTxt='Mål',
+                             graaUt=NA,
+                             decreasing=F,
+                             outfile = '',
+                             lavDG=NA,
+                             width=800,
+                             height=700,
+                             inkl_konf=F,
+                             maalretn='hoy')
 {
 
-  # tittel='testtittel'; terskel=30; minstekrav = NA; maal = 30; skriftStr=1.3; pktStr=1.4;
+  # tittel='testtittel'; terskel=30; minstekrav = 85; maal = 95; skriftStr=1.3; pktStr=1.4;
   # legPlass='top'; minstekravTxt='Min.'; maalTxt='Mål'; graaUt=NA; decreasing=F; outfile = '';
   # lavDG=NA; width=800; height=700; inkl_konf=F; maalretn='hoy'
 
@@ -25,13 +39,15 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
                      Andel = Antall/N*100)
 
 
-  AntTilfeller <- tidyr::spread(Tabell[, -c(4,5)], 'Aar', 'Antall')
-  AntTilfeller <- dplyr::bind_cols(SykehusNavn=c(AntTilfeller$SykehusNavn, "Nasjonalt"),
-                                   dplyr::bind_rows(AntTilfeller[,-1], colSums(AntTilfeller[,-1], na.rm = T)))
+  AntTilfeller <- tidyr::spread(Tabell[, -c(4,5)], 'Aar', 'Antall') %>%
+    janitor::adorn_totals(name = "Nasjonalt") %>% as_tibble()
+  # AntTilfeller <- dplyr::bind_cols(SykehusNavn=c(AntTilfeller$SykehusNavn, "Nasjonalt"),
+  #                                  dplyr::bind_rows(AntTilfeller[,-1], colSums(AntTilfeller[,-1], na.rm = T)))
 
-  N <- tidyr::spread(Tabell[, -c(3,5)], 'Aar', 'N')
-  N <- dplyr::bind_cols(SykehusNavn=c(N$SykehusNavn, "Nasjonalt"),
-                        dplyr::bind_rows(N[,-1], colSums(N[,-1], na.rm = T)))
+  N <- tidyr::spread(Tabell[, -c(3,5)], 'Aar', 'N') %>%
+    janitor::adorn_totals(name = "Nasjonalt") %>% as_tibble()
+  # N <- dplyr::bind_cols(SykehusNavn=c(N$SykehusNavn, "Nasjonalt"),
+  #                       dplyr::bind_rows(N[,-1], colSums(N[,-1], na.rm = T)))
   N[is.na(N)] <- 0
 
   # Andeler, inkludert nasjonalt
@@ -42,11 +58,7 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
   andeler[andeler$SykehusNavn %in% lavDG, -1] <- NA
 
   # Ordne rekkefølge, stigende eller synkende
-  if (decreasing){
-    rekkefolge <- order(andeler[, dim(andeler)[2]], decreasing = decreasing, na.last = F)
-  } else {
-    rekkefolge <- order(andeler[, dim(andeler)[2]], decreasing = decreasing, na.last = F)
-  }
+  rekkefolge <- order(andeler[[dim(andeler)[2]]], decreasing = decreasing, na.last = F)
 
   andeler <- andeler[rekkefolge, ]
   N <- N[rekkefolge, ]
@@ -86,11 +98,11 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
     andeler$SykehusNavn[dim(andeler)[1]] <- paste0('(N, ', names(andeler)[dim(andeler)[2]], ')')
     KI <- cbind(c(NA, NA), KI, c(NA, NA))
   } else {
-    andeler <- rbind(andeler, c(NA,NA,NA))
+    andeler <- rbind(andeler, NA)
     andeler$SykehusNavn[dim(andeler)[1]] <- ''
   }
 
-  andeler <- rbind(c(NA,NA), andeler, c(NA,NA))
+  andeler <- rbind(NA, andeler, NA)
   andeler$SykehusNavn[dim(andeler)[1]] <- ''
   andeler$SykehusNavn[1] <- ' '
 
@@ -217,6 +229,11 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
              line=6, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
       mtext( 'N', side=4, line=4.0, las=1, at=max(ypos), col=1, cex=cexgr*.7, adj = 1)
     }
+    if (dim(N)[2] == 2) {
+      mtext( c(NA, purrr::as_vector(N[,2]), names(N)[2], NA, NA), side=4,
+             line=3, las=1, at=ypos, col=1, cex=cexgr*.7, adj = 1)
+      mtext( 'N', side=4, line=3, las=1, at=max(ypos), col=1, cex=cexgr*.7, adj = 1)
+    }
 
   }
   # else {
@@ -238,7 +255,20 @@ nnrrFigIndikator <- function(indikatordata, tittel='', terskel=30, minstekrav = 
              legend=names(N[,-1]), ncol = dim(andeler)[2]-1)
     }
   }
-
+  if (dim(N)[2] == 3) {
+    points(y=ypos, x=purrr::as_vector(andeler[,2]),cex=pktStr,pch= 19) #'#4D4D4D'
+    # points(y=ypos, x=purrr::as_vector(andeler[,3]),cex=pktStr,pch= 19)
+    par(xpd=FALSE)
+    # if (legPlass=='nede'){
+    #   legend(x=82, y=ypos[2]+1 ,xjust=0, cex=cexgr, bty='n', #bg='white', box.col='white',
+    #          lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+    #          legend=names(N) )}
+    if (legPlass=='top'){
+      legend('top', cex=0.9*cexgr, bty='n', #bg='white', box.col='white',y=max(ypos),
+             lwd=c(NA,NA), pch=c(19,15), pt.cex=c(1.2,1.8), col=c('black',farger[3]),
+             legend=names(N[,-1]), ncol = dim(andeler)[2]-1)
+    }
+  }
 
   text(x=0, y=ypos, labels = pst_txt, cex=0.75, pos=4)#
   if ( outfile != '') {dev.off()}

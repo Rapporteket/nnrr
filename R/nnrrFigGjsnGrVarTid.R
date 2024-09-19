@@ -62,11 +62,11 @@ nnrrFigGjsnGrVarTid <- function(RegData, valgtVar='PatientAge', tittel='', datoF
   gj.sn[gj.sn$Gr_var %in% lavDG, -1] <- NA
 
   # Ordne rekkefølge, stigende eller synkende
-  if (decreasing){
-    rekkefolge <- order(gj.sn[, dim(gj.sn)[2]], decreasing = decreasing, na.last = F)
-  } else {
-    rekkefolge <- order(gj.sn[, dim(gj.sn)[2]], decreasing = decreasing, na.last = F)
-  }
+  # if (decreasing){
+    rekkefolge <- order(gj.sn[[dim(gj.sn)[2]]], decreasing = decreasing, na.last = F)
+  # } else {
+  #   rekkefolge <- order(gj.sn[[dim(gj.sn)[2]]], decreasing = decreasing, na.last = F)
+  # }
 
   gj.sn <- gj.sn[rekkefolge, ]
   N <- N[rekkefolge, ]

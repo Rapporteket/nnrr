@@ -1,0 +1,677 @@
+\documentclass[a4paper]{article} % ,twoside
+\usepackage[norsk]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{subfig}
+\usepackage{pdfpages}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{amssymb}
+\usepackage[a4paper]{geometry}
+\usepackage[pdftex, colorlinks, linkcolor=lysblaa, urlcolor=lysblaa]{hyperref}
+\usepackage{array}
+\usepackage{hyphsubst}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}p{#1}}
+\newif\ifinkl
+
+\title{Kvartalsrapport for NNRR}
+\author{NNRR}
+
+%setter grå skrift fremfort sort
+\usepackage{xcolor}
+\usepackage{graphicx}
+\pagestyle{myheadings}
+\definecolor{lysblaa}{rgb}{0.27,0.51,0.71}
+\definecolor{moerkgraa}{rgb}{0.25,0.25,0.25}
+\color{moerkgraa}
+
+<<'initOpts',include=FALSE>>=
+knitr::opts_chunk$set(warnings=FALSE,echo=FALSE)
+knitr::opts_knit$set(root.dir = './')
+@
+
+<<LastData, include=FALSE, cache=FALSE>>=
+# setwd('c:/GIT/nnrr/doc/')
+rm(list=ls())
+library(nnrr)
+library(tidyverse)
+library(lubridate)
+
+# RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
+# 102959 <- 'Haukeland'
+# 104293 <- 'St. Olavs'
+# 109834 <- 'OUS'
+# 601032 <- 'UNN-Tromsø'
+# 700735 <- 'UNN-Harstad'
+# 102169 <- 'Sandnessjøen'
+# 114174 <- 'Kristiansand'
+# 4211588 <- 'Stavanger'
+# 4212982 <- 'Ålesund'
+# 105821 <- 'Levanger'
+# 103736 <- 'Drammen'
+# 700138 <- 'Stavern'
+# 700701 <- 'Nordlandssykehuset'
+reshID <- 700138
+Inkl_i_rapp <- ifelse(reshID %in% c(114174, 104293, 109834, 700138),
+                      "\\inkltrue", "\\inklfalse")
+
+
+datoTil <- Sys.Date()
+datoTil <- datoTil %>% as.Date() %>% lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
+datoFra <- (datoTil + lubridate::days(1)) %m-% lubridate::years(1)
+
+datoTil <- as.character(datoTil)
+datoFra <- as.character(datoFra)
+
+RegData <- nnrr::nnrrHentRegData()
+
+shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
+
+figstr <- 0.61
+# tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+
+figfolder <- "~/nnrr/inst/figfolder/"
+if (!dir.exists(figfolder)) {
+  dir.create(figfolder)
+}
+@
+
+\begin{document}
+%%%%% Forside
+
+\newgeometry{left=2.5cm,bottom=0.1cm, top=2.1cm}
+\begin{titlepage}
+\color{lysblaa}
+\begin{flushleft}
+\Huge
+\textbf{NNRR}\\
+\vspace{0.3cm}
+\LARGE
+Norsk nakke- og ryggregister
+\end{flushleft}
+% \vspace{0.5cm}
+\vfill
+
+\begin{center}
+{\LARGE \textbf{KVARTALSRAPPORT}}
+\vspace{0.1cm}
+\vspace{1pt}\vspace{-\baselineskip}
+\rule{1.0\textwidth}{1pt}\par   % Horisontal linje
+\vspace{0.5cm}
+\includegraphics[width=1.0\textwidth]{\Sexpr{system.file(file='smertebilde.PNG', package='nnrr')}} % Inkluder bilde
+% \includegraphics[width=1.0\textwidth]{C:/GIT/nnrr/inst/smertebilde.PNG}
+\vspace{1pt}\vspace{-\baselineskip}
+{\color{moerkgraa} \small Illustrasjonsbilde}
+\end{center}
+
+\vfill
+\noindent
+\begin{minipage}[t]{6cm}
+\flushleft
+\textsc{Rapportdato:}
+
+\today\\
+\end{minipage}
+\hfill
+\begin{minipage}[t]{6cm}
+\flushright
+\textsc{For sykehus:}
+
+\textbf{\Sexpr{shtxt}}\\
+\end{minipage}
+\\ \\
+\noindent
+\begin{minipage}[t]{6cm}
+\flushleft
+\textsc{Besøksdato pasient:}
+
+\Sexpr{format(as.Date(datoFra), "%d. %B %Y")} til \Sexpr{format(as.Date(datoTil), "%d. %B %Y")}\\
+\end{minipage}
+
+\vfill
+
+\noindent
+\begin{minipage}[t]{6cm}
+\flushleft
+% \includegraphics[width=0.7\textwidth]{\Sexpr{system.file(file='norgastlogo.png', package='norgast')}} % Inkluder logo
+\end{minipage}
+\hfill
+\begin{minipage}[t]{6cm}
+\flushright
+\normalsize
+Templatversjon III, 2023
+\end{minipage}
+\end{titlepage}
+
+\color{moerkgraa}
+
+
+\section{Bakgrunn}
+\Sexpr{Inkl_i_rapp}
+
+Norsk nakke- og ryggregister (NNRR) er nasjonalt medisinsk kvalitetsregister som inkluderer pasienter med smerter i nakke eller rygg som behandles ved de tverrfaglige nakke- og ryggpoliklinikkene tilknyttet fysikalskmedisinske miljø. Totalt er det 16 potensielle poliklinikker. Når alle disse er tilknyttet vil registeret vil ha en komplett oversikt over slik utredning og behandling i Norge. I 2019 leverte kun fire poliklinikker til registeret, mens i 2023 er totalt 13 poliklinikker tilknyttet. Resterende tverrfaglige nakke- og ryggpoliklinikker vil knyttes til fortløpende. \\ \\
+
+Svarene pasientene fyller ut er tilgjengelig for utreder ved første utredende konsultasjon og kan dermed bedre møtet med den enkelte pasient. Videre er formålet med registeret å bedre kvaliteten på pasienttilbudet ved de spesialiserte tverrfaglige nakke- og ryggpoliklinikkene. Dette innebærer å:
+\begin{itemize}
+\item Å vurdere om tilbudet er likt geografisk fordelt
+\item	Kartlegge hvilke pasienter som henvises til poliklinikkene
+\item	Bidra til at de rette pasienter kanaliseres til de rette behandlingstilbudene
+\item	Evaluere effekten av pasientbehandling medisinsk og samfunnsmessig
+\item	Iverksette kvalitetstiltak lokalt og eventuelt nasjonalt
+\end{itemize}
+
+Hver enhet vil hvert kvartal få rapport på sine data. Her kommer dette kvartalets rapport. Dette viser bare et øyeblikksbilde, som en pulsmåling. Håper dere blir inspirert til å bruke data til kvalitetsforbedringsprosjekter lokalt, eller ta initiativ til nasjonale løft. Man kan også gå direkte inn i eget register for å hente ut egne data. For kort oversikt over nasjonale data se \href{https://www.kvalitetsregistre.no/register/muskel-og-skjelett-rehabilitering/norsk-nakke-og-ryggregister}{her}. Ta gjerne kontakt med daglig leder eller konstituert faglig leder dersom dere savner noe i rapporten eller har andre spørsmål. Mailadresser er: \\
+kjetil.magne.samuelsen@unn.no \\
+maja.wilhelmsen@unn.no
+
+\clearpage
+
+\section{Registrering ved \Sexpr{shtxt}}
+
+
+<<'Tab 1', results='asis', echo=FALSE>>=
+
+datoFra_sistkvartal <- floor_date(as.Date(datoTil), unit="month") %m-% months(2)
+
+aux <- RegData[RegData$Besoksdato >= datoFra_sistkvartal & RegData$Besoksdato <= datoTil, ]
+
+aux$avd <- aux$SykehusNavn
+aux$avd[aux$UnitId != reshID] <- "Landet for øvrig"
+
+# kjonn <- addmargins(table(aux[, c("ErMann", "avd")], useNA = 'ifany'), 2)
+# alder <- c(tapply(aux$PatientAge, aux$avd, mean), Sum=mean(aux$PatientAge))
+# alder_sd <- c(tapply(aux$PatientAge, aux$avd, sd), Sum=sd(aux$PatientAge))
+# alder <- paste0(round(alder, 1), ' (', round(alder_sd, 1),')')
+#
+# familiestatus <- addmargins(table(aux[, c("FamilyStatus", "avd")]), 2)
+# utdanning <- addmargins(table(aux[, c("EducationLevel", "avd")]), 2)
+#
+# samlet <- rbind(rep(NA, dim(kjonn)[2]), kjonn, rep(NA, dim(kjonn)[2]), alder, rep(NA, dim(kjonn)[2]),
+#                 rep(NA, dim(kjonn)[2]), familiestatus, rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]),
+#                 utdanning)
+# rownames(samlet) <- 1:dim(samlet)[1]
+# samlet <- as.data.frame(samlet)
+# samlet$radnavn <- c('\\textbf{Kjønn}', '\\quad Kvinner', '\\quad Menn', '', '\\textbf{Alder, gj.snitt (SD)}', '',
+#                     '\\textbf{Sivilstatus}', '\\quad Gift/Reg. partner', '\\quad Samboende', '\\quad Enslig',
+#                     '\\quad Ikke svart', '', '\\textbf{Utdanning}', '\\quad Grunnskole (7-10 år)', '\\quad Vgs. yrkesfaglig',
+#                     '\\quad Vgs. allmennfaglig', '\\quad Høyskole/univ\\textless 4år',
+#                     '\\quad Høyskole/univ\\textgreater 4 år',
+#                     '\\quad Ikke svart')
+# samlet <- samlet[, c(dim(samlet)[2],1:(dim(samlet)[2]-1))]
+# names(samlet)[1] <- ''
+# names(samlet)[dim(samlet)[2]] <- 'Totalt'
+# # samlet <- samlet[1:19, ]
+#
+#
+# print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
+#                      caption = "Basert på registreringer siste avsluttede kvartal"), include.rownames=FALSE,
+#       sanitize.text.function = function(x){x}, sanitize.colnames.function=function(x) {paste0('{\\textbf{',x,'}}')})
+
+
+N = table(aux[, c("avd")], useNA = 'ifany')
+
+kjonn <- table(aux[, c("ErMann", "avd")], useNA = 'ifany')
+kjonn[,1] <- round(kjonn[,1]/N[1]*100, 1)
+kjonn[,2] <- round(kjonn[,2]/N[2]*100, 1)
+kjonn[,1]  <- paste0(kjonn[,1] , " \\%")
+kjonn[,2]  <- paste0(kjonn[,2] , " \\%")
+
+alder <- tapply(aux$PatientAge, aux$avd, mean)
+alder_sd <- tapply(aux$PatientAge, aux$avd, sd)
+alder <- paste0(round(alder, 1), ' (', round(alder_sd, 1),')')
+
+familiestatus <- table(aux[, c("FamilyStatus", "avd")])
+familiestatus[,1] <- round(familiestatus[,1]/N[1]*100, 1)
+familiestatus[,2] <- round(familiestatus[,2]/N[2]*100, 1)
+familiestatus[,1]  <- paste0(familiestatus[,1] , " \\%")
+familiestatus[,2]  <- paste0(familiestatus[,2] , " \\%")
+utdanning <- table(aux[, c("EducationLevel", "avd")])
+utdanning[,1] <- round(utdanning[,1]/N[1]*100, 1)
+utdanning[,2] <- round(utdanning[,2]/N[2]*100, 1)
+utdanning[,1]  <- paste0(utdanning[,1] , " \\%")
+utdanning[,2]  <- paste0(utdanning[,2] , " \\%")
+
+samlet <- rbind(N, rep(NA, dim(kjonn)[2]), kjonn, rep(NA, dim(kjonn)[2]), alder, rep(NA, dim(kjonn)[2]),
+                rep(NA, dim(kjonn)[2]), familiestatus, rep(NA, dim(kjonn)[2]), rep(NA, dim(kjonn)[2]),
+                utdanning)
+rownames(samlet) <- 1:dim(samlet)[1]
+samlet <- as.data.frame(samlet)
+samlet$radnavn <- c('\\textbf{N}', '\\textbf{Kjønn}', '\\quad Kvinner', '\\quad Menn', '', '\\textbf{Alder, gj.snitt (SD)}', '',
+                    '\\textbf{Sivilstatus}', '\\quad Gift/Reg. partner', '\\quad Samboende', '\\quad Enslig',
+                    '\\quad Ikke svart', '', '\\textbf{Utdanning}', '\\quad Grunnskole (7-10 år)', '\\quad Vgs. yrkesfaglig',
+                    '\\quad Vgs. allmennfaglig', '\\quad Høyskole/univ\\textless 4år',
+                    '\\quad Høyskole/univ\\textgreater 4 år',
+                    '\\quad Ikke svart')
+samlet <- samlet[, 3:1]
+names(samlet)[1] <- ''
+
+
+print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
+                     caption = "Basert på registreringer siste avsluttede kvartal"), include.rownames=FALSE,
+      sanitize.text.function = function(x){x}, sanitize.colnames.function=function(x) {paste0('{\\textbf{',x,'}}')})
+@
+
+
+
+<<'Figur:Aldersfordeling', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
+
+
+
+outfile <- paste0(figfolder, "alder.pdf")
+valgtVar <- "PatientAge"
+plotdata <- nnrr::nnrrBeregnAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=datoTil, enhetsUtvalg=1,
+                                    minald=0, maxald=130, erMann=99, reshID=reshID)
+nnrr::nnrrSoyleplot(plotdata = plotdata,
+                    outfile=outfile)
+
+outfile<-paste0(figfolder, 'VentetidFraHenvisning_fordeling.pdf')
+valgtVar <- "VentetidFraHenvisning_kat"
+plotdata <- nnrr::nnrrBeregnAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=datoTil, enhetsUtvalg=1,
+                                    minald=0, maxald=130, erMann=99, reshID=reshID)
+nnrr::nnrrSoyleplot(plotdata = plotdata,
+                    outfile=outfile)
+@
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}alder.pdf}
+\caption{Aldersfordelig i egen spesialisthelsetjeneste siste kvartal}
+\end{figure}
+
+<<'Figur:Tidsvisning', include=FALSE, echo=FALSE, eval=T, cache=FALSE>>=
+
+outfile <- paste0(figfolder, "ventetid_krav.pdf")
+valgtVar <- "ventetid_krav"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
+
+outfile <- paste0(figfolder, "andel_tverrfaglig.pdf")
+valgtVar <- "tverrfaglig_behandlet"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", maal = 30, maalnivaatxt = "Mål")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile, maal = 30,
+                   maalnivaatxt = "Mål",
+                   inkl_konf = 0)
+
+outfile <- paste0(figfolder, "andel_tverrfaglig_tolk.pdf")
+valgtVar <- "andel_tverrfaglig_tolk"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", maal = 30, maalnivaatxt = "Mål")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile, maal = 30,
+                   maalnivaatxt = "Mål",
+                   inkl_konf = 0)
+
+outfile <- paste0(figfolder, "andel_tverrfaglig_ikkenorsk.pdf")
+valgtVar <- "andel_tverrfaglig_ikkenorsk"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", maal = 30, maalnivaatxt = "Mål")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile, maal = 30,
+                   maalnivaatxt = "Mål",
+                   inkl_konf = 0)
+
+
+outfile <- paste0(figfolder, "individuell_oppfolging.pdf")
+valgtVar <- "individuell_oppfolging"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra,
+                                     datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99,
+                                     outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
+
+outfile <- paste0(figfolder, "smerter_2aar.pdf")
+valgtVar <- "smerter_2aar"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
+
+
+outfile <- paste0(figfolder, "fabq11.pdf")
+valgtVar <- "fabq11"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
+
+outfile <- paste0(figfolder, "fabq11_v2.pdf")
+valgtVar <- "fabq11_v2"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil,
+                                     enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99,
+                                     outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0)
+
+
+outfile <- paste0(figfolder, "mestringsorientert_samtale.pdf")
+valgtVar <- "mestringsorientert_samtale"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0, maal = 90, moderat = 80)
+
+outfile <- paste0(figfolder, "ind_raad_livsstil.pdf")
+valgtVar <- "ind_raad_livsstil"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0, maal = 90, moderat = 80)
+
+outfile <- paste0(figfolder, "kartlagt_funksjon.pdf")
+valgtVar <- "kartlagt_funksjon"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", iArbeid = 1)
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0, maal = 90, moderat = 80)
+
+outfile <- paste0(figfolder, "gjennomgang_billedfunn.pdf")
+valgtVar <- "gjennomgang_billedfunn"
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal")
+nnrr::nnrrTidsplot(plotdata = plotdata,
+                   outfile=outfile,
+                   inkl_konf = 0, maal = 90, moderat = 80)
+
+
+valgtVar <- "opplevd_nytte_beh_6mnd"
+plotdata1 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                      datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+valgtVar <- "opplevd_nytte_beh_12mnd"
+plotdata2 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                      datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                      minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                      tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+
+outfile <- paste0(figfolder, "opplevd_nytte_beh.pdf")
+nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
+                            plotdata2 = plotdata2,
+                            outfile=outfile,
+                            inkl_konf = 0)
+
+
+valgtVar <- "odi_klinisk_viktig_6mnd"
+plotdata1 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+valgtVar <- "odi_klinisk_viktig_12mnd"
+plotdata2 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                      datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+
+outfile <- paste0(figfolder, "odi_klinisk_viktig.pdf")
+nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
+                            plotdata2 = plotdata2,
+                            outfile=outfile,
+                            inkl_konf = 0)
+
+
+valgtVar <- "bedring_smerte_hvile_6mnd"
+plotdata1 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+valgtVar <- "bedring_smerte_hvile_12mnd"
+plotdata2 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+
+outfile <- paste0(figfolder, "bedring_smerte_hvile.pdf")
+nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
+                            plotdata2 = plotdata2,
+                            outfile=outfile,
+                            inkl_konf = 0)
+
+
+valgtVar <- "bedring_smerte_aktiv_6mnd"
+plotdata1 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+valgtVar <- "bedring_smerte_aktiv_12mnd"
+plotdata2 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+
+outfile <- paste0(figfolder, "bedring_smerte_aktiv.pdf")
+nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
+                            plotdata2 = plotdata2,
+                            outfile=outfile,
+                            inkl_konf = 0)
+
+valgtVar <- "fornoyd_6mnd"
+plotdata1 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg")
+valgtVar <- "fornoyd_12mnd"
+plotdata2 <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+
+outfile <- paste0(figfolder, "fornoyd.pdf")
+nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
+                            plotdata2 = plotdata2,
+                            outfile=outfile,
+                            inkl_konf = 0)
+
+outfile <- paste0(figfolder, "fornoyd_gruppert_6mnd.pdf")
+valgtVar <- "fornoyd_6mnd"
+nnrrFigAndelGrvar(RegData, valgtVar=valgtVar, datoFra=datoFra,
+                  datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
+                  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
+                  grtittel="Behandling i spesialisthelsetjenesten")
+
+outfile <- paste0(figfolder, "fornoyd_gruppert_12mnd.pdf")
+valgtVar <- "fornoyd_12mnd"
+nnrrFigAndelGrvar(RegData, valgtVar=valgtVar, datoFra=datoFra,
+                  datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg2",
+                  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
+                  grtittel="Behandling i spesialisthelsetjenesten")
+
+outfile <- paste0(figfolder, "fornoyd_gruppert.pdf")
+nnrrFigAndelGrvar_6og12mnd(RegData, valgtVar1 = "fornoyd_6mnd",
+                  valgtVar2 = "fornoyd_12mnd", datoFra=datoFra,
+                  datoTil=datoTil, enhetsUtvalg=1,
+                  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID, grvar="beh_spes_v3",
+                  grtittel="Behandling i spesialisthelsetjenesten")
+
+outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert_6mnd.pdf")
+nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_6mnd", datoFra=datoFra,
+                  datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
+                  minald=0, maxald=130, erMann=99, outfile=outfile,
+                  reshID=reshID, grvar="beh_spes_v3",
+                  grtittel="Behandling i spesialisthelsetjenesten")
+
+outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert_12mnd.pdf")
+nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_12mnd",
+                  datoFra=datoFra, datoTil=datoTil,
+                  enhetsUtvalg=1, datovar="dato_oppfolg2",
+                  minald=0, maxald=130, erMann=99, outfile=outfile,
+                  reshID=reshID, grvar="beh_spes_v3",
+                  grtittel="Behandling i spesialisthelsetjenesten")
+
+outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert.pdf")
+nnrrFigAndelGrvar_6og12mnd(RegData, valgtVar1="opplevd_nytte_beh_6mnd",
+                  valgtVar2="opplevd_nytte_beh_12mnd",
+                  datoFra=datoFra, datoTil=datoTil,
+                  enhetsUtvalg=1, datovar="dato_oppfolg2",
+                  minald=0, maxald=130, erMann=99, outfile=outfile,
+                  reshID=reshID, grvar="beh_spes_v3",
+                  grtittel="Behandling i spesialisthelsetjenesten")
+@
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}VentetidFraHenvisning_fordeling.pdf}
+\caption{Ventetid i dager fra henvisning til besøk i egen spesialisthelsetjeneste siste kvartal}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}ventetid_krav.pdf}
+\caption{Andel pasienter med 50 dager eller mindre fra henvisning til besøk i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}andel_tverrfaglig.pdf}
+\caption{Andel pasienter anbefalt tverrfaglig behandling (individuelt eller i gruppe) i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
+\end{figure}
+
+
+\ifinkl
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}andel_tverrfaglig_tolk.pdf}
+\caption{Andel pasienter med tolk som er anbefalt tverrfaglig behandling (individuelt eller i gruppe) i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}andel_tverrfaglig_ikkenorsk.pdf}
+\caption{Andel ikke-norske pasienter som er anbefalt tverrfaglig behandling (individuelt eller i gruppe) i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
+\end{figure}
+\fi
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}individuell_oppfolging.pdf}
+\caption{Andel pasienter anbefalt individuell oppfølging i egen spesialisthelsetjeneste sammenlignet med landet forøvrig siste 4 kvartal}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}smerter_2aar.pdf}
+\caption{Andel pasienter med smerter over 2 år i egen spesialisthelsetjeneste sammenlignet med landet for øvrig.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}fabq11_v2.pdf}
+\caption{Andel pasienter som er enig (delvis eller helt) i følgende utsagn: Jeg tror ikke jeg vil være tilbake på det vanlige arbeidet mitt innen tre måneder. Viser egen spesialisthelsetjeneste sammenlignet med landet for øvrig.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}mestringsorientert_samtale.pdf}
+\caption{Andel pasienter som får mestringsorientert samtale.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}ind_raad_livsstil.pdf}
+\caption{Andel pasienter som får individuell rådgivning vedrørende livsstil og/eller medikamenter.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}kartlagt_funksjon.pdf}
+\caption{Andel pasienter som får kartlagt funksjonsevne relatert til arbeid og utdannelse blant pasienter som har et arbeidsforhold.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}gjennomgang_billedfunn.pdf}
+\caption{Andel pasienter som har fått tatt billeddiagnostisikk som får gjennomgang av sine billedfunn.}
+\end{figure}
+
+\clearpage
+
+\section{Resultater}
+Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskjema, slik at disse resultater må tolkes med forsiktighet. Absolutte tall kan være svært små som dermed gir store prosentutslag.
+
+
+\subsection{Opplevd nytte av behandling}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr*0.9}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh.pdf}
+\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 6 og 12 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr*0.9}\textwidth]{\Sexpr{figfolder}opplevd_nytte_beh_gruppert.pdf}
+\caption{Andel pasienter som rapporterer nytte (helt, mye eller litt bedre) 6 og 12 mnd etter utredning/behandling i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal. Gruppert etter type behandling.}
+\end{figure}
+
+\clearpage
+
+\subsection{Funksjonsbedring}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}odi_klinisk_viktig.pdf}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring i funksjon (ODI) (30 \% eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+
+\clearpage
+
+\subsection{Bedring i smerte}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr*0.9}\textwidth]{\Sexpr{figfolder}bedring_smerte_hvile.pdf}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr*0.9}\textwidth]{\Sexpr{figfolder}bedring_smerte_aktiv.pdf}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+
+\clearpage
+
+\subsection{Tilfredshet med behandlingen}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr*0.9}\textwidth]{\Sexpr{figfolder}fornoyd.pdf}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr*0.9}\textwidth]{\Sexpr{figfolder}fornoyd_gruppert.pdf}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling angir å være fornøyd eller nøytral i møte med personalet ved sykehuset når spurt ved oppfølging sammenlignet med landet for øvrig siste 4 kvartal.  Gruppert etter type behandling.}
+\end{figure}
+
+
+\end{document}
