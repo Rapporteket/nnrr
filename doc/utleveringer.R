@@ -1,14 +1,53 @@
 rm(list=ls())
 library(nnrr)
 
+########### Utlevering Marte Glad 12.09.2024   ################################
+library(dplyr)
+var_pre <- readxl::read_xlsx("~/mydata/nnrr/Variabler til masteroppgave.xlsx",
+                             sheet = 3)
+var_beh <- readxl::read_xlsx("~/mydata/nnrr/Variabler til masteroppgave.xlsx",
+                             sheet = 4)
+var_6mnd <- readxl::read_xlsx("~/mydata/nnrr/Variabler til masteroppgave.xlsx",
+                              sheet = 2)
+var_12mnd <- readxl::read_xlsx("~/mydata/nnrr/Variabler til masteroppgave.xlsx",
+                               sheet = 1)
+pasientsvar_pre <- read.csv2('~/mydata/nnrr/data_pre_2024-09-13_0921.csv') %>%
+  select(var_pre$Variabelnavn) %>%
+  select(-PasientGUID, -Skjematype, -S1b_DateOfCompletion)
+legeskjema <- read.csv2('~/mydata/nnrr/data_beh_2024-09-13_0903.csv') %>%
+  select(intersect(var_beh$Variabelnavn, names(.))) %>%
+  select(-Skjematype)
+oppf6mnd <- read.csv2('~/mydata/nnrr/data_6mnd_2024-09-13_0927.csv') %>%
+  select(var_6mnd$Variabelnavn) %>%
+  select(-Skjematype)
+oppf12mnd <- read.csv2('~/mydata/nnrr/data_12mnd_2024-09-13_0930.csv') %>%
+  select(var_12mnd$Variabelnavn) %>%
+  select(-Skjematype)
+
+regdata <- legeskjema %>%
+  dplyr::filter(S1b_DateOfCompletion >= "2021-01-01",
+                S1b_DateOfCompletion <= "2023-12-31") %>%
+  merge(pasientsvar_pre,
+        by.x = "SkjemaGUID", by.y = "HovedskjemaGUID") %>%
+  dplyr::filter(!is.na(HSCL10Score)) %>%
+  merge(oppf6mnd, by.x = "SkjemaGUID", by.y = "HovedskjemaGUID",
+        suffixes = c("", "_oppf6mnd")) %>%
+  merge(oppf12mnd, by.x = "SkjemaGUID", by.y = "HovedskjemaGUID",
+        suffixes = c("", "_oppf12mnd"))
+
+write.csv2(regdata, "~/mydata/nnrr/data_nystad_20240916.csv", row.names = F)
+
 #### Utlevering Andreas Sandvik - 13.06.2024 ########
 library(dplyr)
-var_pre <- readxl::read_xlsx("~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
-                             sheet = 1)
-var_beh <- readxl::read_xlsx("~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
-                             sheet = 2)
-var_6mnd <- readxl::read_xlsx("~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
-                              sheet = 3)
+var_pre <- readxl::read_xlsx(
+  "~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
+  sheet = 1)
+var_beh <- readxl::read_xlsx(
+  "~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
+  sheet = 2)
+var_6mnd <- readxl::read_xlsx(
+  "~/nnrr/doc/Søknad om utlevering av data fra NNRR- 3 sheets med ønskede variabler.xlsx",
+  sheet = 3)
 # pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-06-04_0904.csv') %>%
 #   select(var_pre$varnavn)
 # legeskjema <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-06-04_0904.csv') %>%
