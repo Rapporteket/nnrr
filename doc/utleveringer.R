@@ -15,7 +15,7 @@ pasientsvar_pre <- read.csv2('~/mydata/nnrr/data_pre_2024-09-13_0921.csv') %>%
   select(var_pre$Variabelnavn) %>%
   select(-PasientGUID, -Skjematype, -S1b_DateOfCompletion)
 legeskjema <- read.csv2('~/mydata/nnrr/data_beh_2024-09-13_0903.csv') %>%
-  select(intersect(var_beh$Variabelnavn, names(.))) %>%
+  select(intersect(var_beh$Variabelnavn, names(.)), PatientGender, PatientAge) %>%
   select(-Skjematype)
 oppf6mnd <- read.csv2('~/mydata/nnrr/data_6mnd_2024-09-13_0927.csv') %>%
   select(var_6mnd$Variabelnavn) %>%
@@ -35,7 +35,7 @@ regdata <- legeskjema %>%
   merge(oppf12mnd, by.x = "SkjemaGUID", by.y = "HovedskjemaGUID",
         suffixes = c("", "_oppf12mnd"))
 
-write.csv2(regdata, "~/mydata/nnrr/data_nystad_20240916.csv", row.names = F)
+write.csv2(regdata, "~/mydata/nnrr/data_nystad_20241018.csv", row.names = F)
 
 #### Utlevering Andreas Sandvik - 13.06.2024 ########
 library(dplyr)
@@ -56,8 +56,8 @@ var_6mnd <- readxl::read_xlsx(
 #   select(var_6mnd$varnavn)
 pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1230_paspre.csv') %>%
   select(var_pre$varnavn)
-legeskjema <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1222_behandler.csv') %>%
-  select(var_beh$varnavn)
+legeskjema <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1222_beh.csv') %>%
+  select(var_beh$varnavn, PatientGender, PatientAge)
 oppf6mnd <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1237_pas6mnd.csv') %>%
   select(var_6mnd$varnavn)
 
@@ -91,11 +91,11 @@ oppf6mnd <- oppf6mnd %>% filter(HovedskjemaGUID %in% pasientsvar_pre$Hovedskjema
 duplikater <- oppf6mnd %>% filter(n()>1, .by = HovedskjemaGUID) %>%
   arrange(HovedskjemaGUID)
 
-readr::write_csv2(data_koblet_filtrert, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_data_koblet.csv")
-readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_pasientsvar_pre.csv")
-readr::write_csv2(legeskjema, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_behandlerskjema.csv")
-readr::write_csv2(oppf6mnd, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_pasientsvar_6md.csv")
-readr::write_csv2(duplikater, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_duplikat6mnd.csv")
+readr::write_csv2(data_koblet_filtrert, "~/mydata/nnrr/masterNNRR_2024-10-18_data_koblet.csv")
+readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/masterNNRR_2024-10-18_pasientsvar_pre.csv")
+readr::write_csv2(legeskjema, "~/mydata/nnrr/masterNNRR_2024-10-18_behandlerskjema.csv")
+readr::write_csv2(oppf6mnd, "~/mydata/nnrr/masterNNRR_2024-10-18_pasientsvar_6md.csv")
+readr::write_csv2(duplikater, "~/mydata/nnrr/masterNNRR_2024-10-18_duplikat6mnd.csv")
 
 #### Utlevering Kjetil - pasienter som mangler pasientskjema 08.05.2024 ########
 library(dplyr)
