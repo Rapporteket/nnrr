@@ -1,6 +1,34 @@
 rm(list=ls())
 library(nnrr)
 
+######### Utlevering John Bjørneboe okt 2024  ########################################
+pasientsvar_pre <-
+  readr::read_csv2(
+    '~/mydata/nnrr/data_pre_2024-09-13_0921.csv')
+legeskjema <-
+  readr::read_csv2(
+    '~/mydata/nnrr/data_beh_2024-09-13_0903.csv')
+
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_pre$HovedskjemaGUID))[
+    table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <- pasientsvar_pre[
+    !(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'))
+
+RegData$FormDate <- as.Date(RegData$FormDate, format="%d.%m.%Y")
+
+RegData <- RegData[which(RegData$FormDate >= "2022-01-01" & RegData$FormDate <= "2024-08-01"), ]
+
+write.csv2(RegData, "~/mydata/nnrr/nnrrdata2024_10_30.csv", row.names = F,
+           fileEncoding = "Latin1", na = "")
+
+
+
 ########### Utlevering Marte Glad 12.09.2024   ################################
 library(dplyr)
 var_pre <- readxl::read_xlsx("~/mydata/nnrr/Variabler til masteroppgave.xlsx",
