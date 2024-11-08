@@ -12,11 +12,8 @@ appServer <- function(input, output, session) {
   rapbase::appLogger(session = session, msg = "Starting nnrr application")
 
   # Last data
-  RegData <- rapbase::loadStagingData("nnrr", "RegData") #Benyttes i appen
-  if (isFALSE(RegData)) {
-    RegData <- nnrr::nnrrHentRegData()
-    rapbase::saveStagingData("nnrr", "RegData", RegData)
-  }
+  RegData <- nnrr::nnrrHentRegData()
+
 
   registryName <- "nnrr"
 

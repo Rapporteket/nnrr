@@ -1,7 +1,92 @@
 rm(list=ls())
 library(nnrr)
+######### Utlevering Emberland nov 2024  #######################################
 
-######### Utlevering John Bjørneboe okt 2024  ########################################
+legeskjema <-
+  readr::read_csv2(
+    paste0("~/mydata/nnrr/data_beh_2024-11-07_1551.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("~/mydata/nnrr/data_pre_2024-11-07_1554.csv"))
+pasientsvar_post <-
+  readr::read_csv2(
+    paste0("~/mydata/nnrr/data_6mnd_2024-11-07_1559.csv"))
+pasientsvar_post2 <-
+  readr::read_csv2(
+    paste0("~/mydata/nnrr/data_12mnd_2024-11-07_1602.csv"))
+
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <-
+    pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post <-
+    pasientsvar_post[!(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_post2$HovedskjemaGUID))[table(pasientsvar_post2$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post2 <-
+    pasientsvar_post2[!(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+variabler <- read.csv("~/mydata/nnrr/emberland.csv")
+
+pasientsvar_pre <-
+  pasientsvar_pre[, intersect(variabler$Baseline[variabler$Baseline!=""],
+                                               names(pasientsvar_pre))]
+legeskjema <-
+  legeskjema[, intersect(variabler$Behandler[variabler$Behandler!=""],
+                        names(legeskjema))]
+pasientsvar_post <-
+  pasientsvar_post[, intersect(variabler$pas6mnd[variabler$pas6mnd!=""],
+                               names(pasientsvar_post))]
+pasientsvar_post2 <-
+  pasientsvar_post2[, intersect(variabler$pas12mnd[variabler$pas12mnd!=""],
+                               names(pasientsvar_post2))]
+
+legeskjema <- legeskjema %>%
+  dplyr::filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2022-01-01",
+                as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") <= "2022-12-31") %>%
+  dplyr::filter(SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)
+
+pasientsvar_pre <- pasientsvar_pre %>%
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post <- pasientsvar_post %>%
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post2 <- pasientsvar_post2 %>%
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+
+Utflatet <- merge(pasientsvar_pre,
+                  legeskjema %>% dplyr::select(-PasientGUID),
+                  by.x = "HovedskjemaGUID", by.y = "SkjemaGUID") %>%
+  merge(pasientsvar_post %>% dplyr::select(-PasientGUID),
+        by = "HovedskjemaGUID",
+        suffixes = c("", "_6mnd"), all.x = TRUE) %>%
+  merge(pasientsvar_post2 %>% dplyr::select(-PasientGUID),
+        by = "HovedskjemaGUID",
+        suffixes = c("", "_12mnd"), all.x = TRUE)
+
+readr::write_csv2(legeskjema, "~/mydata/nnrr/legeskjema_2024_11_08.csv")
+readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/pasientsvar_pre_2024_11_08.csv")
+readr::write_csv2(pasientsvar_post, "~/mydata/nnrr/pasientsvar_6mnd_2024_11_08.csv")
+readr::write_csv2(pasientsvar_post2, "~/mydata/nnrr/pasientsvar_12mnd_2024_11_08.csv")
+readr::write_csv2(Utflatet, "~/mydata/nnrr/Utflatet_2024_11_08.csv")
+
+# pre:
+# "IsPainMedicineNoPrescription" "IsPainMedicinePrescription"
+# "DateOfCompletion"
+# post, begge:
+# "ProfessionalCapability"       "IsPainMedicineNoPrescription"
+# "IsPainMedicinePrescription"
+
+
+
+######### Utlevering John Bjørneboe okt 2024  ##################################
 pasientsvar_pre <-
   readr::read_csv2(
     '~/mydata/nnrr/data_pre_2024-09-13_0921.csv')
