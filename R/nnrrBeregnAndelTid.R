@@ -66,7 +66,8 @@ nnrrBeregnAndelTid <- function(RegData,
   PlotParams$RegData <- NA
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
-  NNRRUtvalg <- nnrrUtvalg(RegData=RegData, datoFra=datoFra, datoTil=datoTil, minald=minald,
+  NNRRUtvalg <- nnrrUtvalg(RegData=RegData, datoFra=datoFra,
+                           datoTil=datoTil, minald=minald,
                            maxald=maxald, erMann=erMann, datovar=datovar,
                            tverrfaglig=tverrfaglig, minHSCL = minHSCL,
                            maxHSCL = maxHSCL, medikamenter = medikamenter,
@@ -80,23 +81,33 @@ nnrrBeregnAndelTid <- function(RegData,
   RegData$Kvartal <- floor((RegData$Mnd - 1)/3)+1
   RegData$Halvaar <- floor((RegData$Mnd - 1)/6)+1
 
-  RegData$TidsEnhet <- switch(tidsenhet,
-                              Aar = RegData$Aar-min(RegData$Aar)+1,
-                              Mnd = RegData$Mnd-min(RegData$Mnd[RegData$Aar==min(RegData$Aar)])+1+(RegData$Aar-min(RegData$Aar))*12,
-                              Kvartal = RegData$Kvartal-min(RegData$Kvartal[RegData$Aar==min(RegData$Aar)])+1+
-                                (RegData$Aar-min(RegData$Aar))*4,
-                              Halvaar = RegData$Halvaar-min(RegData$Halvaar[RegData$Aar==min(RegData$Aar)])+1+
-                                (RegData$Aar-min(RegData$Aar))*2
+  RegData$TidsEnhet <- switch(
+    tidsenhet,
+    Aar = RegData$Aar-min(RegData$Aar)+1,
+    Mnd = RegData$Mnd-min(RegData$Mnd[RegData$Aar==min(RegData$Aar)])+1+
+      (RegData$Aar-min(RegData$Aar))*12,
+    Kvartal = RegData$Kvartal-min(RegData$Kvartal[RegData$Aar==min(RegData$Aar)])+1+
+      (RegData$Aar-min(RegData$Aar))*4,
+    Halvaar = RegData$Halvaar-min(RegData$Halvaar[RegData$Aar==min(RegData$Aar)])+1+
+      (RegData$Aar-min(RegData$Aar))*2
   )
 
-  Tidtxt <- switch(tidsenhet,
-                   Mnd = paste(substr(RegData$Aar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)], 3,4),
-                               sprintf('%02.0f', RegData$Mnd[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]), sep='.'),
-                   Kvartal = paste(substr(RegData$Aar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)], 3,4),
-                                   sprintf('%01.0f', RegData$Kvartal[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]), sep='-'),
-                   Halvaar = paste(substr(RegData$Aar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)], 3,4),
-                                   sprintf('%01.0f', RegData$Halvaar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]), sep='-'),
-                   Aar = as.character(RegData$Aar[match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]))
+  Tidtxt <- switch(
+    tidsenhet,
+    Mnd = paste(substr(RegData$Aar[match(1:max(RegData$TidsEnhet),
+                                         RegData$TidsEnhet)], 3,4),
+                sprintf('%02.0f', RegData$Mnd[match(1:max(RegData$TidsEnhet),
+                                                    RegData$TidsEnhet)]), sep='.'),
+    Kvartal = paste(substr(RegData$Aar[match(1:max(RegData$TidsEnhet),
+                                             RegData$TidsEnhet)], 3,4),
+                    sprintf('%01.0f', RegData$Kvartal[
+                      match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]), sep='-'),
+    Halvaar = paste(substr(RegData$Aar[match(1:max(RegData$TidsEnhet),
+                                             RegData$TidsEnhet)], 3,4),
+                    sprintf('%01.0f', RegData$Halvaar
+                            [match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]), sep='-'),
+    Aar = as.character(RegData$Aar[match(1:max(RegData$TidsEnhet),
+                                         RegData$TidsEnhet)]))
 
   RegData$TidsEnhet <- factor(RegData$TidsEnhet, levels=1:max(RegData$TidsEnhet))
 

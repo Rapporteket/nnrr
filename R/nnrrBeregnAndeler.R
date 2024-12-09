@@ -57,7 +57,7 @@ nnrrBeregnAndeler  <- function(RegData,
 
   # Initialiserer nødvendige størrelser
   Andeler <- list(Hoved = 0, Rest =0)
-  ind <- list(Hoved=which(RegData$UnitId == reshID), Rest=which(RegData$UnitId != reshID))
+  # ind <- list(Hoved=which(RegData$UnitId == reshID), Rest=which(RegData$UnitId != reshID))
   NRest <- 0
   NvarRest <- 0
 
@@ -75,6 +75,8 @@ nnrrBeregnAndeler  <- function(RegData,
     RegData <- PlotParams$RegData
     PlotParams$RegData <- NA
     if (enhetsUtvalg==1) {
+      ind <- list(Hoved=which(RegData$UnitId == reshID),
+                  Rest=which(RegData$UnitId != reshID))
       AntHoved <- table(RegData$VariabelGr[ind$Hoved])
       NHoved <- sum(AntHoved)
       Andeler$Hoved <- 100*AntHoved/NHoved
@@ -95,6 +97,8 @@ nnrrBeregnAndeler  <- function(RegData,
   if (flerevar == 1){
 
     if (enhetsUtvalg==1) {
+      ind <- list(Hoved=which(RegData$UnitId == reshID),
+                  Rest=which(RegData$UnitId != reshID))
       PlotParams <- nnrrPrepVar(RegData[ind$Hoved, ], valgtVar) # Hovegruppe
       AntHoved <- PlotParams$AntVar
       NHoved <- max(PlotParams$NVar, na.rm=T)

@@ -253,15 +253,21 @@ print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
 
 outfile <- paste0(figfolder, "alder.pdf")
 valgtVar <- "PatientAge"
-plotdata <- nnrr::nnrrBeregnAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=datoTil, enhetsUtvalg=1,
-                                    minald=0, maxald=130, erMann=99, reshID=reshID)
+plotdata <- nnrr::nnrrBeregnAndeler(RegData, valgtVar=valgtVar,
+                                    datoFra=datoFra_sistkvartal,
+                                    datoTil=datoTil, enhetsUtvalg=1,
+                                    minald=0, maxald=130, erMann=99,
+                                    reshID=reshID)
 nnrr::nnrrSoyleplot(plotdata = plotdata,
                     outfile=outfile)
 
 outfile<-paste0(figfolder, 'VentetidFraHenvisning_fordeling.pdf')
 valgtVar <- "VentetidFraHenvisning_kat"
-plotdata <- nnrr::nnrrBeregnAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra_sistkvartal, datoTil=datoTil, enhetsUtvalg=1,
-                                    minald=0, maxald=130, erMann=99, reshID=reshID)
+plotdata <- nnrr::nnrrBeregnAndeler(RegData, valgtVar=valgtVar,
+                                    datoFra=datoFra_sistkvartal,
+                                    datoTil=datoTil, enhetsUtvalg=1,
+                                    minald=0, maxald=130, erMann=99,
+                                    reshID=reshID)
 nnrr::nnrrSoyleplot(plotdata = plotdata,
                     outfile=outfile)
 @
@@ -276,8 +282,11 @@ nnrr::nnrrSoyleplot(plotdata = plotdata,
 
 outfile <- paste0(figfolder, "ventetid_krav.pdf")
 valgtVar <- "ventetid_krav"
-plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil,
+                                     enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99,
+                                     outfile=outfile, reshID=reshID,
                                      tidsenhet="Kvartal")
 nnrr::nnrrTidsplot(plotdata = plotdata,
                    outfile=outfile,
@@ -285,9 +294,13 @@ nnrr::nnrrTidsplot(plotdata = plotdata,
 
 outfile <- paste0(figfolder, "andel_tverrfaglig.pdf")
 valgtVar <- "tverrfaglig_behandlet"
-plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
-                                     minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
-                                     tidsenhet="Kvartal", maal = 30, maalnivaatxt = "Mål")
+plotdata <- nnrr::nnrrBeregnAndelTid(RegData, valgtVar=valgtVar,
+                                     datoFra=datoFra, datoTil=datoTil,
+                                     enhetsUtvalg=1,
+                                     minald=0, maxald=130, erMann=99,
+                                     outfile=outfile, reshID=reshID,
+                                     tidsenhet="Kvartal", maal = 30,
+                                     maalnivaatxt = "Mål")
 nnrr::nnrrTidsplot(plotdata = plotdata,
                    outfile=outfile, maal = 30,
                    maalnivaatxt = "Mål",
