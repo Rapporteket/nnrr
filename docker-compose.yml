@@ -1,8 +1,6 @@
 services:
   db:
     image: mysql:8
-    command: --innodb-log-file-size=500M --innodb_strict_mode=0
-    restart: "no"
     volumes:
       - ~/softlinks/mysql_db:/var/lib/mysql
     environment:
