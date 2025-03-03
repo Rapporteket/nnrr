@@ -11,22 +11,19 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
 
   registryName <- "nnrr"
   dbType <- "mysql"
-  datasti <- if (rapbase::isRapContext()) {
-    "~/mydata/nnrr/"
-  } else {"~/softlinks/mydata/nnrr/"}
 
   legeskjema <-
     readr::read_csv2(
-        paste0("~/mydata/nnrr/legeskjema_2025-01-22_1629.csv"))
+        paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1611.csv"))
   pasientsvar_pre <-
     readr::read_csv2(
-      paste0("~/mydata/nnrr/pasientsvar_pre_2025-01-22_1634.csv"))
+      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1620.csv"))
   pasientsvar_post <-
     readr::read_csv2(
-      paste0("~/mydata/nnrr/pasientsvar_6mnd_2025-01-22_1637.csv"))
+      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1627.csv"))
   pasientsvar_post2 <-
     readr::read_csv2(
-      paste0("~/mydata/nnrr/pasientsvar_12mnd_2025-01-22_1640.csv"))
+      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1629.csv"))
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){

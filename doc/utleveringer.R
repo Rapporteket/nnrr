@@ -1,5 +1,76 @@
 rm(list=ls())
 library(nnrr)
+
+######### Utlevering Emberland nov 2024  #######################################
+
+varliste <- read.csv2("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/nnrr_var_utlevering21jan2025.csv")
+
+legeskjema <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1611.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1620.csv"))
+pasientsvar_post <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1627.csv"))
+pasientsvar_post2 <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1629.csv"))
+
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <-
+    pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post <-
+    pasientsvar_post[!(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_post2$HovedskjemaGUID))[table(pasientsvar_post2$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post2 <-
+    pasientsvar_post2[!(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+legeskjema <- legeskjema |>
+  dplyr::filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2021-01-01",
+                as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") <= "2025-01-22") |>
+  dplyr::filter(SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)
+
+pasientsvar_pre <- pasientsvar_pre |>
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post <- pasientsvar_post |>
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post2 <- pasientsvar_post2 |>
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+
+Utflatet <- merge(pasientsvar_pre,
+                  legeskjema |> dplyr::select(-PasientGUID),
+                  by.x = "HovedskjemaGUID", by.y = "SkjemaGUID",
+                  suffixes = c("_baseline", "")) |>
+  merge(pasientsvar_post |> dplyr::select(-PasientGUID),
+        by = "HovedskjemaGUID",
+        suffixes = c("", "_6mnd"), all.x = TRUE) |>
+  merge(pasientsvar_post2 |> dplyr::select(-PasientGUID),
+        by = "HovedskjemaGUID",
+        suffixes = c("", "_12mnd"), all.x = TRUE)
+
+# readr::write_csv2(
+#   Utflatet,
+#   "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/Utflatet_2025_03_03.csv"
+#   )
+
+write.csv2(Utflatet,
+           "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/Utflatet_2025_03_03.csv",
+           fileEncoding = "Latin1", na = "", row.names = FALSE
+)
+
+
 ######### Utlevering Emberland nov 2024  #######################################
 
 legeskjema <-
