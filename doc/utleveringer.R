@@ -1,16 +1,16 @@
 rm(list=ls())
 library(nnrr)
 
-######### Utlevering Emberland nov 2024  #######################################
+######### Utlevering Emberland mars 2025  #######################################
 
 varliste <- read.csv2("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/nnrr_var_utlevering21jan2025.csv")
 
 legeskjema <-
   readr::read_csv2(
-    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1611.csv"))
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1611_v2.csv"))
 pasientsvar_pre <-
   readr::read_csv2(
-    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1620.csv"))
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1620_v2.csv"))
 pasientsvar_post <-
   readr::read_csv2(
     paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1627.csv"))
