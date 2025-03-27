@@ -1,6 +1,53 @@
 rm(list=ls())
 library(nnrr)
 
+legeskjema <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0912.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0918.csv"))
+pasientsvar_post <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0924.csv"))
+pasientsvar_post2 <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0928.csv"))
+
+legeskjema <- legeskjema |>
+  dplyr::filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2021-01-01",
+                as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") <= "2025-02-04",
+                FormStatus == 2,
+                SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)
+pasientsvar_pre <- pasientsvar_pre |>
+  dplyr::filter(FormStatus == 2,
+                HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post <- pasientsvar_post |>
+  dplyr::filter(FormStatus == 2,
+                HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post2 <- pasientsvar_post2 |>
+  dplyr::filter(FormStatus == 2,
+                HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+
+write.csv2(
+  legeskjema,
+  "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/legeskjema.csv",
+  fileEncoding = "Latin1", na = "", row.names = FALSE)
+write.csv2(
+  pasientsvar_pre,
+  "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/pasientsvar_pre.csv",
+  fileEncoding = "Latin1", na = "", row.names = FALSE)
+write.csv2(
+  pasientsvar_post,
+  "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/pasientsvar_post.csv",
+  fileEncoding = "Latin1", na = "", row.names = FALSE)
+write.csv2(
+  pasientsvar_post2,
+  "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/pasientsvar_post2.csv",
+  fileEncoding = "Latin1", na = "", row.names = FALSE)
+
+
+
 ######### Utlevering Emberland mars 2025  #######################################
 
 varliste <- read.csv2("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/nnrr_var_utlevering21jan2025.csv")
@@ -109,16 +156,16 @@ variabler <- read.csv("~/mydata/nnrr/emberland.csv")
 
 pasientsvar_pre <-
   pasientsvar_pre[, intersect(variabler$Baseline[variabler$Baseline!=""],
-                                               names(pasientsvar_pre))]
+                              names(pasientsvar_pre))]
 legeskjema <-
   legeskjema[, intersect(variabler$Behandler[variabler$Behandler!=""],
-                        names(legeskjema))]
+                         names(legeskjema))]
 pasientsvar_post <-
   pasientsvar_post[, intersect(variabler$pas6mnd[variabler$pas6mnd!=""],
                                names(pasientsvar_post))]
 pasientsvar_post2 <-
   pasientsvar_post2[, intersect(variabler$pas12mnd[variabler$pas12mnd!=""],
-                               names(pasientsvar_post2))]
+                                names(pasientsvar_post2))]
 
 legeskjema <- legeskjema %>%
   dplyr::filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2022-01-01",

@@ -14,16 +14,16 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
 
   legeskjema <-
     readr::read_csv2(
-        paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1611.csv"))
+        paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0912.csv"))
   pasientsvar_pre <-
     readr::read_csv2(
-      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1620.csv"))
+      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0918.csv"))
   pasientsvar_post <-
     readr::read_csv2(
-      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1627.csv"))
+      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0924.csv"))
   pasientsvar_post2 <-
     readr::read_csv2(
-      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1629.csv"))
+      paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0928.csv"))
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){
