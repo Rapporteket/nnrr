@@ -41,7 +41,9 @@ options(dplyr.summarise.inform = FALSE)
 
 rap_aar <- 2024
 
-icd10 <- read.table('~/mydata/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+datasti <- "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/aarsrapp2024/"
+icd10 <- read.table(paste0(datasti, "icd10.csv"), sep=';',
+                    header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 RegData <- nnrr::nnrrHentRegData()
 
 RegDataAll <- RegData
@@ -72,7 +74,7 @@ map_resh_orgnr <- data.frame(
 # kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
 format_ut <- ".pdf"
-figfolder <- "~/mydata/nnrr/indikatorer_2024/"
+figfolder <- paste0(datasti, "indikatorer_2024/")
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
@@ -609,132 +611,51 @@ if (format_ut != "pdf") {
 
 
 
-<<'DG-tall NNRR', results='asis', echo=FALSE, message=FALSE>>=
-
-dg_ny <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2023.csv",
-                          locale = readr::locale(encoding = "Latin1"))
-
-
-map_dg2 <- data.frame(enhet=c("Helgelandssykehuset, SandnessjÃ¸en",
-                              "St. Olavs Hospital",
-                              "UNN Harstad",
-                              "UNN TromsÃ¸",
-                              "Stavanger",
-                              "Oslo Universitetssykehus",
-                              "MÃ¸re og Romsdal, Ã\u0085lesund",
-                              "SÃ¸rlandet sykehus",
-                              "Helse Bergen, Haukeland universitetssykehus",
-                              "Vestre Viken Drammen", "Levanger",
-                              "Sykehuset i Vestfold Rehabilitering Stavern",
-                              "Nordlandssykehuset"),
-                      avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
-                                  4212982, 114174, 102959, 103736, 105821, 700138,
-                                  700701))
-
-dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
-dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
-dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
-dg_ny$year <- 2023
-dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
-dg_ny$ind_id <- "nnrr_dg"
-dg_ny$context <- "caregiver"
-
-dg_gml <- readr::read_csv2("~/mydata/nnrr/nnrr_dg_shusviser_2022.csv",
-                           locale = readr::locale(encoding = "Latin1"))
-
-Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
-names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
-Indikatorer$context <- "caregiver"
-Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
-
-Indikatorer <- dplyr::bind_rows(Indikatorer, dg_ny) %>%
-  dplyr::bind_rows(dg_gml)
-
-write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
-           row.names = F, fileEncoding = "UTF-8")
-
-
-
-
-
-
-# nokkeltall_pr_forlop <-  RegData %>% group_by(Aar) %>%
-#   summarise("Antall forlop" = n(),
-#             "Andel kvinner" = sum(ErMann==0)/n(),
-#             Gjennomsnittsalder = mean(PatientAge),
-#             "Andel i arbeid ved utredning" = sum(Working)/n(),
-#             "Andel smertevarighet 3 mnd eller mer" = sum(as.numeric(PainDurationNow) %in% 3:5)/sum(as.numeric(PainDurationNow) %in% 1:5))
-#
-#
-# regdata_unik_pr_aar <- RegData %>% group_by(Aar, PasientGUID) %>%
-#   summarise(PatientAge = first(PatientAge, order_by = S1b_DateOfCompletion),
-#             ErMann = first(ErMann, order_by = S1b_DateOfCompletion),
-#             Working = first(Working, order_by = S1b_DateOfCompletion),
-#             PainDurationNow = first(PainDurationNow, order_by = S1b_DateOfCompletion))
-#
-#
-# nokkeltall_pr_pas <-  regdata_unik_pr_aar %>% group_by(Aar) %>%
-#   summarise("Antall pasienter" = n(),
-#             "Andel kvinner" = sum(ErMann==0)/n(),
-#             Gjennomsnittsalder = mean(PatientAge),
-#             "Andel i arbeid ved utredning" = sum(Working)/n(),
-#             "Andel smertevarighet 3 mnd eller mer" = sum(as.numeric(PainDurationNow) %in% 3:5)/sum(as.numeric(PainDurationNow) %in% 1:5))
-#
-# Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
-# names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
-# Indikatorer$context <- "caregiver"
-# Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
-# # Indikatorer <- Indikatorer[!(Indikatorer$ind_id == "nnrr_jobb" & Indikatorer$year > 2020 ), ] # Fjerner arbeidsind for nyere registrernger
-# # Ny variant kommer
-# # write.csv2(Indikatorer, paste0('C:/GIT/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
-#
-# dg <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_raa.csv",
-#                        locale = readr::locale(encoding = "Latin1"),
-#                        show_col_types = FALSE)
-# # dg <- read.csv2("C:/GIT/data/nnrr/dg_nnrr_raa.csv")
-# dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
-#
-#
-# map_dg2 <- data.frame(enhet=c("Sandnessjøen", "St Olavs", "Harstad", "Tromsø",
-#                               "Stavanger", "Oslo", "Møre og Romsdal", "Kristiansand",
-#                               "Haukeland", "Drammen", "Levanger", "Stavern"),
-#                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
-#                                   4212982, 114174, 102959, 103736, 105821, 700138))
-#
-# dg_ny <- readr::read_csv2("~/mydata/nnrr/Dekningsgrad 2021 NNRR.csv",
-#                           locale = readr::locale(encoding = "Latin1"))
-# dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
-# dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
-# dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
-# dg_ny$year <- 2021
-# names(dg_ny)[2:3] <- c("denominator", "var")
-# dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
-#
-# dg_2022 <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2022.csv",
-#                           locale = readr::locale(encoding = "Latin1"))
-# dg_2022$reshid <- map_dg2$avdresh[match(dg_2022$Enhet, map_dg2$enhet)]
-# dg_2022$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_2022$reshid, map_resh_orgnr$resh)]
-# dg_2022 <- dg_2022[!is.na(dg_2022$orgnr), ]
-# dg_2022$year <- 2022
-# names(dg_2022)[c(2,5)] <- c("denominator", "var")
-# dg_2022 <- dg_2022[,c("orgnr", "year", "var", "denominator")]
-#
-# dg_ny <- dplyr::bind_rows(dg_ny, dg_2022)
-#
-# # dg$shus2 <- qmongrdata::SykehusNavnStruktur$SykehusNavn[match(dg$orgnr, qmongrdata::SykehusNavnStruktur$OrgNrShus)]
-# #
-# dg <- dg[,c("orgnr", "aar", "teller", "nevner")]
-# names(dg) <- c("orgnr", "year", "var", "denominator")
-#
-# dg <- dplyr::bind_rows(dg, dg_ny)
-# dg$ind_id <- "nnrr_dg"
-# dg$context <- "caregiver"
-#
-# Indikatorer <- dplyr::bind_rows(Indikatorer, dg)
-#
-# write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
-#            row.names = F, fileEncoding = "UTF-8")
-@
+% # <<'DG-tall NNRR', results='asis', echo=FALSE, message=FALSE, include=FALSE>>=
+% #
+% # dg_ny <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2023.csv",
+% #                           locale = readr::locale(encoding = "Latin1"))
+% #
+% #
+% # map_dg2 <- data.frame(enhet=c("Helgelandssykehuset, SandnessjÃ¸en",
+% #                               "St. Olavs Hospital",
+% #                               "UNN Harstad",
+% #                               "UNN TromsÃ¸",
+% #                               "Stavanger",
+% #                               "Oslo Universitetssykehus",
+% #                               "MÃ¸re og Romsdal, Ã\u0085lesund",
+% #                               "SÃ¸rlandet sykehus",
+% #                               "Helse Bergen, Haukeland universitetssykehus",
+% #                               "Vestre Viken Drammen", "Levanger",
+% #                               "Sykehuset i Vestfold Rehabilitering Stavern",
+% #                               "Nordlandssykehuset"),
+% #                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
+% #                                   4212982, 114174, 102959, 103736, 105821, 700138,
+% #                                   700701))
+% #
+% # dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
+% # dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
+% # dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
+% # dg_ny$year <- 2023
+% # dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
+% # dg_ny$ind_id <- "nnrr_dg"
+% # dg_ny$context <- "caregiver"
+% #
+% # dg_gml <- readr::read_csv2("~/mydata/nnrr/nnrr_dg_shusviser_2022.csv",
+% #                            locale = readr::locale(encoding = "Latin1"))
+% #
+% # Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
+% # names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
+% # Indikatorer$context <- "caregiver"
+% # Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
+% #
+% # Indikatorer <- dplyr::bind_rows(Indikatorer, dg_ny) %>%
+% #   dplyr::bind_rows(dg_gml)
+% #
+% # # write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
+% # #            row.names = F, fileEncoding = "UTF-8")
+% #
+% # @
 
 
 \end{document}
