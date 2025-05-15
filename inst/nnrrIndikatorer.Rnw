@@ -73,14 +73,14 @@ map_resh_orgnr <- data.frame(
 
 # kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
-format_ut <- ".pdf"
+format_ut <- ".svg"
 figfolder <- paste0(datasti, "indikatorer_2024/")
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
 
 figstr <- 0.61
-# tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+# knitr::knit2pdf("nnrrIndikatorer.Rnw")
 @
 
 \begin{document}

@@ -66,7 +66,7 @@ Inkl_i_rapp <- ifelse(reshID %in% c(114174, 104293, 109834, 700138),
                       "\\inkltrue", "\\inklfalse")
 
 figstr <- 0.61
-figfolder <- paste0(tempdir(), "/")
+figfolder <- paste0(normalizePath(tempdir(), winslash = "/"), "/")
 
 @
 

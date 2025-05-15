@@ -69,17 +69,19 @@ samledok_server <- function(id, reshID, RegData, userRole, hvd_session){
       output$kvartal_ui <- renderUI({
         ns <- session$ns
         if (!is.null(input$valgtAar)) {
-          selectInput(inputId = ns("kvartal"), label = "Til og med (avsluttet) kvartal",
-                      choices = if (input$valgtAar == format(Sys.Date(), '%Y')) {
-                        ant_kvartal <- match(Sys.Date() %>% as.Date() %>%
-                                               lubridate::floor_date(unit = 'quarter') %>%
-                                               as.character() %>% substr(6,10),
-                                             c('04-01', '07-01', '10-01'))
-                        rev(setNames(paste0(input$valgtAar, c('-04-01', '-07-01', '-10-01'))[1:ant_kvartal], paste0(1:ant_kvartal, '. kvartal')))
-                      } else {
-                        rev(setNames(paste0(c(input$valgtAar, input$valgtAar, input$valgtAar, as.numeric(input$valgtAar) + 1),
-                                            c('-04-01', '-07-01', '-10-01', '-01-01')), paste0(1:4, '. kvartal')))
-                      })
+          selectInput(
+            inputId = ns("kvartal"),
+            label = "Til og med (avsluttet) kvartal",
+            choices = if (input$valgtAar == format(Sys.Date(), '%Y')) {
+              ant_kvartal <- match(Sys.Date() %>% as.Date() %>%
+                                     lubridate::floor_date(unit = 'quarter') %>%
+                                     as.character() %>% substr(6,10),
+                                   c('04-01', '07-01', '10-01'))
+              rev(setNames(paste0(input$valgtAar, c('-04-01', '-07-01', '-10-01'))[1:ant_kvartal], paste0(1:ant_kvartal, '. kvartal')))
+            } else {
+              rev(setNames(paste0(c(input$valgtAar, input$valgtAar, input$valgtAar, as.numeric(input$valgtAar) + 1),
+                                  c('-04-01', '-07-01', '-10-01', '-01-01')), paste0(1:4, '. kvartal')))
+            })
         }
       })
 
@@ -100,15 +102,15 @@ samledok_server <- function(id, reshID, RegData, userRole, hvd_session){
       output$lastNed_kvartal <- downloadHandler(
         filename = function(){
           if (is.null(input$valgtShus)) {
-          paste0("Kvartalsrapp",
-                 RegData$SykehusNavn[match(reshID, RegData$UnitId)],
-                 format(Sys.time(), format = "%Y-%m-%d-%H%M%S"), ".pdf")
+            paste0("Kvartalsrapp",
+                   RegData$SykehusNavn[match(reshID, RegData$UnitId)],
+                   format(Sys.time(), format = "%Y-%m-%d-%H%M%S"), ".pdf")
           } else {
             paste0("Kvartalsrapp",
                    paste(RegData$SykehusNavn[match(as.numeric(input$valgtShus),
                                                    RegData$UnitId)], collapse = "_"),
                    format(Sys.time(), format = "%Y-%m-%d-%H%M%S"), ".pdf")
-            }
+          }
         },
         content = function(file){
           contentFile2(
