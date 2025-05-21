@@ -62,7 +62,7 @@ nnrrBeregnAndeler  <- function(RegData,
   NvarRest <- 0
 
   if (valgtVar %in% c('AarsakSmerte_PasRap', 'beh_kommunalt', 'beh_kommunalt_v2',
-                      'beh_spesialist',
+                      'beh_spesialist', 'beh_spesialist_v2',
                       'pasrapp_beh_klinikk', 'pasrapp_beh_klinikk_v2')) {
     flerevar <- 1
   } else {

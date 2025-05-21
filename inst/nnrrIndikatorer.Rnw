@@ -536,10 +536,10 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med
 <<'Fig. Fornoyd med behandling', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "fornoyd_med_behandling.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 95, maalretn = 'hoy')
+nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 90, maalretn = 'hoy')
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 95, maalretn = 'hoy')
+  nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 90, maalretn = 'hoy')
 }
 
 @

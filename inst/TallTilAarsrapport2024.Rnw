@@ -528,25 +528,72 @@ BehSpeshelsetj <- data.frame(
             'Tverrfaglig behandling i gruppe (antall ganger)'), varnavn_1b$Feltnavn)])
 
 BehSpeshelsetj <- BehSpeshelsetj[-3, ]
-tab7 <- RegData[, c(as.character(BehSpeshelsetj$varnavn), "Treatment_GroupInterdisciplinary", "Aar",
-                    "Treatment_TreatmentInSpecialistServices")] %>% group_by (Aar) %>%
-  summarise('Behandling i spesialhelsetjenesten' = sum(Treatment_TreatmentInSpecialistServices),
-            'Henvist til vurdering av operasjon' = sum(Treatment_FollowUpOperation),
-            'Anbefaler henvisning til annet opptrenings /rehabiliteringssenter' = sum(Treatment_TreatmentOtherRehabCentre),
-            'Kontroll etter vurdering eller behandling' = sum(Treatment_ControlAfterReviewOrTreatment),
-            'Individuell oppfølging 1-2 ganger' = sum(Treatment_IndividualFollowUp1to2Times),
-            'Individuell tverrfaglig behandling 1-3 ganger' = sum(Treatment_InvidualInterdisciplinary==1),
-            'Individuell tverrfaglig behandling 4-10 ganger' = sum(Treatment_InvidualInterdisciplinary==2),
-            'Individuell tverrfaglig behandling mer enn 10 ganger' = sum(Treatment_InvidualInterdisciplinary==3),
-            'Tverrfaglig behandling i gruppe 1-3 ganger' = sum(Treatment_GroupInterdisciplinary2018==1 | Treatment_GroupInterdisciplinary==1),
-            'Tverrfaglig behandling i gruppe 4-10 ganger' = sum(Treatment_GroupInterdisciplinary2018 %in% 2:3 | Treatment_GroupInterdisciplinary==2),
-            'Tverrfaglig behandling i gruppe mer enn 10 ganger' = sum(Treatment_GroupInterdisciplinary2018==4 | Treatment_GroupInterdisciplinary==3)) %>%
+tab7 <- RegData[, c(as.character(BehSpeshelsetj$varnavn),
+                    "Treatment_GroupInterdisciplinary", "Aar",
+                    "Treatment_TreatmentInSpecialistServices")] %>%
+  group_by (Aar) %>%
+  summarise(
+    'Behandling i spesialhelsetjenesten' =
+      sum(Treatment_TreatmentInSpecialistServices),
+    'Henvist til vurdering av operasjon' =
+      sum(Treatment_FollowUpOperation),
+    'Anbefaler henvisning til annet opptrenings /rehabiliteringssenter' =
+      sum(Treatment_TreatmentOtherRehabCentre),
+    'Kontroll etter vurdering eller behandling' =
+      sum(Treatment_ControlAfterReviewOrTreatment),
+    'Individuell oppfølging 1-2 ganger' =
+      sum(Treatment_IndividualFollowUp1to2Times),
+    'Individuell tverrfaglig behandling 1-3 ganger' =
+      sum(Treatment_InvidualInterdisciplinary==1),
+    'Individuell tverrfaglig behandling 4-10 ganger' =
+      sum(Treatment_InvidualInterdisciplinary==2),
+    'Individuell tverrfaglig behandling mer enn 10 ganger' =
+      sum(Treatment_InvidualInterdisciplinary==3),
+    'Tverrfaglig behandling i gruppe 1-3 ganger' =
+      sum(Treatment_GroupInterdisciplinary2018==1 | Treatment_GroupInterdisciplinary==1),
+    'Tverrfaglig behandling i gruppe 4-10 ganger' =
+      sum(Treatment_GroupInterdisciplinary2018 %in% 2:3 | Treatment_GroupInterdisciplinary==2),
+    'Tverrfaglig behandling i gruppe mer enn 10 ganger' =
+      sum(Treatment_GroupInterdisciplinary2018==4 | Treatment_GroupInterdisciplinary==3)
+    ) %>%
   mutate(across(c(2), as.integer))
-
 
 tab7 <- tr_summarize_output(tab7)
 
-print(xtable::xtable(tab7, align=c('l', 'l', rep('r', ncol(tab7)-1)),
+tab7_v2 <- RegData |>
+  dplyr::summarise(
+    'Behandling i spesialhelsetjenesten' =
+      sum(Treatment_TreatmentInSpecialistServices, na.rm = TRUE),
+    'Henvist til vurdering av operasjon' =
+      sum(Treatment_FollowUpOperation, na.rm = TRUE),
+    'Henvisning til annet opptrenings/rehabiliteringssenter' =
+      sum(Treatment_TreatmentOtherRehabCentre, na.rm = TRUE),
+    'Individuell monofaglig oppfølging (1-3 ganger)' =
+      sum(Treatment_IndividualMonoDiciplinary==1, na.rm = TRUE),
+    'Individuell monofaglig oppfølging (4-10 ganger)' =
+      sum(Treatment_IndividualMonoDiciplinary==2, na.rm = TRUE),
+    'Individuell monofaglig oppfølging (>10 ganger)' =
+      sum(Treatment_IndividualMonoDiciplinary==3, na.rm = TRUE),
+    'Individuell tverrfaglig behandling (1-3 ganger)' =
+      sum(Treatment_InvidualInterdisciplinary==1, na.rm = TRUE),
+    'Individuell tverrfaglig behandling (4-10 ganger)' =
+      sum(Treatment_InvidualInterdisciplinary==2, na.rm = TRUE),
+    'Individuell tverrfaglig behandling (>10 ganger)' =
+      sum(Treatment_InvidualInterdisciplinary==3, na.rm = TRUE),
+    'Tverrfaglig behandling i gruppe (1-3 ganger)' =
+      sum(Treatment_GroupInterdisciplinary2018==1, na.rm = TRUE),
+    'Tverrfaglig behandling i gruppe (4-6 ganger)' =
+      sum(Treatment_GroupInterdisciplinary2018==2, na.rm = TRUE),
+    'Tverrfaglig behandling i gruppe (7-10 ganger)' =
+      sum(Treatment_GroupInterdisciplinary2018==3, na.rm = TRUE),
+    'Tverrfaglig behandling i gruppe (>10 ganger)' =
+      sum(Treatment_GroupInterdisciplinary2018==4, na.rm = TRUE),
+    .by = Aar
+  ) |> mutate(across(c(2), as.integer)) |>
+  tr_summarize_output()
+
+
+print(xtable::xtable(tab7_v2, align=c('l', 'l', rep('r', ncol(tab7_v2)-1)),
                      caption = 'Behandlingsløype i spesialisthelsetjenesten'),
       include.rownames=FALSE, sanitize.text.function = function(x){x})
 @
@@ -576,7 +623,7 @@ if (!is.na(annetformat)) {
 
 
 
-valgtVar <- "beh_spesialist"
+valgtVar <- "beh_spesialist_v2"
 outfile <- paste0(figfolder, "beh_spesialist.pdf")
 # nnrrFigAndeler(RegDataAll, valgtVar = valgtVar, enhetsUtvalg = 0, reshID = 0, outfile=outfile,
 #                datoFra = paste0(rap_aar, "-01-01"), datoTil = paste0(rap_aar, "-12-31"))
@@ -1367,25 +1414,63 @@ tab15[, -c(1, dim(tab15)[2])] <- tab15[, -c(1, dim(tab15)[2])]/tab15$N*100
 tab15[, -c(1, dim(tab15)[2])] <- sapply(tab15[, -c(1, dim(tab15)[2])], function(x) {sprintf("%.1f%%", x)})
 tab15 <- tab15[tab15$N > 0, ]
 
-print(xtable::xtable(tab15, digits=0, align=c('l', 'l', rep('R{0.35in}', ncol(tab15)-1)),
+tab15_v2 <- RegData |>
+  dplyr::summarise(
+    'Behandling i spesialhelsetjenesten' =
+      sum(Treatment_TreatmentInSpecialistServices, na.rm = TRUE),
+    'Henvist til vurdering av operasjon' =
+      sum(Treatment_FollowUpOperation, na.rm = TRUE),
+    'Henvisning til annet opptrenings/rehabiliteringssenter' =
+      sum(Treatment_TreatmentOtherRehabCentre, na.rm = TRUE),
+    'Individuell monofaglig oppfølging (1-3 ganger)' =
+      sum(Treatment_IndividualMonoDiciplinary==1, na.rm = TRUE),
+    'Individuell monofaglig oppfølging (4-10 ganger)' =
+      sum(Treatment_IndividualMonoDiciplinary==2, na.rm = TRUE),
+    'Individuell monofaglig oppfølging (>10 ganger)' =
+      sum(Treatment_IndividualMonoDiciplinary==3, na.rm = TRUE),
+    'Individuell tverrfaglig behandling (1-3 ganger)' =
+      sum(Treatment_InvidualInterdisciplinary==1, na.rm = TRUE),
+    'Individuell tverrfaglig behandling (4-10 ganger)' =
+      sum(Treatment_InvidualInterdisciplinary==2, na.rm = TRUE),
+    'Individuell tverrfaglig behandling (>10 ganger)' =
+      sum(Treatment_InvidualInterdisciplinary==3, na.rm = TRUE),
+    'Tverrfaglig behandling i gruppe (1-3 ganger)' =
+      sum(Treatment_GroupInterdisciplinary2018==1, na.rm = TRUE),
+    'Tverrfaglig behandling i gruppe (4-6 ganger)' =
+      sum(Treatment_GroupInterdisciplinary2018==2, na.rm = TRUE),
+    'Tverrfaglig behandling i gruppe (7-10 ganger)' =
+      sum(Treatment_GroupInterdisciplinary2018==3, na.rm = TRUE),
+    'Tverrfaglig behandling i gruppe (>10 ganger)' =
+      sum(Treatment_GroupInterdisciplinary2018==4, na.rm = TRUE),
+    N = n(),
+    .by = SykehusNavn
+  ) |> janitor::adorn_totals()
+
+tab15_v2[, -c(1, dim(tab15_v2)[2])] <- tab15_v2[, -c(1, dim(tab15_v2)[2])]/tab15_v2$N*100
+tab15_v2[, -c(1, dim(tab15_v2)[2])] <- sapply(tab15_v2[, -c(1, dim(tab15_v2)[2])], function(x) {sprintf("%.1f%%", x)})
+tab15_v2 <- tab15_v2[tab15_v2$N > 0, ] |> dplyr::arrange(SykehusNavn)
+
+
+print(xtable::xtable(tab15_v2, digits=0, align=c('l', 'l', rep('R{0.35in}', ncol(tab15_v2)-1)),
                      caption = 'Behandlingsløype i spesialisthelsetjenesten'),
       include.rownames=FALSE, size = "\\scriptsize")
 
-write.csv2(tab15, paste0(tabfolder, "tab_behandling_spestjeneste.csv"),
+write.csv2(tab15_v2, paste0(tabfolder, "tab_behandling_spestjeneste.csv"),
            row.names = F, fileEncoding = "Latin1")
 @
 
 
 
 <<'Tab: Behandlingsløype forts.', results='asis', echo=FALSE, warning=F>>=
-tab16 <- RegData[, c( "SykehusNavn", "Treatment_TrainingActivation", "Treatment_WorkFollowUp", "Treatment_CognitiveApproach",
-                      "Treatment_Education", "Treatment_PsykomotoricTherapy")] %>%
+tab16 <- RegData[, c( "SykehusNavn", "Treatment_TrainingActivation",
+                      "Treatment_WorkFollowUp", "Treatment_CognitiveApproach",
+                      "Treatment_Education", "Treatment_AttentionAndBodyawareness_Training")] %>%
   group_by (SykehusNavn) %>%
   summarise('Trening / aktivisering' = sum(Treatment_TrainingActivation),
             'Arbeidsmessig oppfølging' = sum(Treatment_WorkFollowUp),
             'Kognitiv tilnærming' = sum(Treatment_CognitiveApproach),
             'Undervisning' = sum(Treatment_Education),
-            'Psykomotorisk behandling' = sum(Treatment_PsykomotoricTherapy),
+            'Psykomotorisk behandling' = sum(Treatment_AttentionAndBodyawareness_Training),
             N = n()) %>%
   janitor::adorn_totals()
 tab16[, -c(1, dim(tab16)[2])] <- tab16[, -c(1, dim(tab16)[2])]/tab16$N*100
@@ -1467,59 +1552,124 @@ if (!is.na(annetformat)) {
 <<'Nye tab: pasientrapportert behandling', results='asis', echo=FALSE, warning=F>>=
 
 RegDataAll$TreatmentOperation[is.na(RegDataAll$TreatmentOperation)] <- 0
-RegDataAll$ingen_beh <- !RegDataAll$TreatmentOperation & !RegDataAll$TreatmentPostIndividual &
-  !RegDataAll$TreatmentPostGroupbased & !RegDataAll$TreatmentPostHospitalExtendedExamination
+RegDataAll$ingen_beh <- !RegDataAll$TreatmentOperation &
+  !RegDataAll$TreatmentPostIndividual &
+  !RegDataAll$TreatmentPostGroupbased &
+  !RegDataAll$TreatmentPostHospitalExtendedExamination
 
-aux <- RegDataAll %>% filter(Besoksdato>=paste0(rap_aar-1, "-07-01") & Besoksdato<=paste0(rap_aar, "-06-30") &
-                               regstatus_post == 1) %>% group_by(SykehusNavn) %>%
-  summarise("Ingen behandling" = paste0(sum(ingen_beh), " (", round(100*sum(ingen_beh)/n(),1), "%)"),
-            "Operasjon" = paste0(sum(TreatmentOperation), " (", round(100*sum(TreatmentOperation)/n(),1), "%)"),
-            "Individuell behandling" = paste0(sum(TreatmentPostIndividual), " (", round(100*sum(TreatmentPostIndividual)/n(),1), "%)"),
-            "Gruppebehandling" = paste0(sum(TreatmentPostGroupbased), " (", round(100*sum(TreatmentPostGroupbased)/n(),1), "%)"),
-            "Videre kontroller" = paste0(sum(TreatmentPostHospitalExtendedExamination), " (", round(100*sum(TreatmentPostHospitalExtendedExamination)/n(),1), "%)"),
-            N=n())
+aux <- RegDataAll %>%
+  filter(Besoksdato>=paste0(rap_aar-1, "-07-01") &
+           Besoksdato<=paste0(rap_aar, "-06-30") &
+           regstatus_post == 1) %>% group_by(SykehusNavn) %>%
+  summarise(
+    "Ingen behandling" = paste0(sum(ingen_beh), " (",
+                                round(100*sum(ingen_beh)/n(),1), "%)"),
+    "Operasjon" = paste0(sum(TreatmentOther),
+                         " (", round(100*sum(TreatmentOther)/n(),1), "%)"),
+    "Individuell behandling" = paste0(
+      sum(TreatmentPostIndividual),
+      " (", round(100*sum(TreatmentPostIndividual)/n(),1), "%)"),
+    "Gruppebehandling" = paste0(
+      sum(TreatmentPostGroupbased),
+      " (", round(100*sum(TreatmentPostGroupbased)/n(),1), "%)"),
+    "Videre kontroller" = paste0(
+      sum(TreatmentPostHospitalExtendedExamination), " (",
+      round(100*sum(TreatmentPostHospitalExtendedExamination)/n(),1), "%)"),
+    N=n())
 
-samlet <- RegDataAll %>% filter(Besoksdato>=paste0(rap_aar-1, "-07-01") & Besoksdato<=paste0(rap_aar, "-06-30") &
-                                  regstatus_post == 1) %>%
-  summarise("Ingen behandling" = paste0(sum(ingen_beh), " (", round(100*sum(ingen_beh)/n(),1), "%)"),
-            "Operasjon" = paste0(sum(TreatmentOperation), " (", round(100*sum(TreatmentOperation)/n(),1), "%)"),
-            "Individuell behandling" = paste0(sum(TreatmentPostIndividual), " (", round(100*sum(TreatmentPostIndividual)/n(),1), "%)"),
-            "Gruppebehandling" = paste0(sum(TreatmentPostGroupbased), " (", round(100*sum(TreatmentPostGroupbased)/n(),1), "%)"),
-            "Videre kontroller" = paste0(sum(TreatmentPostHospitalExtendedExamination), " (", round(100*sum(TreatmentPostHospitalExtendedExamination)/n(),1), "%)"),
-            N=n())
+samlet <- RegDataAll %>%
+  filter(Besoksdato>=paste0(rap_aar-1, "-07-01") &
+           Besoksdato<=paste0(rap_aar, "-06-30") &
+           regstatus_post == 1) %>%
+  summarise(
+    "Ingen behandling" = paste0(sum(ingen_beh), " (",
+                                round(100*sum(ingen_beh)/n(),1), "%)"),
+    "Operasjon" = paste0(sum(TreatmentOther), " (",
+                         round(100*sum(TreatmentOther)/n(),1), "%)"),
+    "Individuell behandling" = paste0(
+      sum(TreatmentPostIndividual), " (",
+      round(100*sum(TreatmentPostIndividual)/n(),1), "%)"),
+    "Gruppebehandling" = paste0(
+      sum(TreatmentPostGroupbased), " (",
+      round(100*sum(TreatmentPostGroupbased)/n(),1), "%)"),
+    "Videre kontroller" = paste0(
+      sum(TreatmentPostHospitalExtendedExamination), " (",
+      round(100*sum(TreatmentPostHospitalExtendedExamination)/n(),1), "%)"),
+    N=n())
 
 aux <- dplyr::bind_rows(aux, tibble(SykehusNavn = "Total", samlet))
 
 names(aux)[1] <- ""
 
-print(xtable::xtable(aux, digits=0, align=c('l', 'l', rep('R{0.8in}', ncol(aux)-2), 'r'), caption='Pasientrapportert behandling på nakke - og ryggpoliklinikken.'), include.rownames=FALSE)
+print(xtable::xtable(
+  aux, digits=0,
+  align=c('l', 'l', rep('R{0.8in}', ncol(aux)-2), 'r'),
+  caption='Pasientrapportert behandling på nakke - og ryggpoliklinikken.'),
+  include.rownames=FALSE)
 
-write.csv2(aux, paste0(tabfolder, "tab_pasientrapp_beh_klin.csv"), row.names = F, fileEncoding = "Latin1")
+write.csv2(aux, paste0(tabfolder, "tab_pasientrapp_beh_klin.csv"),
+           row.names = F, fileEncoding = "Latin1")
 
-aux2 <- RegDataAll %>% filter(Besoksdato>=paste0(rap_aar-1, "-07-01") & Besoksdato<=paste0(rap_aar, "-06-30") &
-                                regstatus_post == 1) %>% group_by(SykehusNavn) %>%
-  summarise('Trening hos fysioterapeut' = paste0(sum(TreatmentPhysioTherapist !=0), " (", round(100*sum(TreatmentPhysioTherapist !=0)/n(),1), "%)"),
-            'Annen behandling hos fysioterapeut' = paste0(sum(TreatmentPhysioTherapistOther !=0), " (", round(100*sum(TreatmentPhysioTherapistOther !=0)/n(),1), "%)"),
-            'Manuell terapi' = paste0(sum(TreatmentManuelTherapi !=0), " (", round(100*sum(TreatmentManuelTherapi !=0)/n(),1), "%)"),
-            'Psykomotorisk fysioterapi'= paste0(sum(TreatmentPsychomotoricTherapy !=0), " (", round(100*sum(TreatmentPsychomotoricTherapy !=0)/n(),1), "%)"),
-            'Kiropraktor'= paste0(sum(TreatmentChiropractor !=0), " (", round(100*sum(TreatmentChiropractor !=0)/n(),1), "%)"),
-            'Annen behandling'= paste0(sum(TreatmentOtherTreatment !=0), " (", round(100*sum(TreatmentOtherTreatment !=0)/n(),1), "%)"),
-            N=n())
+aux2 <- RegDataAll %>%
+  filter(Besoksdato>=paste0(rap_aar-1, "-07-01") &
+           Besoksdato<=paste0(rap_aar, "-06-30") &
+           regstatus_post == 1) %>%
+  group_by(SykehusNavn) %>%
+  summarise(
+    'Trening hos fysioterapeut' =
+      paste0(sum(TreatmentPhysioTherapist !=0), " (",
+             round(100*sum(TreatmentPhysioTherapist !=0)/n(),1), "%)"),
+    'Annen behandling hos fysioterapeut' =
+      paste0(sum(TreatmentPhysioTherapistOther !=0), " (",
+             round(100*sum(TreatmentPhysioTherapistOther !=0)/n(),1), "%)"),
+    'Manuell terapi' = paste0(
+      sum(TreatmentManuelTherapi !=0), " (",
+      round(100*sum(TreatmentManuelTherapi !=0)/n(),1), "%)"),
+    'Psykomotorisk fysioterapi'= paste0(
+      sum(TreatmentPsychomotoricTherapy !=0), " (",
+      round(100*sum(TreatmentPsychomotoricTherapy !=0)/n(),1), "%)"),
+    'Kiropraktor'= paste0(sum(
+      TreatmentChiropractor !=0), " (",
+      round(100*sum(TreatmentChiropractor !=0)/n(),1), "%)"),
+    'Annen behandling'= paste0(sum(
+      TreatmentOtherTreatment !=0), " (",
+      round(100*sum(TreatmentOtherTreatment !=0)/n(),1), "%)"),
+    N=n())
 
-samlet <- RegDataAll %>% filter(Besoksdato>=paste0(rap_aar-1, "-07-01") & Besoksdato<=paste0(rap_aar, "-06-30") &
-                                  regstatus_post == 1) %>%
-  summarise('Trening hos fysioterapeut' = paste0(sum(TreatmentPhysioTherapist !=0), " (", round(100*sum(TreatmentPhysioTherapist !=0)/n(),1), "%)"),
-            'Annen behandling hos fysioterapeut' = paste0(sum(TreatmentPhysioTherapistOther !=0), " (", round(100*sum(TreatmentPhysioTherapistOther !=0)/n(),1), "%)"),
-            'Manuell terapi' = paste0(sum(TreatmentManuelTherapi !=0), " (", round(100*sum(TreatmentManuelTherapi !=0)/n(),1), "%)"),
-            'Psykomotorisk fysioterapi'= paste0(sum(TreatmentPsychomotoricTherapy !=0), " (", round(100*sum(TreatmentPsychomotoricTherapy !=0)/n(),1), "%)"),
-            'Kiropraktor'= paste0(sum(TreatmentChiropractor !=0), " (", round(100*sum(TreatmentChiropractor !=0)/n(),1), "%)"),
-            'Annen behandling'= paste0(sum(TreatmentOtherTreatment !=0), " (", round(100*sum(TreatmentOtherTreatment !=0)/n(),1), "%)"),
-            N=n())
+samlet <- RegDataAll %>%
+  filter(
+    Besoksdato>=paste0(rap_aar-1, "-07-01") &
+      Besoksdato<=paste0(rap_aar, "-06-30") &
+      regstatus_post == 1) %>%
+  summarise(
+    'Trening hos fysioterapeut' = paste0(sum(
+      TreatmentPhysioTherapist !=0), " (",
+      round(100*sum(TreatmentPhysioTherapist !=0)/n(),1), "%)"),
+    'Annen behandling hos fysioterapeut' = paste0(sum(
+      TreatmentPhysioTherapistOther !=0), " (",
+      round(100*sum(TreatmentPhysioTherapistOther !=0)/n(),1), "%)"),
+    'Manuell terapi' = paste0(sum(
+      TreatmentManuelTherapi !=0), " (",
+      round(100*sum(TreatmentManuelTherapi !=0)/n(),1), "%)"),
+    'Psykomotorisk fysioterapi'= paste0(sum(
+      TreatmentPsychomotoricTherapy !=0), " (",
+      round(100*sum(TreatmentPsychomotoricTherapy !=0)/n(),1), "%)"),
+    'Kiropraktor'= paste0(sum(
+      TreatmentChiropractor !=0), " (",
+      round(100*sum(TreatmentChiropractor !=0)/n(),1), "%)"),
+    'Annen behandling'= paste0(sum(
+      TreatmentOtherTreatment !=0), " (",
+      round(100*sum(TreatmentOtherTreatment !=0)/n(),1), "%)"),
+    N=n())
 
 aux2 <- dplyr::bind_rows(aux2, tibble(SykehusNavn = "Total", samlet))
 
-print(xtable::xtable(aux2, digits=0, align=c('l', 'l', rep('R{0.8in}', ncol(aux2)-2), 'r'), caption='Antall pasientrapportert oppfølging utenfor sykehus ved 6 mnd oppfølging.'), include.rownames=FALSE,
-      size = "\\scriptsize")
+print(xtable::xtable(
+  aux2, digits=0,
+  align=c('l', 'l', rep('R{0.8in}', ncol(aux2)-2), 'r'),
+  caption='Antall pasientrapportert oppfølging utenfor sykehus ved 6 mnd oppfølging.'),
+  include.rownames=FALSE,
+  size = "\\scriptsize")
 
 # aux2 <- tr_summarize_output(aux2)
 # print(xtable::xtable(aux2, digits=0, caption='Antall pasientrapportert oppfølging utenfor sykehus ved 6 mnd oppfølging.'), include.rownames=FALSE)
@@ -1762,8 +1912,8 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1),
 outfile <- "mestringsorientert_samtale.pdf"
 outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'),
-                   minstekrav = 85, maal = 95,
-                   outfile=outfile)
+                 minstekrav = 85, maal = 95,
+                 outfile=outfile)
 if (annetformat != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
   nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'),
@@ -1865,7 +2015,7 @@ aux <- RegData %>%
   filter(regstatus == 1 & TreatmentAbilityToWorkFunctionLevel %in% 1:2)
 
 aux$Teller <- 0
-aux$Teller[aux$CourseYellowFlagComplicatingFactors %in% 1] <- 1
+aux$Teller[aux$TreatmentAbilityToWorkFunctionLevel %in% 1] <- 1
 
 ######### Indikator #####################################################################
 indikator <- aux[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
