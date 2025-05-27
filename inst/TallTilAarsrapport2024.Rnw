@@ -555,7 +555,7 @@ tab7 <- RegData[, c(as.character(BehSpeshelsetj$varnavn),
       sum(Treatment_GroupInterdisciplinary2018 %in% 2:3 | Treatment_GroupInterdisciplinary==2),
     'Tverrfaglig behandling i gruppe mer enn 10 ganger' =
       sum(Treatment_GroupInterdisciplinary2018==4 | Treatment_GroupInterdisciplinary==3)
-    ) %>%
+  ) %>%
   mutate(across(c(2), as.integer))
 
 tab7 <- tr_summarize_output(tab7)
@@ -700,10 +700,14 @@ tab8[, -dim(tab8)[2]] <- tab8[, -dim(tab8)[2]]/tab8$N*100
 tab8[, -dim(tab8)[2]] <- sapply(tab8[, -dim(tab8)[2]], function(x) {sprintf("%.1f%%", x)})
 tab8 <- tab8[tab8$N > 0, ]
 
+write.csv2(tab8, paste0(tabfolder, "tab8_nytte_av_behandling.csv"),
+           row.names = T, fileEncoding = "Latin1")
 
-print(xtable::xtable(tab8, digits=0, align=c('l',rep('R{0.4in}', ncol(tab8))),
-                     caption = ' Hvilken nytte/bedring mener du at du har hatt av behandlingen. Fordelt på sykehus.'),
-      size = "\\scriptsize")
+print(xtable::xtable(
+  tab8, digits=0, align=c('l',rep('R{0.4in}', ncol(tab8))),
+  caption = ' Hvilken nytte/bedring mener du at du har hatt av behandlingen.
+  Fordelt på sykehus.'),
+  size = "\\scriptsize")
 
 @
 
@@ -1466,12 +1470,14 @@ tab16 <- RegData[, c( "SykehusNavn", "Treatment_TrainingActivation",
                       "Treatment_WorkFollowUp", "Treatment_CognitiveApproach",
                       "Treatment_Education", "Treatment_AttentionAndBodyawareness_Training")] %>%
   group_by (SykehusNavn) %>%
-  summarise('Trening / aktivisering' = sum(Treatment_TrainingActivation),
-            'Arbeidsmessig oppfølging' = sum(Treatment_WorkFollowUp),
-            'Kognitiv tilnærming' = sum(Treatment_CognitiveApproach),
-            'Undervisning' = sum(Treatment_Education),
-            'Psykomotorisk behandling' = sum(Treatment_AttentionAndBodyawareness_Training),
-            N = n()) %>%
+  summarise(
+    'Trening / aktivisering' = sum(Treatment_TrainingActivation),
+    'Arbeidsmessig oppfølging' = sum(Treatment_WorkFollowUp),
+    'Kognitiv tilnærming' = sum(Treatment_CognitiveApproach),
+    'Undervisning' = sum(Treatment_Education),
+    'Oppmerksomhetstrening og kroppsbevissthet' =
+      sum(Treatment_AttentionAndBodyawareness_Training),
+    N = n()) %>%
   janitor::adorn_totals()
 tab16[, -c(1, dim(tab16)[2])] <- tab16[, -c(1, dim(tab16)[2])]/tab16$N*100
 tab16[, -c(1, dim(tab16)[2])] <- sapply(tab16[, -c(1, dim(tab16)[2])], function(x) {sprintf("%.1f%%", x)})
@@ -1496,9 +1502,11 @@ tab17[, -dim(tab17)[2]] <- sapply(tab17[, -dim(tab17)[2]], function(x) {sprintf(
 tab17 <- tab17[tab17$N > 0, ]
 
 
-print(xtable::xtable(tab17, digits=0, align=c('l',rep('R{0.6in}', ncol(tab17))),
-                     caption = ' Hvilken nytte/bedring mener du at du har hatt av behandlingen. Fordelt på sykehus.'),
-      size = "\\small")
+print(xtable::xtable(
+  tab17, digits=0, align=c('l',rep('R{0.6in}', ncol(tab17))),
+  caption = ' Hvilken nytte/bedring mener du at du har hatt av behandlingen.
+  Fordelt på sykehus.'),
+  size = "\\small")
 
 @
 
@@ -1825,16 +1833,18 @@ aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
                     "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
                     "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")] >= 2 ] <- 1
 
-aux$ant_hoy_uhi <- rowSums(aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
-                                    "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
-                                    "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
-                                    "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
-                                    "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")], na.rm = T)
-aux$ant_besvart_uhi <- rowSums(is.na(aux[ , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
-                                              "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
-                                              "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
-                                              "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
-                                              "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")]))
+aux$ant_hoy_uhi <- rowSums(aux[
+  , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+      "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+      "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+      "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+      "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")], na.rm = T)
+aux$ant_besvart_uhi <- rowSums(is.na(aux[
+  , c("UhiQ1", "UhiQ2", "UhiQ3", "UhiQ4",
+      "UhiQ8", "UhiQ9", "UhiQ10", "UhiQ11", "UhiQ12", "UhiQ13", "UhiQ14",
+      "UhiQ15", "UhiQ16", "UhiQ17", "UhiQ18", "UhiQ19", "UhiQ20", "UhiQ21",
+      "UhiQ22", "UhiQ23", "UhiQ24", "UhiQ25", "UhiQ26", "UhiQ27", "UhiQ28",
+      "UhiQ29", "UhiQ30", "UhiQ31", "UhiQ32", "UhiQ33")]))
 
 aux <- aux[aux$ant_besvart_uhi >= 3, ]
 aux$Teller <- 0
@@ -2040,10 +2050,16 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1),
 <<'Fig. Kartlegging funksjonsevne', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "funksjonkartlagt.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, c('Andel kartlagt funksjonsevne', 'relatert til arbeid og utdanning'), outfile=outfile)
+nnrrFigIndikator(indikator,
+                 c('Andel kartlagt funksjonsevne',
+                   'relatert til arbeid og utdanning'),
+                 outfile=outfile)
 if (annetformat != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), annetformat)
-  nnrrFigIndikator(indikator, c('Andel kartlagt funksjonsevne', 'relatert til arbeid og utdanning'), outfile=outfile)
+  nnrrFigIndikator(indikator,
+                   c('Andel kartlagt funksjonsevne',
+                     'relatert til arbeid og utdanning'),
+                   outfile=outfile)
 }
 @
 

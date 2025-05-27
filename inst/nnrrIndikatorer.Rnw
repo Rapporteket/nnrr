@@ -135,7 +135,8 @@ aux <- aux[!is.na(aux$OdiScore) & !is.na(aux$OdiScore_post), ]
 # aux$odidiff_klin_viktig[aux$OdiScore - aux$OdiScore_post >= 10] <- 1
 
 aux$odidiff_klin_viktig <- 0
-aux$odidiff_klin_viktig[(aux$OdiScore - aux$OdiScore_post)/aux$OdiScore >= .3] <- 1
+# aux$odidiff_klin_viktig[(aux$OdiScore - aux$OdiScore_post)/aux$OdiScore >= .3] <- 1
+aux$odidiff_klin_viktig[(aux$OdiScore - aux$OdiScore_post) >= 10] <- 1
 
 ######### Indikator #####################################################################
 indikator <- aux[, c("UnitId", "aar_oppfolg", "odidiff_klin_viktig", "SykehusNavn")]
@@ -148,7 +149,7 @@ indikator$ind_id <- "nnrr_bedret_funksjon"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
 tabell1 <- nnrrIndikatorTabell(aux, indikator = 'odidiff_klin_viktig')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i ODI (reduksjon $\\geq$ 30 \\%)'), include.rownames=FALSE)
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i ODI (minimum 10 poeng reduksjon'), include.rownames=FALSE)
 #########################################################################################
 @
 
@@ -168,10 +169,10 @@ aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 aux <- aux[!is.na(aux$NdiScore) & !is.na(aux$NdiScore_post), ]
 aux$ndidiff_klin_viktig <- 0
 aux$ndidiff_klin_viktig[aux$NdiScore - aux$NdiScore_post >= 10] <- 1
-aux$ndidiff_klin_viktig[(aux$NdiScore - aux$NdiScore_post)/aux$NdiScore >= .3] <- 1
+# aux$ndidiff_klin_viktig[(aux$NdiScore - aux$NdiScore_post)/aux$NdiScore >= .3] <- 1
 
 tabell1 <- nnrrIndikatorTabell(aux, indikator = 'ndidiff_klin_viktig')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i NDI (reduksjon $\\geq$ 30 \\%)'), include.rownames=FALSE)
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i NDI (minimum 10 poeng reduksjon'), include.rownames=FALSE)
 
 ######### Indikator #####################################################################
 datasett_indikator7ndi <- aux[, c("UnitId", "SykehusNavn", "Aar", "ndidiff_klin_viktig")]
@@ -254,13 +255,22 @@ datasett_indikator8minimal_funksjonsnedsettelseNDI <- aux[, c("UnitId", "Sykehus
 
 <<'Indikator 9: andel med klinisk viktig endring smerte', results='asis', echo=FALSE>>=
 
-aux <- Oppf_data %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
-                              !is.na(PainExperiencesNoActivity_post) & PainExperiencesNoActivity != 0)
+aux <- Oppf_data %>%
+  filter(
+    regstatus_pre == 1 &
+      regstatus_post == 1 &
+      !is.na(PainExperiencesNoActivity) &
+      !is.na(PainExperiencesNoActivity_post) &
+      PainExperiencesNoActivity != 0)
 
-aux$pstEndringSmerteHvile <- (aux$PainExperiencesNoActivity - aux$PainExperiencesNoActivity_post)/aux$PainExperiencesNoActivity*100
+# aux$pstEndringSmerteHvile <-
+#   (aux$PainExperiencesNoActivity - aux$PainExperiencesNoActivity_post)/
+#   aux$PainExperiencesNoActivity*100
 
 aux$Indikator <- 0
-aux$Indikator[aux$pstEndringSmerteHvile >= 30 ] <- 1
+# aux$Indikator[aux$pstEndringSmerteHvile >= 30 ] <- 1
+aux$Indikator[(aux$PainExperiencesNoActivity -
+                 aux$PainExperiencesNoActivity_post) >= 2] <- 1
 
 ######### Indikator #####################################################################
 indikator <- aux[, c("UnitId", "Aar", "Indikator", "SykehusNavn")]
@@ -272,7 +282,7 @@ indikator$ind_id <- "nnrr_bedring_smerte_hvile"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
 tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% eller mer reduksjon i smerte i hvile. Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget.'), include.rownames=FALSE)
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 2 poeng eller mer reduksjon i smerte i hvile. Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget.'), include.rownames=FALSE)
 
 #########################################################################################
 @
@@ -290,13 +300,21 @@ if (format_ut != "pdf") {
 <<'Indikator 9: andel med klinisk viktig endring smerte forts', results='asis', echo=FALSE>>=
 #### Smerte i aktivitet
 
-aux <- Oppf_data %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
-                              !is.na(PainExperiencesActivity_post) & PainExperiencesActivity != 0)
+aux <- Oppf_data %>%
+  filter(regstatus_pre == 1 &
+           regstatus_post == 1 &
+           !is.na(PainExperiencesActivity) &
+           !is.na(PainExperiencesActivity_post) &
+           PainExperiencesActivity != 0)
 
-aux$pstEndringSmerteAktiv <- (aux$PainExperiencesActivity - aux$PainExperiencesActivity_post)/aux$PainExperiencesActivity*100
+# aux$pstEndringSmerteAktiv <-
+#   (aux$PainExperiencesActivity - aux$PainExperiencesActivity_post)/
+#   aux$PainExperiencesActivity*100
 
 aux$Indikator <- 0
-aux$Indikator[aux$pstEndringSmerteAktiv >= 30 ] <- 1
+# aux$Indikator[aux$pstEndringSmerteAktiv >= 30 ] <- 1
+aux$Indikator[(aux$PainExperiencesActivity -
+                 aux$PainExperiencesActivity_post) >= 2 ] <- 1
 
 ######### Indikator #####################################################################
 indikator <- aux[, c("UnitId", "Aar", "Indikator", "SykehusNavn")]
@@ -309,7 +327,7 @@ Indikatorer <- bind_rows(Indikatorer, indikator)
 #########################################################################################
 
 tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% eller mer reduksjon i smerte i aktivitet.  Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget'), include.rownames=FALSE)
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 2 poeng eller mer reduksjon i smerte i aktivitet.  Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget'), include.rownames=FALSE)
 @
 
 <<'Fig. Klinisk viktig bedring av smerte aktiv', include=FALSE, echo=FALSE, eval=T>>=
@@ -536,10 +554,10 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med
 <<'Fig. Fornoyd med behandling', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "fornoyd_med_behandling.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 90, maalretn = 'hoy')
+nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=80, maal = 90, maalretn = 'hoy')
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 90, maalretn = 'hoy')
+  nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=80, maal = 90, maalretn = 'hoy')
 }
 
 @
