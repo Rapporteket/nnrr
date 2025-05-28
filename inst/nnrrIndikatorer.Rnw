@@ -93,8 +93,12 @@ skjema1b$tverrfaglig_behandlet <- 0
 skjema1b$tverrfaglig_behandlet[skjema1b$Treatment_GroupInterdisciplinary2018 != 0 | skjema1b$Treatment_GroupInterdisciplinary != 0] <- 1
 skjema1b$tverrfaglig_behandlet[skjema1b$Treatment_InvidualInterdisciplinary != 0] <- 1
 
-tabell1 <- nnrrIndikatorTabell(skjema1b, indikator = 'tverrfaglig_behandlet')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel tverrfaglig behandlet'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(skjema1b |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'tverrfaglig_behandlet')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel tverrfaglig behandlet'),
+      include.rownames=FALSE)
 
 
 ######### Indikator #####################################################################
@@ -148,8 +152,15 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_bedret_funksjon"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'odidiff_klin_viktig')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i ODI (minimum 10 poeng reduksjon'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'odidiff_klin_viktig')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption=paste0('Andel med klinisk viktig endring i ODI
+                     (minimum 10 poeng reduksjon). I hele perioden er det ',
+                     sum(aux$OdiScore[which(aux$Aar > rap_aar-4)] < 10), '
+                     pasienter som har prescore $<$ 10')),
+      include.rownames=FALSE)
 #########################################################################################
 @
 
@@ -171,8 +182,15 @@ aux$ndidiff_klin_viktig <- 0
 aux$ndidiff_klin_viktig[aux$NdiScore - aux$NdiScore_post >= 10] <- 1
 # aux$ndidiff_klin_viktig[(aux$NdiScore - aux$NdiScore_post)/aux$NdiScore >= .3] <- 1
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'ndidiff_klin_viktig')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i NDI (minimum 10 poeng reduksjon'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'ndidiff_klin_viktig')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption=paste0('Andel med klinisk viktig endring i NDI
+                     (minimum 10 poeng reduksjon). I hele perioden er det ',
+                     sum(aux$OdiScore[which(aux$Aar > rap_aar-4)] < 10), '
+                     pasienter som har prescore $<$ 10')),
+      include.rownames=FALSE)
 
 ######### Indikator #####################################################################
 datasett_indikator7ndi <- aux[, c("UnitId", "SykehusNavn", "Aar", "ndidiff_klin_viktig")]
@@ -186,8 +204,13 @@ aux <- aux[!is.na(aux$OdiScore) & !is.na(aux$OdiScore_post), ]
 aux$minimal_funksjonsnedsettelse <- 0
 aux$minimal_funksjonsnedsettelse[aux$OdiScore_post <= 23] <- 1
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'minimal_funksjonsnedsettelse')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med minimal funksjonsnedsettelse etter 6 mnd. (ODI score oppfølging $\\leq$ 23)'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'minimal_funksjonsnedsettelse')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel med minimal funksjonsnedsettelse etter 6
+                     mnd. (ODI score oppfølging $\\leq$ 23)'),
+      include.rownames=FALSE)
 
 ######### Indikator #####################################################################
 # datasett_indikator8minimal_funksjonsnedsettelseODI <- aux[, c("UnitId", "SykehusNavn", "Aar", "minimal_funksjonsnedsettelse")]
@@ -226,8 +249,13 @@ aux <- aux[!is.na(aux$NdiScore) & !is.na(aux$NdiScore_post), ]
 aux$minimal_funksjonsnedsettelse <- 0
 aux$minimal_funksjonsnedsettelse[aux$NdiScore_post <= 20] <- 1
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'minimal_funksjonsnedsettelse')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med minimal funksjonsnedsettelse etter 6 mnd. (NDI score oppfølging $\\leq$ 20)'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'minimal_funksjonsnedsettelse')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel med minimal funksjonsnedsettelse etter
+                     6 mnd. (NDI score oppfølging $\\leq$ 20)'),
+      include.rownames=FALSE)
 
 ######### Indikator #####################################################################
 datasett_indikator8minimal_funksjonsnedsettelseNDI <- aux[, c("UnitId", "SykehusNavn", "Aar", "minimal_funksjonsnedsettelse")]
@@ -281,8 +309,17 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_bedring_smerte_hvile"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 2 poeng eller mer reduksjon i smerte i hvile. Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget.'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'Indikator')
+print(xtable::xtable(
+  tabell1,
+  digits=c(0,0,0,0,0,1),
+  caption=paste0(
+    'Andel med 2 poeng eller mer reduksjon i smerte i hvile. Individer med
+    smertescore = 0 ved inklusjon er fjernet fra utvalget. Det er ',
+    sum(aux$PainExperiencesNoActivity[aux$Aar > rap_aar-4] < 2), ' pasienter som
+    har prescore 1 over hele perioden.') ),
+  include.rownames=FALSE)
 
 #########################################################################################
 @
@@ -326,8 +363,17 @@ indikator$ind_id <- "nnrr_bedring_smerte_aktiv"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 #########################################################################################
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 2 poeng eller mer reduksjon i smerte i aktivitet.  Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'Indikator')
+print(xtable::xtable(
+  tabell1,
+  digits=c(0,0,0,0,0,1),
+  caption=paste0(
+    'Andel med 2 poeng eller mer reduksjon i smerte i aktivitet Individer med
+    smertescore = 0 ved inklusjon er fjernet fra utvalget. Det er ',
+    sum(aux$PainExperiencesActivity[aux$Aar > rap_aar-4] < 2), ' pasienter som
+    har prescore 1 over hele perioden.')),
+  include.rownames=FALSE)
 @
 
 <<'Fig. Klinisk viktig bedring av smerte aktiv', include=FALSE, echo=FALSE, eval=T>>=
@@ -403,8 +449,19 @@ aux$tilbake_i_arbeid <- 0
 aux$tilbake_i_arbeid[which((aux$WorkingPercent_post - aux$WorkingPercent) >= 0 &
                              aux$WorkingStatus == 1)] <- 1
 
-tabell2 <- nnrrIndikatorTabell(aux, indikator = 'tilbake_i_arbeid')
-print(xtable::xtable(tabell2, digits=c(0,0,0,0,0,1), caption='Andel delvis/fullt tilbake i arbeid. Utvalget består av alle som det finnes oppfølgingsdata på og er registrert som sykemeldt ved inklusjon. Hvis de i tillegg er registrert som i 100 \\% arbeid ved inklusjon fjernes de fra utvalget. For å regnes som tilbake i arbeid skal de ha registrert arbeidsstatus som Inntektsgivende arbeid, samt ha en prosentvis stilling ved oppfølging som er større eller lik den ved inklusjon.'), include.rownames=FALSE)
+tabell2 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'tilbake_i_arbeid')
+print(xtable::xtable(tabell2,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel delvis/fullt tilbake i arbeid. Utvalget
+                     består av alle som det finnes oppfølgingsdata på og er
+                     registrert som sykemeldt ved inklusjon. Hvis de i tillegg
+                     er registrert som i 100 \\% arbeid ved inklusjon fjernes
+                     de fra utvalget. For å regnes som tilbake i arbeid skal
+                     de ha registrert arbeidsstatus som Inntektsgivende arbeid,
+                     samt ha en prosentvis stilling ved oppfølging som er større
+                     eller lik den ved inklusjon.'),
+      include.rownames=FALSE)
 @
 
 
@@ -516,8 +573,12 @@ if (format_ut != "pdf") {
   nnrrFigIndikator(indikator, 'Pasientopplevd bedring av behandling', outfile=outfile, maal = 40, minstekrav = 30)
 }
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'NytteAvBehandling')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Pasientrapportert nytte av behandling'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'NytteAvBehandling')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Pasientrapportert nytte av behandling'),
+      include.rownames=FALSE)
 
 @
 
@@ -544,8 +605,12 @@ indikator$ind_id <- "nnrr_misfornoeyd"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Fornoyd')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med eller nøytral til behandlingen'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'Fornoyd')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel fornøyd med eller nøytral til behandlingen'),
+      include.rownames=FALSE)
 
 #########################################################################################
 @
@@ -572,8 +637,12 @@ if (format_ut != "pdf") {
 
 <<'Indikator 13: Andel oppfølginger utfylt', results='asis', echo=FALSE>>=
 
-tabell1 <- nnrrIndikatorTabell(Oppf_data, indikator = 'regstatus_post')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel oppfølgingsskjema utfylt'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(Oppf_data |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'regstatus_post')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel oppfølgingsskjema utfylt'),
+      include.rownames=FALSE)
 
 @
 
@@ -602,7 +671,9 @@ tabell1 <- aux %>%
   arrange(-`Andel (%)`) %>% mutate(År = NA)
 
 tabell1$År[1] <- rap_aar
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel som mottar mestringsorientert samtale'), include.rownames=FALSE)
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1),
+                     caption='Andel som mottar mestringsorientert samtale'),
+      include.rownames=FALSE)
 
 #########################################################################################
 @

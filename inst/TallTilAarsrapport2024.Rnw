@@ -77,7 +77,8 @@ tab0 <- RegData[, c("SykehusNavn", "regstatus", "regstatus_pre", "regstatus_post
   summarise('Pasientskjema' = sum(regstatus_pre),
             'Behandlerskjema' = sum(regstatus),
             'Oppfølgingsskjema' = sum(regstatus_post)) %>% ungroup()
-tot <- RegData[, c("regstatus", "regstatus_pre", "regstatus_post", "Aar")] %>% group_by (Aar) %>%
+tot <- RegData[, c("regstatus", "regstatus_pre", "regstatus_post", "Aar")] %>%
+  group_by (Aar) %>%
   summarise('Pasientskjema' = sum(regstatus_pre),
             'Behandlerskjema' = sum(regstatus),
             'Oppfølgingsskjema' = sum(regstatus_post)) %>% ungroup()
@@ -89,7 +90,12 @@ tab0 <- tab0[order(tab0$Aar), ]
 tab0$Aar[!as.logical(c(1, diff(tab0$Aar)))] <- NA
 names(tab0)[1:2] <- c('År', 'Sykehus')
 
-print(xtable::xtable(tab0[,-5], digits=0, align=c('l', 'l', 'l', rep('r', ncol(tab0)-3)), caption = 'Oversikt over registreringer. Kun pasientskjema som har et tilhørende behandlerskjema er inkludert'), include.rownames=FALSE, sanitize.text.function = identity)
+print(xtable::xtable(
+  tab0[,-5],
+  digits=0, align=c('l', 'l', 'l', rep('r', ncol(tab0)-3)),
+  caption = 'Oversikt over registreringer. Kun pasientskjema som har et
+  tilhørende behandlerskjema er inkludert'),
+  include.rownames=FALSE, sanitize.text.function = identity)
 @
 
 
