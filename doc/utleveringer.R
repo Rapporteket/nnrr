@@ -1,6 +1,62 @@
 rm(list=ls())
 library(nnrr)
 
+######### Utlevering Thomas Kadar juni 2025  #######################################
+
+legeskjema <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-04-23_1444.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-04-23_1458.csv"))
+pasientsvar_post <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-04-23_1503.csv"))
+pasientsvar_post2 <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-04-23_1507.csv"))
+
+flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <- names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post <- pasientsvar_post[!(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <- names(table(pasientsvar_post2$HovedskjemaGUID))[table(pasientsvar_post2$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post2 <- pasientsvar_post2[!(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+variabler <- readxl::read_xlsx(
+  "~/regdata/nnrr/utleveringer/Bestillingsskjema for datauttrekk NNRR_mai2025.xlsx",
+  sheet = 1, range = "A33:D117")
+
+legeskjema <- legeskjema |>
+  dplyr::filter(S1b_DateOfCompletion >= "2021-01-01") |>
+  dplyr::select(c(intersect(names(legeskjema), variabler$behandler), "SkjemaGUID"))
+pasientsvar_pre <- pasientsvar_pre |>
+  dplyr::select(c(intersect(names(pasientsvar_pre), variabler$baseline), "HovedskjemaGUID"))
+pasientsvar_post <- pasientsvar_post |>
+  dplyr::select(c(intersect(names(pasientsvar_post), variabler$oppf6mnd), "HovedskjemaGUID"))
+pasientsvar_post2 <- pasientsvar_post2 |>
+  dplyr::select(c(intersect(names(pasientsvar_post2), variabler$oppf12mnd), "HovedskjemaGUID"))
+
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre')) |>
+  merge(pasientsvar_post, by.x = 'SkjemaGUID',
+        by.y = 'HovedskjemaGUID', suffixes = c('', '_post'),
+        all.x = TRUE) |>
+  merge(pasientsvar_post2, by.x = 'SkjemaGUID',
+        by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'),
+        all.x = TRUE) |>
+  dplyr::select(-SkjemaGUID)
+
+write.csv2(RegData, "~/regdata/nnrr/utleveringer/kadar_juni2025.csv",
+           row.names = F, fileEncoding = "Latin1")
+
+######### Utlevering ukjent mars 2025  #######################################
 legeskjema <-
   readr::read_csv2(
     paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0912.csv"))

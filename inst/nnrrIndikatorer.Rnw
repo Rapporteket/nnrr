@@ -700,51 +700,96 @@ if (format_ut != "pdf") {
 
 
 
-% # <<'DG-tall NNRR', results='asis', echo=FALSE, message=FALSE, include=FALSE>>=
-% #
-% # dg_ny <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2023.csv",
-% #                           locale = readr::locale(encoding = "Latin1"))
-% #
-% #
-% # map_dg2 <- data.frame(enhet=c("Helgelandssykehuset, SandnessjÃ¸en",
-% #                               "St. Olavs Hospital",
-% #                               "UNN Harstad",
-% #                               "UNN TromsÃ¸",
-% #                               "Stavanger",
-% #                               "Oslo Universitetssykehus",
-% #                               "MÃ¸re og Romsdal, Ã\u0085lesund",
-% #                               "SÃ¸rlandet sykehus",
-% #                               "Helse Bergen, Haukeland universitetssykehus",
-% #                               "Vestre Viken Drammen", "Levanger",
-% #                               "Sykehuset i Vestfold Rehabilitering Stavern",
-% #                               "Nordlandssykehuset"),
-% #                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
-% #                                   4212982, 114174, 102959, 103736, 105821, 700138,
-% #                                   700701))
-% #
-% # dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
-% # dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
-% # dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
-% # dg_ny$year <- 2023
-% # dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
-% # dg_ny$ind_id <- "nnrr_dg"
-% # dg_ny$context <- "caregiver"
-% #
-% # dg_gml <- readr::read_csv2("~/mydata/nnrr/nnrr_dg_shusviser_2022.csv",
-% #                            locale = readr::locale(encoding = "Latin1"))
-% #
-% # Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
-% # names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
-% # Indikatorer$context <- "caregiver"
-% # Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
-% #
-% # Indikatorer <- dplyr::bind_rows(Indikatorer, dg_ny) %>%
-% #   dplyr::bind_rows(dg_gml)
-% #
-% # # write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
-% # #            row.names = F, fileEncoding = "UTF-8")
-% #
-% # @
+<<'DG-tall NNRR', results='asis', echo=FALSE, message=FALSE, include=FALSE>>=
+
+dg_gml <- read.csv2("~/regdata/nnrr/dg_2023nnrr.csv") |>
+  dplyr::filter(ind_id == "nnrr_dg")
+
+dg_2024 <- tribble(
+  ~Sykehus, ~var, ~denominator, ~orgnr,
+  "Haukeland universitetssykehus", 741, 802, 974557746,
+  "Oslo Universitetssykehus", 1397, 1800, 974589095,
+  "Stavanger", 506, 632, 974703300,
+  "St. Olavs Hospital", 952, 1248, 974749025,
+  "Sørlandet sykehus", 767, 1026, 974733013,
+  "Sykehuset i Vestfold Rehabilitering Stavern", 966, 1395, 974575396,
+  "Vestre Viken Drammen", 264, 378, 974631326,
+  "UNN Tromsø", 440, 529, 974795787,
+  "Møre og Romsdal, Ålesund", 105, 119, 974747138,
+  "Helgelandssykehuset, Sandnessjøen", 58, 62, 974795477,
+  "UNN Harstad", 27, 43, 974795639,
+  "Nordlandssykehuset", 87, 110, 993562718,
+  "Sykehuset Innlandet", 102, 131, 874631752,
+  "Levanger", 61, 100, 974754118,
+  "Helse Fonna", 12, 15, 996328112
+) |>
+  dplyr::mutate(year = 2024,
+                context = "caregiver",
+                ind_id = "nnrr_dg") |>
+  dplyr::select(-Sykehus)
+
+dg_samlet <- dplyr::bind_rows(dg_gml, dg_2024)
+
+Indikatorer <- Indikatorer |>
+  dplyr::rename(
+    orgnr = OrgNrShus,
+    year = Aar,
+    var = Teller,
+    denominator = Nevner
+  ) |>
+  dplyr::mutate(context = "caregiver") |>
+  dplyr::select(context, orgnr, year, var, denominator, ind_id) |>
+  dplyr::bind_rows(dg_samlet)
 
 
-\end{document}
+write.csv2(Indikatorer, "~/regdata/nnrr/behandlingskvalitet/beh_kval_2024.csv",
+           row.names = F)
+
+
+  #
+  # dg_ny <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2023.csv",
+  #                           locale = readr::locale(encoding = "Latin1"))
+  #
+  #
+  # map_dg2 <- data.frame(enhet=c("Helgelandssykehuset, SandnessjÃ¸en",
+  #                               "St. Olavs Hospital",
+  #                               "UNN Harstad",
+  #                               "UNN TromsÃ¸",
+  #                               "Stavanger",
+  #                               "Oslo Universitetssykehus",
+  #                               "MÃ¸re og Romsdal, Ã\u0085lesund",
+  #                               "SÃ¸rlandet sykehus",
+  #                               "Helse Bergen, Haukeland universitetssykehus",
+  #                               "Vestre Viken Drammen", "Levanger",
+  #                               "Sykehuset i Vestfold Rehabilitering Stavern",
+  #                               "Nordlandssykehuset"),
+  #                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
+  #                                   4212982, 114174, 102959, 103736, 105821, 700138,
+  #                                   700701))
+  #
+  # dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
+  # dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
+  # dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
+  # dg_ny$year <- 2023
+  # dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
+  # dg_ny$ind_id <- "nnrr_dg"
+  # dg_ny$context <- "caregiver"
+  #
+  # dg_gml <- readr::read_csv2("~/mydata/nnrr/nnrr_dg_shusviser_2022.csv",
+  #                            locale = readr::locale(encoding = "Latin1"))
+  #
+  # Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
+  # names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
+  # Indikatorer$context <- "caregiver"
+  # Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
+  #
+  # Indikatorer <- dplyr::bind_rows(Indikatorer, dg_ny) %>%
+  #   dplyr::bind_rows(dg_gml)
+  #
+  # # write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
+  # #            row.names = F, fileEncoding = "UTF-8")
+  #
+  @
+
+
+  \end{document}
