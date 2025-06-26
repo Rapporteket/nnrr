@@ -232,6 +232,8 @@ oppsummert_kat <- Utflatet %>%
 # data_pre$Kjonn <- factor(data_pre$PatientGender, levels = 1:2, labels = c("Mann", "Kvinne"))
 # data_pre$NationalCountry_lab
 
+
+
 data_analyse <- data_pre |>
   mutate(alder_kat = cut(PatientAge, breaks = c(0, 30, 67, 140)),
          Kjonn = factor(PatientGender, levels = 1:2, labels = c("Mann", "Kvinne")),
@@ -240,8 +242,6 @@ data_analyse <- data_pre |>
                                       labels = c("Norsk", "Ikke-norsk/ukjent")),
          oppf = relevel(as.factor(Oppfolging), "Mangler_oppf")
   )
-
-
 
 model1 <- glm(oppf ~ 1 + alder_kat + Kjonn + NationalCountry_lab,
               data = data_analyse, family = "binomial")
@@ -252,9 +252,7 @@ model1 <- glm(oppf ~ 1 + alder_kat + Kjonn + NationalCountry_lab,
 
 a <- exp(coef(model1))
 b <- exp(confint(model1))
-bind_cols(var=names(a), estimate=a,b)
-
-
+bind_cols(var=names(a), estimate=a, b)
 
 table(data_pre$Oppfolging, useNA = 'ifany')
 data_analyse |> summarise(N = n(),
@@ -360,10 +358,11 @@ oppsummert_kat <- Utflatet %>%
          Har_oppf_gr2, Mangler_oppf_gr2, odds.ratio,
          p.verdi, konfint_lav, konfint_hoy)
 
-write.csv2(oppsummert_kat,
-           "~/mydata/nnrr/validering2024/oppsummering_kategoriske_var_12mnd.csv",
-           row.names = F,
-           fileEncoding = "Latin1")
+# kommentert ut 20.06.2025
+# write.csv2(oppsummert_kat,
+#            "~/mydata/nnrr/validering2024/oppsummering_kategoriske_var_12mnd.csv",
+#            row.names = F,
+#            fileEncoding = "Latin1")
 
 
 numvar <- names(data_pre)[(names(data_pre) %in%
@@ -401,11 +400,41 @@ for (m in 1:length(oppsummert_num$name)) {
   oppsummert_num$konfint_hoy[m] <- res$conf.int[2]
 }
 
+# kommentert ut 20.06.2025
+# write.csv2(oppsummert_num,
+#            "~/mydata/nnrr/validering2024/oppsummering_numeriske_var_12mnd.csv",
+#            row.names = F,
+#            fileEncoding = "Latin1")
 
-write.csv2(oppsummert_num,
-           "~/mydata/nnrr/validering2024/oppsummering_numeriske_var_12mnd.csv",
-           row.names = F,
-           fileEncoding = "Latin1")
+
+################################################################################
+################################################################################
+################################################################################
+# Nye analyser 20.06.2025
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################################################################################
+################################################################################
+################################################################################
+
+
+
 
 
 
