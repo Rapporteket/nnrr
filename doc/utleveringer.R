@@ -1,7 +1,46 @@
 rm(list=ls())
 library(nnrr)
 
-######### Utlevering Thomas Kadar juni 2025  #######################################
+######### Utlevering Erlend Hoftun Farbu 30.06.2025  ###########################
+
+legeskjema <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-06-30_1315.csv")) |>
+  dplyr::rename(PasientFnr = "_PasientFnr")
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-06-30_1137.csv"))
+
+flere_hovedskjemaGuid <- pasientsvar_pre |>
+  dplyr::count(HovedskjemaGUID) |>
+  dplyr::filter(n > 1) |> dplyr::select(HovedskjemaGUID) |> unlist()
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <- pasientsvar_pre |>
+    dplyr::filter(!(HovedskjemaGUID %in% flere_hovedskjemaGuid))
+}
+
+variabler <- readxl::read_xlsx(
+  "~/regdata/nnrr/utleveringer/Bestillingsskjema for datauttrekk NNRR_juni2025.xlsx",
+  sheet = 1, range = "A32:B109")
+
+legeskjema <- legeskjema |>
+  dplyr::filter(S1b_DateOfCompletion >= "2021-01-01",
+                S1b_DateOfCompletion < "2024-01-01") |>
+  dplyr::select(c("SkjemaGUID", "PasientFnr", "PasientGUID",
+                  "S1b_DateOfCompletion", "UnitTitleWithPath", "UnitId",
+                  intersect(names(legeskjema), variabler$Behandler)))
+pasientsvar_pre <- pasientsvar_pre |>
+  dplyr::select(c(intersect(names(pasientsvar_pre), variabler$Baseline),
+                  "HovedskjemaGUID"))
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre')) |>
+  dplyr::select(-SkjemaGUID)
+
+write.csv2(RegData, "~/regdata/nnrr/utleveringer/farbu_juni2025.csv",
+           row.names = F, fileEncoding = "Latin1")
+
+
+######### Utlevering Thomas Kadar juni 2025  ###################################
 
 legeskjema <-
   readr::read_csv2(
