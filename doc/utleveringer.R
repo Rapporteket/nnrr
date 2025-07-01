@@ -28,6 +28,12 @@ legeskjema <- legeskjema |>
                 S1b_DateOfCompletion < "2024-01-01") |>
   dplyr::select(c("SkjemaGUID", "PasientFnr", "PasientGUID",
                   "S1b_DateOfCompletion", "UnitTitleWithPath", "UnitId",
+                  "TreatmentEvaluationByDoctor",
+                  "TreatmentEvaluationByPhysiotherapist",
+                  "TreatmentEvaluationByNurse",
+                  "TreatmentEvaluationByPsychologist",
+                  "TreatmentEvaluationBySocionom",
+                  "TreatmentEvaluationOther",
                   intersect(names(legeskjema), variabler$Behandler)))
 pasientsvar_pre <- pasientsvar_pre |>
   dplyr::select(c(intersect(names(pasientsvar_pre), variabler$Baseline),

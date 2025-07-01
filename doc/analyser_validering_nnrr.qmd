@@ -229,3 +229,78 @@ for (p in 1:length(var_num)){
 }
 ```
 
+# Nye analyser: dikotomiserte variabler
+
+```{r}
+smnslaatt <- read.csv2(
+  paste0(filfolder, "oppsummering_kategoriske_redigert_paindurationnow.csv"),
+  fileEncoding = "Latin1") |>  
+  filter(variable != "",
+         Slaa_sammen != "") |> 
+  dplyr::rename(variabel_id = variable,
+                verdi = value,
+                verditekst = Slaa_sammen)
+  
+
+erstatt_koder_m_etiketter <- function(df, mapping) {
+  df_label <- df %>%  
+    dplyr::mutate(
+      dplyr::across(
+        intersect(names(df), mapping$variabel_id), 
+        ~ factor(.x, 
+                 levels = dplyr::filter(mapping, 
+                                        variabel_id %in% 
+                                          dplyr::cur_column())$verdi,
+                 labels = dplyr::filter(mapping, 
+                                        variabel_id %in% 
+                                          dplyr::cur_column())$verditekst))
+    )
+}
+
+data_analyse_dikotom <- erstatt_koder_m_etiketter(data_analyse,smnslaatt)
+
+var_kat <- intersect(var_kat, smnslaatt$variabel_id)
+
+```
+
+## Analyser dikotomiserte variabler: Aldersjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + PatientAge")),
+    data = data_analyse_dikotom |> dplyr::filter(!is.na(!!sym(var_kat[p]))), 
+    family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
+
+## Analyser dikotomiserte variabler: Kjønnsjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + Kjonn")),
+    data = data_analyse_dikotom |> dplyr::filter(!is.na(!!sym(var_kat[p]))), 
+    family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
+
+## Analyser dikotomiserte variabler: Alders- og kjønnsjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + PatientAge + Kjonn")),
+    data = data_analyse_dikotom |> dplyr::filter(!is.na(!!sym(var_kat[p]))), 
+    family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
