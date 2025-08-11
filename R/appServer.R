@@ -111,41 +111,41 @@ appServer <- function(input, output, session) {
 
 
   # dummy report and orgs to subscribe and dispatch
-  orgs <- list(
-    TestOrg = 999999
-  )
-  report <- list(
-    Veiledning = list(
-      synopsis = "Testrapport kun for illustrasjon",
-      fun = "reportProcessor",
-      paramNames = c("report", "outputFormat", "title"),
-      paramValues = c("veiledning", "pdf", "Testrapport")
-    )#,
+  # orgs <- list(
+  #   TestOrg = 999999
+  # )
+  # report <- list(
+  #   Veiledning = list(
+  #     synopsis = "Testrapport kun for illustrasjon",
+  #     fun = "reportProcessor",
+  #     paramNames = c("report", "outputFormat", "title"),
+  #     paramValues = c("veiledning", "pdf", "Testrapport")
+  #   )#,
     # Eksempelrapport = list(
     #   synopsis = "Eksempelrapport med data fra nnrr",
     #   fun = "reportProcessor",
     #   paramNames = c("report", "outputFormat", "title"),
     #   paramValues = c("eksSamlerapport", "pdf", "Eksempelrapport")
     # )
-  )
+  # )
 
-  # subscribe
-  rapbase::autoReportServer(
-    "nnrrSubscription", registryName = registryName, type = "subscription",
-    reports = report, orgs = orgs
-  )
-
-  # dispatch
-  org <- rapbase::autoReportOrgServer("nnrrDispatchOrg", orgs)
-  fileFormat <- rapbase::autoReportFormatServer("nnrrDispatchFormat")
-  paramNames <- shiny::reactive(c("outputFormat"))
-  paramValues <- shiny::reactive(c(fileFormat()))
-  rapbase::autoReportServer(
-    "nnrrDispatch", registryName = registryName, type = "dispatchment",
-    org = org$value,
-    paramNames = paramNames, paramValues = paramValues, reports = report,
-    orgs = orgs
-  )
+  # # subscribe
+  # rapbase::autoReportServer(
+  #   "nnrrSubscription", registryName = registryName, type = "subscription",
+  #   reports = report, orgs = orgs
+  # )
+  #
+  # # dispatch
+  # org <- rapbase::autoReportOrgServer("nnrrDispatchOrg", orgs)
+  # fileFormat <- rapbase::autoReportFormatServer("nnrrDispatchFormat")
+  # paramNames <- shiny::reactive(c("outputFormat"))
+  # paramValues <- shiny::reactive(c(fileFormat()))
+  # rapbase::autoReportServer(
+  #   "nnrrDispatch", registryName = registryName, type = "dispatchment",
+  #   org = org$value,
+  #   paramNames = paramNames, paramValues = paramValues, reports = report,
+  #   orgs = orgs
+  # )
 
   # use stats
   rapbase::statsServer("nnrrStats", registryName = registryName)
