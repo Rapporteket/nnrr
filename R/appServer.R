@@ -151,7 +151,7 @@ appServer <- function(input, output, session) {
   )
 
   # use stats
-  rapbase::statsServer("nnrrStats", registryName = registryName)
+  rapbase::statsServer("nnrrStats", registryName = registryName, app_id = Sys.getenv("FALK_APP_ID"))
 
   # export
   # rapbase::exportGuideServer("nnrrExport", registryName)
