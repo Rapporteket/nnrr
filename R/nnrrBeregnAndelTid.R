@@ -153,9 +153,12 @@ nnrrBeregnAndelTid <- function(RegData,
     KonfRest <- binomkonf(NTidHendRest, NTidRest)*100}
 
   ##-----------Figur---------------------------------------
-  tittel <- PlotParams$tittel; grtxt <- PlotParams$grtxt; grtxt2 <- PlotParams$grtxt2;
-  stabel <- PlotParams$stabel; subtxt <- PlotParams$subtxt; incl_N <- PlotParams$incl_N;
-  incl_pst <- PlotParams$incl_pst; retn <- PlotParams$retn; cexgr <- PlotParams$cexgr;
+  tittel <- PlotParams$tittel; grtxt <- PlotParams$grtxt;
+  grtxt2 <- PlotParams$grtxt2;
+  stabel <- PlotParams$stabel; subtxt <- PlotParams$subtxt;
+  incl_N <- PlotParams$incl_N;
+  incl_pst <- PlotParams$incl_pst; retn <- PlotParams$retn;
+  cexgr <- PlotParams$cexgr;
   VarTxt <- PlotParams$VarTxt; ##
 
   # FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett=NNRRUtvalg$fargepalett)

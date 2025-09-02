@@ -185,6 +185,82 @@ nnrrPrepVar <- function(RegData, valgtVar)
     retn <- "H"
   }
 
+  ###########################
+
+  if (valgtVar=='tilbake_jobb_6mnd') {
+    tittel <- "Andel tilbake i arbeid"
+    grtxt <- c("Nei", "Ja")
+    RegData <- RegData |>
+      dplyr::filter(regstatus==1,
+                    regstatus_post==1,
+                    IsEmployed == 1,
+                    S2_SickLeave) |>
+      dplyr::mutate(
+        Variabel = ifelse(
+          (S2_Working_post & (!S2_SickLeave_post & !S2_NAV_post)), 1, 0),
+        VariabelGr <- factor(Variabel, levels = 0:1, labels = grtxt)
+      )
+    retn <- "H"
+  }
+
+  if (valgtVar=='tilbake_jobb_12mnd') {
+    tittel <- "Andel tilbake i arbeid"
+    grtxt <- c("Nei", "Ja")
+    RegData <- RegData |>
+      dplyr::filter(regstatus==1,
+                    regstatus_post2==1,
+                    IsEmployed == 1,
+                    S2_SickLeave) |>
+      dplyr::mutate(
+        Variabel = ifelse(
+          (S2_Working_post2 & (!S2_SickLeave_post2 & !S2_NAV_post2)), 1, 0),
+        VariabelGr <- factor(Variabel, levels = 0:1, labels = grtxt)
+      )
+    retn <- "H"
+
+  }
+
+  if (valgtVar=='mer_jobb_6mnd') {
+    tittel <- c("Andel tilbake i arbeid eller",
+                "med lavere grad av sykemelding")
+    grtxt <- c("Nei", "Ja")
+    RegData <- RegData |>
+      dplyr::filter(regstatus==1,
+                    regstatus_post==1,
+                    IsEmployed == 1,
+                    S2_SickLeave) |>
+      dplyr::mutate(
+        Variabel = ifelse(
+          (S2_Working_post & (!S2_SickLeave_post & !S2_NAV_post) |
+             (S2_SickLeave_Percent_post < S2_SickLeave_Percent)), 1, 0),
+        VariabelGr <- factor(Variabel, levels = 0:1, labels = grtxt)
+      )
+    retn <- "H"
+  }
+
+  if (valgtVar=='mer_jobb_12mnd') {
+    tittel <- c("Andel tilbake i arbeid eller",
+                "med lavere grad av sykemelding")
+    grtxt <- c("Nei", "Ja")
+    RegData <- RegData |>
+      dplyr::filter(regstatus==1,
+                    regstatus_post2==1,
+                    IsEmployed == 1,
+                    S2_SickLeave) |>
+      dplyr::mutate(
+        Variabel = ifelse(
+          (S2_Working_post2 & (!S2_SickLeave_post2 & !S2_NAV_post2) |
+             (S2_SickLeave_Percent_post2 < S2_SickLeave_Percent)), 1, 0),
+        VariabelGr <- factor(Variabel, levels = 0:1, labels = grtxt)
+      )
+    retn <- "H"
+  }
+
+  ####################################
+
+
+
+
   if (valgtVar=='odi_klinisk_viktig') {
     tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
