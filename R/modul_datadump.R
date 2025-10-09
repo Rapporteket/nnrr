@@ -82,8 +82,8 @@ datadump_Server <- function(id, RegData, userRole, hvd_session, reshID){
           }
           dumpdata <- tmpData[which(as.Date(tmpData$S1b_DateOfCompletion, format="%d.%m.%Y") >= input$datovalg[1] &
                                       as.Date(tmpData$S1b_DateOfCompletion, format="%d.%m.%Y") <= input$datovalg[2]), ]
-          if (userRole != 'SC') {
-            dumpdata <- dumpdata[dumpdata$UnitId %in% reshID, ]
+          if (userRole() != 'SC') {
+            dumpdata <- dumpdata[dumpdata$UnitId %in% reshID(), ]
           }
           # write.csv2(dumpdata, file, row.names = F, na = '', fileEncoding = 'Latin1')
           readr::write_excel_csv2(dumpdata, file)

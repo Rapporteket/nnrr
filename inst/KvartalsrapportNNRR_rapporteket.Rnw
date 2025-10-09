@@ -456,7 +456,8 @@ nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
 
 valgtVar <- "tilbake_jobb_6mnd"
 plotdata1 <- nnrr::nnrrBeregnAndelTid(
-  RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+  RegData, valgtVar=valgtVar,
+  datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
   minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
   tidsenhet="Kvartal", datovar = "dato_oppfolg")
 valgtVar <- "tilbake_jobb_12mnd"
@@ -474,7 +475,8 @@ nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
 
 valgtVar <- "mer_jobb_6mnd"
 plotdata1 <- nnrr::nnrrBeregnAndelTid(
-  RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
+  RegData, valgtVar=valgtVar, datoFra=datoFra,
+  datoTil=datoTil, enhetsUtvalg=1,
   minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
   tidsenhet="Kvartal", datovar = "dato_oppfolg")
 valgtVar <- "mer_jobb_12mnd"
@@ -489,6 +491,46 @@ nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
                             plotdata2 = plotdata2,
                             outfile=outfile,
                             inkl_konf = 0)
+
+valgtVar <- "tilbake_jobb_6mnd"
+plotdata1 <- nnrr::nnrrBeregnAndelTid(
+  RegData, valgtVar=valgtVar,
+  datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1, tverrfaglig = 1,
+  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+  tidsenhet="Kvartal", datovar = "dato_oppfolg")
+valgtVar <- "tilbake_jobb_12mnd"
+plotdata2 <- nnrr::nnrrBeregnAndelTid(
+  RegData, valgtVar=valgtVar,
+  datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1, tverrfaglig = 1,
+  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+  tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+
+outfile <- paste0(figfolder, "tilbake_i_arbeid_tverrfaglig.pdf")
+nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
+                            plotdata2 = plotdata2,
+                            outfile=outfile,
+                            inkl_konf = 0)
+
+valgtVar <- "mer_jobb_6mnd"
+plotdata1 <- nnrr::nnrrBeregnAndelTid(
+  RegData, valgtVar=valgtVar, datoFra=datoFra,
+  datoTil=datoTil, enhetsUtvalg=1, tverrfaglig = 1,
+  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+  tidsenhet="Kvartal", datovar = "dato_oppfolg")
+valgtVar <- "mer_jobb_12mnd"
+plotdata2 <- nnrr::nnrrBeregnAndelTid(
+  RegData, valgtVar=valgtVar,
+  datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1, tverrfaglig = 1,
+  minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
+  tidsenhet="Kvartal", datovar = "dato_oppfolg2")
+
+outfile <- paste0(figfolder, "mer_arbeid_tverrfaglig.pdf")
+nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
+                            plotdata2 = plotdata2,
+                            outfile=outfile,
+                            inkl_konf = 0)
+
+
 
 
 valgtVar <- "bedring_smerte_hvile_6mnd"
@@ -709,8 +751,20 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 
 \begin{figure}[ht]
 \centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tilbake_i_arbeid_tverrfaglig.pdf}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i arbeid blant de tverrfaglig utredede.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}mer_arbeid.pdf}
 \caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i arbeid eller har lavere grad sykemelding.}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}mer_arbeid_tverrfaglig.pdf}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i arbeid eller har lavere grad sykemelding blant de tverrfaglig utredede.}
 \end{figure}
 
 

@@ -165,7 +165,7 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
       # })
 
       observe(
-        if (userRole != 'SC') {
+        if (userRole() != 'SC') {
           shinyjs::hide(id = 'valgtShus')
         }
       )
@@ -182,7 +182,7 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
                                               minald=as.numeric(input$alder[1]),
                                               maxald=as.numeric(input$alder[2]),
                                               erMann=as.numeric(input$erMann),
-                                              reshID=reshID,
+                                              reshID=reshID(),
                                               tverrfaglig = as.numeric(input$tverrfaglig),
                                               minHSCL = input$HSCL[1],
                                               maxHSCL = input$HSCL[2],

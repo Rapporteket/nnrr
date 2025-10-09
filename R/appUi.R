@@ -25,24 +25,11 @@ appUi <- function() {
       theme = "rap/bootstrap.css",
       id = "tabs",
 
-      # shiny::tabPanel(
-      #   "Start",
-      #   shiny::mainPanel(
-      #     rapbase::renderRmd(
-      #       system.file("veiledning.Rmd", package = "nnrr"),
-      #       outputType = "html_fragment"
-      #     ),
-      #     rapbase::navbarWidgetInput("nnrrNavbarWidget")
-      #   )
-      # ),
+      shiny::tabPanel(
+        "Startside",
+        rapbase::navbarWidgetInput("navbar-widget", selectOrganization = TRUE),
 
-      shiny::tabPanel("Startside",
-                      shinyjs::useShinyjs(),
-                      rapbase::appNavbarUserWidget(user = uiOutput("appUserName"),
-                                                   organization = uiOutput("appOrgName"),
-                                                   addUserInfo = TRUE),
-                      tags$head(tags$link(rel="shortcut icon", href="rap/favicon.ico")),
-                      nnrr::startside_UI("startside")
+        nnrr::startside_UI("startside")
       ),
       shiny::tabPanel("Fordelinger",
                       nnrr::fordelingsfig_UI(id = "fordelingsfig_id")

@@ -64,7 +64,7 @@ startside_UI <- function(id){
 #'
 startside <- function(input, output,session, usrRole){
   observe(
-    if (usrRole != "SC") {
+    if (usrRole() != "SC") {
       shinyjs::hide("SC1")
     }
   )

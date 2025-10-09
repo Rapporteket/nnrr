@@ -14,34 +14,46 @@ appServer <- function(input, output, session) {
   # Last data
   RegData <- nnrr::nnrrHentRegData()
 
+  map_avdeling <- data.frame(
+    UnitId = unique(RegData$UnitId),
+    orgname = RegData$SykehusNavn[match(unique(RegData$UnitId),
+                                        RegData$UnitId)])
+
+  user <- rapbase::navbarWidgetServer2(
+    "navbar-widget",
+    orgName = "nnrr",
+    caller = "nnrr",
+    map_orgname = shiny::req(map_avdeling)
+  )
+
 
   registryName <- "nnrr"
 
-  userFullName <- rapbase::getUserFullName(session)
-  userRole <- rapbase::getUserRole(session)
-  userReshId <- rapbase::getUserReshId(session)
-  hospitalName <- RegData$SykehusNavn[match(userReshId, RegData$UnitId)]
+  # userFullName <- rapbase::getUserFullName(session)
+  # userRole <- rapbase::getUserRole(session)
+  # userReshId <- rapbase::getUserReshId(session)
+  # hospitalName <- RegData$SykehusNavn[match(userReshId, RegData$UnitId)]
 
   # rapbase::navbarWidgetServer("nnrrNavbarWidget", "nnrr",
   #                             caller = "nnrr")
 
-  fordelingsfigServer("fordelingsfig_id", reshID = userReshId,
-                      RegData = RegData, userRole = userRole, hvd_session = session)
+  fordelingsfigServer("fordelingsfig_id", reshID = user$org,
+                      RegData = RegData, userRole = user$role, hvd_session = session)
 
   sykehusvisningServer("sykehusvisning_id",
-                      RegData = RegData, userRole = userRole, hvd_session = session)
+                      RegData = RegData, userRole = user$role, hvd_session = session)
 
-  tidsvisningServer("tidsvisning_id", reshID = userReshId,
-                    RegData = RegData, userRole = userRole, hvd_session = session)
+  tidsvisningServer("tidsvisning_id", reshID = user$org,
+                    RegData = RegData, userRole = user$role, hvd_session = session)
 
   indikatorfigServer("indikatorfig_id",
-                     RegData = RegData, userRole = userRole, hvd_session = session)
+                     RegData = RegData, userRole = user$role, hvd_session = session)
 
-  datadump_Server("datadump_id", reshID = userReshId,
-                  RegData = RegData, userRole = userRole, hvd_session = session)
+  datadump_Server("datadump_id", reshID = user$org,
+                  RegData = RegData, userRole = user$role, hvd_session = session)
 
-  samledok_server("samledok", reshID = userReshId,
-                  RegData = RegData, userRole = userRole, hvd_session = session)
+  samledok_server("samledok", reshID = user$org,
+                  RegData = RegData, userRole = user$role, hvd_session = session)
 
   # Administrative tabeller
   # nnrr::admtab_server("admtabell", SkjemaOversikt)

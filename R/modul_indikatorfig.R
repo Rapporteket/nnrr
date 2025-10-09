@@ -66,7 +66,7 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
       })
 
       # observe(
-      #   if (userRole != 'SC') {
+      #   if (userRole() != 'SC') {
       #     shinyjs::hide(id = 'valgtShus')
       #   })
 
