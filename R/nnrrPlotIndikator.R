@@ -8,6 +8,68 @@
 #'
 #' @export
 #'
+ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
+                              lavDG=NA, inkl_konf=F)
+{
+  indikator=indikatordata$indikator
+  tittel=indikatordata$tittel
+  terskel=indikatordata$terskel
+  minstekrav=indikatordata$minstekrav
+  maal=indikatordata$maal
+  skriftStr=indikatordata$skriftStr
+  pktStr=indikatordata$pktStr
+  legPlass=indikatordata$legPlass
+  minstekravTxt=indikatordata$minstekravTxt
+  maalTxt=indikatordata$maalTxt
+  decreasing=indikatordata$decreasing
+  width=indikatordata$width
+  height=indikatordata$height
+  maalretn=indikatordata$maalretn
+
+  Tabell <- indikator |>
+    dplyr::filter(year > max(year)-3) |>
+    dplyr::summarise(Antall = sum(var),
+                     N = sum(denominator),
+                     .by = c(SykehusNavn, year)) |>
+    dplyr::group_by(year) |>
+    dplyr::group_modify(~ .x |> janitor::adorn_totals(name = "Nasjonalt")) |>
+    dplyr::mutate(Andel = Antall/N*100) |>
+    dplyr::mutate(Andel = ifelse(N < terskel, NA, Andel))
+
+
+  ggplot(Tabell, aes(SykehusNavn, Andel)) + geom_col(width = 2 / 3)
+
+
+
+    # dplyr::arrange(year) |>
+    # tidyr::pivot_wider(names_from = year,
+    #                    values_from = c(Antall, N, Andel))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+#' Gi en visuell fremstilling av registerets indikatorer over tid
+#'
+#' @param indikatordata En dataramme med følgende kolonner:
+#'                 - ReshId
+#'                 - year
+#'                 - Teller
+#'                 - Sykehusnavn
+#'
+#' @export
+#'
 nnrrPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
                              lavDG=NA, inkl_konf=F)
 {
@@ -26,12 +88,12 @@ nnrrPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
   height=indikatordata$height
   maalretn=indikatordata$maalretn
 
-  indikator <- indikator[indikator$year > max(indikator$year)-3, ] # behold bare siste 3 år
-
-  Tabell <- indikator %>% dplyr::group_by(SykehusNavn, year) %>%
+  Tabell <- indikator |>
+    dplyr::filter(year > max(year)-3) |>
     dplyr::summarise(Antall = sum(var),
                      N = dplyr::n(),
-                     Andel = Antall/N*100)
+                     Andel = Antall/N*100,
+                     .by = c(SykehusNavn, year))
 
   AntTilfeller <- tidyr::spread(Tabell[, -c(4,5)], 'year', 'Antall') %>%
     janitor::adorn_totals(name = "Nasjonalt")

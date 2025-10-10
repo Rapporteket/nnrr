@@ -35,13 +35,13 @@ knitr::opts_knit$set(root.dir = './')
 # setwd('c:/GIT/nnrr/doc/')
 rm(list=ls())
 library(nnrr)
-library(tidyverse)
+# library(tidyverse)
 library(lubridate)
 options(dplyr.summarise.inform = FALSE)
 
 rap_aar <- 2024
 
-datasti <- "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/aarsrapp2024/"
+datasti <- "C:/regdata/nnrr/aarsrapp2024/"
 icd10 <- read.table(paste0(datasti, "icd10.csv"), sep=';',
                     header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
 RegData <- nnrr::nnrrHentRegData()
