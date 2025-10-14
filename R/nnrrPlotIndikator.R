@@ -9,7 +9,7 @@
 #' @export
 #'
 ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
-                              lavDG=NA, inkl_konf=F)
+                            lavDG=NA, inkl_konf=F)
 {
   indikator=indikatordata$indikator
   tittel=indikatordata$tittel
@@ -34,16 +34,34 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
     dplyr::group_by(year) |>
     dplyr::group_modify(~ .x |> janitor::adorn_totals(name = "Nasjonalt")) |>
     dplyr::mutate(Andel = Antall/N*100) |>
-    dplyr::mutate(Andel = ifelse(N < terskel, NA, Andel))
+    dplyr::mutate(Andel = ifelse(N < terskel, NA, Andel)) |>
+    dplyr::mutate(year_fct = as.factor(year))
+
+  Andel <- Tabell |>
+    dplyr::select(SykehusNavn, year, Andel) |>
+    dplyr::arrange(year) |>
+    tidyr::pivot_wider(names_from = year,
+                       values_from = c(Andel))
+  N <- Tabell |>
+    dplyr::select(SykehusNavn, year, N) |>
+    dplyr::arrange(year) |>
+    tidyr::pivot_wider(names_from = year,
+                       values_from = c(N))
+
+  Andel[N[[4]] < terskel, -1] <- NA
+  names(Andel)[2:4] <- c("rad1", "rad2", "rad3")
 
 
-  ggplot(Tabell, aes(SykehusNavn, Andel)) + geom_col(width = 2 / 3)
+  ggplot(Andel, aes(SykehusNavn, !!sym(names(Andel)[4]))) +
+    geom_col(width = 4 / 5) + coord_flip()
 
-
-
-    # dplyr::arrange(year) |>
-    # tidyr::pivot_wider(names_from = year,
-    #                    values_from = c(Antall, N, Andel))
+  ggplot(Tabell, aes(x = SykehusNavn, y = Andel, fill = year_fct)) +
+    geom_col(position = "dodge") + coord_flip() +
+    labs(title = "Grouped Bar Chart Example",
+         y = "Andel",
+         x = "Sykehus",
+         fill = "Aar") +
+    theme_minimal()
 
 
 
@@ -71,7 +89,7 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
 #' @export
 #'
 nnrrPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
-                             lavDG=NA, inkl_konf=F)
+                              lavDG=NA, inkl_konf=F)
 {
   indikator=indikatordata$indikator
   tittel=indikatordata$tittel

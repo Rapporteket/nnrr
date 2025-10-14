@@ -1,6 +1,26 @@
 rm(list=ls())
 library(nnrr)
 
+### Tall til Ingrid 13.10.2025 #########
+# tittel <- c("Andel tverrfaglig behandlet blant", "pasienter som mottar tolk")
+RegData <- RegData[RegData$NationalInterpreter %in% 1, ]
+RegData <- RegData[RegData$regstatus==1, ]
+RegData$Variabel <- 0
+RegData$Variabel[RegData$Treatment_GroupInterdisciplinary2018 != 0 |
+                   RegData$Treatment_GroupInterdisciplinary != 0] <- 1
+RegData$Variabel[RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
+grtxt <- c("Nei", "Ja")
+RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+
+Tabell <- RegData |>
+  dplyr::summarise(
+    Antall_tverrfaglig = sum(Variabel),
+    N = dplyr::n(),
+                   .by = c(SykehusNavn, Aar))
+
+write.csv2(Tabell, "tverrfaglig_tolk.csv", row.names = F, fileEncoding = "Latin1")
+
+
 ######### Utlevering Erlend Hoftun Farbu 30.06.2025  ###########################
 
 legeskjema <-
