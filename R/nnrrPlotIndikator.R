@@ -9,33 +9,25 @@
 #' @export
 #'
 ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
-                            lavDG=NA, inkl_konf=F)
+                            lavDG=NA, inkl_konf=F, ant_aar = 3)
 {
   indikator=indikatordata$indikator
   tittel=indikatordata$tittel
   terskel=indikatordata$terskel
   minstekrav=indikatordata$minstekrav
   maal=indikatordata$maal
-  skriftStr=indikatordata$skriftStr
-  pktStr=indikatordata$pktStr
-  legPlass=indikatordata$legPlass
-  minstekravTxt=indikatordata$minstekravTxt
-  maalTxt=indikatordata$maalTxt
   decreasing=indikatordata$decreasing
-  width=indikatordata$width
-  height=indikatordata$height
   maalretn=indikatordata$maalretn
 
   Tabell <- indikator |>
-    dplyr::filter(year > max(year)-3) |>
+    dplyr::filter(year > max(year) - ant_aar) |>
     dplyr::summarise(Antall = sum(var),
                      N = sum(denominator),
                      .by = c(SykehusNavn, year)) |>
     dplyr::group_by(year) |>
     dplyr::group_modify(~ .x |> janitor::adorn_totals(name = "Nasjonalt")) |>
     dplyr::mutate(Andel = Antall/N*100) |>
-    dplyr::mutate(Andel = ifelse(N < terskel, NA, Andel)) |>
-    dplyr::mutate(year_fct = as.factor(year))
+    dplyr::mutate(Andel = ifelse(N < terskel, NA, Andel))
 
   Andel <- Tabell |>
     dplyr::select(SykehusNavn, year, Andel) |>
@@ -48,20 +40,174 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
     tidyr::pivot_wider(names_from = year,
                        values_from = c(N))
 
-  Andel[N[[4]] < terskel, -1] <- NA
-  names(Andel)[2:4] <- c("rad1", "rad2", "rad3")
+  Andel[N[[dim(N)[2]]] < terskel, -1] <- NA
+  Andel_long <- Andel |>
+    dplyr::arrange(
+      desc(is.na(!!rlang::sym(dplyr::last(names(Andel))))),
+      !!rlang::sym(dplyr::last(names(Andel)))
+    ) |>
+    dplyr::mutate(
+      SykehusNavn = forcats::fct_inorder(SykehusNavn)
+    ) |>
+    tidyr::pivot_longer(cols = 2:dim(Andel)[2],
+                        names_to = "year",
+                        values_to = "andel") |>
+    merge(Tabell |> dplyr::select(year, SykehusNavn, Antall, N),
+          by = c("year", "SykehusNavn"), all.x = TRUE)
 
 
-  ggplot(Andel, aes(SykehusNavn, !!sym(names(Andel)[4]))) +
-    geom_col(width = 4 / 5) + coord_flip()
+  aar <- sort(unique(Andel_long$year))
+  library(ggplot2)
+  library(plotly)
+  library(dplyr)
+  bakgrunn_gronn <- data.frame(
+    xmin = 50,
+    xmax = Inf,
+    ymin = 0,
+    ymax = dim(Andel)[1] + 1,
+    color = "#A7EBCE"
+  )
+  bakgrunn_gul <- data.frame(
+    xmin = 40,
+    xmax = 50,
+    ymin = 0,
+    ymax = dim(Andel)[1] + 1,
+    color = "#F5F0D5"
+  )
+  bakgrunn_rod <- data.frame(
+    xmin = 0,
+    xmax = 40,
+    ymin = 0,
+    ymax = dim(Andel)[1] + 1,
+    color = "#F0DEDB"
+  )
+  alpha <- .8
 
-  ggplot(Tabell, aes(x = SykehusNavn, y = Andel, fill = year_fct)) +
-    geom_col(position = "dodge") + coord_flip() +
-    labs(title = "Grouped Bar Chart Example",
-         y = "Andel",
-         x = "Sykehus",
-         fill = "Aar") +
-    theme_minimal()
+  # x11()
+  p <- ggplot(Andel_long,
+              aes(x = andel, y = SykehusNavn, shape = year, color = year,
+                  text = paste("Sykehus:", SykehusNavn, "<br>Antall:",
+                               Antall, "<br>N:", N, "<br>Andel:", sprintf("%.1f", andel)))) +
+    geom_rect(data = bakgrunn_gronn,
+              aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+              fill = bakgrunn_gronn$color,
+              alpha = alpha, inherit.aes = FALSE) +
+    geom_rect(data = bakgrunn_gul,
+              aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+              fill = bakgrunn_gul$color,
+              alpha = alpha, inherit.aes = FALSE) +
+    geom_rect(data = bakgrunn_rod,
+              aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+              fill = bakgrunn_rod$color,
+              alpha = alpha, inherit.aes = FALSE) +
+    geom_bar(data = Andel_long %>% filter(year == dplyr::last(aar)),
+             aes(x = andel, y = SykehusNavn),
+             stat = "identity", fill = "steelblue", alpha = 1, width = 4 / 5) +
+    geom_point(size = 3) +
+    scale_shape_manual(values = setNames(
+      c(rev(c(19, 1, 17, 6, 15, 0)[1:(length(aar)-1)]), NA), aar)) +
+    scale_color_manual(values = setNames(
+      c(rep("black", length(aar)-1), "steelblue"), aar)) +
+    scale_x_continuous(limits = c(0, 1.1*max(Andel_long$andel, na.rm = T)),
+                       expand = c(0, 0)) +
+    labs(title = tittel, x = "Andel (%)", y = element_blank()) +
+    theme(
+      legend.position = "top",
+      legend.title = element_blank(),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.background = element_rect(fill = "white"),
+      plot.title = element_text(vjust = 5, hjust = 0.5),
+      plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
+    )
+
+  plotly::ggplotly(p, tooltip = "text")
+
+
+  #
+  #
+  #
+  #   CType <- c("2022" = "black", "2023" = "black", "2024" = "steelblue")
+  #   LType <- c("2022" = 19, "2023" = 1, "2024" = 24)
+  #   x11()
+  #   ggplot(Andel, aes(SykehusNavn, rad3)) +
+  #     geom_col(width = 4 / 5, fill = "steelblue") +
+  #     coord_flip() +
+  #     scale_y_continuous(expand = c(0, 0)) +
+  #     theme(
+  #       panel.grid.major.y = element_blank(),
+  #       panel.grid.minor.y = element_blank(),
+  #       axis.ticks.y = element_blank(),
+  #       panel.grid.major.x = element_blank(),
+  #       panel.grid.minor.x = element_blank(),
+  #       axis.ticks.x = element_blank(),
+  #       panel.background = element_rect(fill = "white"),
+  #       plot.title = element_text(vjust = 5,
+  #                                 hjust = 0.5),
+  #       plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
+  #     ) +
+  #     labs(title = tittel,
+  #          y = "Andel (%)",
+  #          x = element_blank()) +
+  #     geom_point(aes(SykehusNavn, rad2), shape = 19) +
+  #     geom_point(aes(SykehusNavn, rad1), shape = 1) +
+  #     scale_color_manual(name = "legend", values = CType) +
+  #     scale_shape_manual(name = "legend", values = LType) +
+  #     theme(legend.position = "bottomright", legend.title = element_blank())
+  #
+  #   Andel <- tribble(
+  #     ~SykehusNavn, ~rad1, ~rad2, ~rad3,
+  #     "UNN-Harstad",  NA    , NA   , NA   ,
+  #     "Kirkenes", NA    , NA   , NA   ,
+  #     "Drammen",  0.386,  0   ,  1.29,
+  #     "Stavern", 12.7  ,  5.34,  3.95,
+  #     "NLSH", 34.0  , 33.3 , 14.3 ,
+  #     "SI-Ottestad", NA    , 12.5 , 14.9 ,
+  #     "St. Olavs", 21.6  , 16.1 , 17.3 ,
+  #     "Levanger", NA    , 11.3 , 19.1 ,
+  #     "Nasjonalt", 30.4  , 27.3 , 29.8 ,
+  #     "UNN-Tromsø", 21.3  , 21.9 , 32.5 ,
+  #     "Haukeland", 43.5  , 34.7 , 33.0 ,
+  #     "Kristiansand", 31.9  , 34.0 , 34.2 ,
+  #     "Sandnessjøen", 39.6  , 20.7 , 36.8 ,
+  #     "OUS", 41.0  , 34.2 , 42.1 ,
+  #     "Stord", NA    , NA   , 60.7 ,
+  #     "Ålesund", 60.1  , 64.8 , 62.5 ,
+  #     "Stavanger", 38.1  , 65.8 , 63.5
+  #   )
+  #
+  #   CType1 <- c("2024" = "steelblue")
+  #   CType <- c("2022" = "black", "2023" = "black")
+  #   LType <- c("2022" = 1, "2023" = 19)
+  #   x11()
+  #   ggplot(Andel, aes(SykehusNavn, rad3, fill = "2024")) +
+  #     geom_col(width = 4 / 5) +
+  #     coord_flip() +
+  #     scale_y_continuous(limits = c(0, 1.1*max(Andel[-1], na.rm = T)),
+  #                        expand = c(0, 0)) +
+  #     labs(title = tittel, y = "Andel (%)", x = element_blank()) +
+  #     geom_point(aes(SykehusNavn, rad2, color = "2023", shape = "2023")) +
+  #     geom_point(aes(SykehusNavn, rad1, color = "2022", shape = "2022")) +
+  #     scale_color_manual(name = "legend", values = CType) +
+  #     scale_shape_manual(name = "legend", values = LType) +
+  #     scale_fill_manual(name = "legend", values = CType1) +
+  #     theme(
+  #       legend.position = "top",
+  #       legend.title = element_blank(),
+  #       panel.grid.major.y = element_blank(),
+  #       panel.grid.minor.y = element_blank(),
+  #       axis.ticks.y = element_blank(),
+  #       panel.grid.major.x = element_blank(),
+  #       panel.grid.minor.x = element_blank(),
+  #       axis.ticks.x = element_blank(),
+  #       panel.background = element_rect(fill = "white"),
+  #       plot.title = element_text(vjust = 5, hjust = 0.5),
+  #       plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
+  #     )
 
 
 

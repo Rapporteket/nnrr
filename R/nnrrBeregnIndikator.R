@@ -44,7 +44,7 @@ nnrrBeregnIndikator <- function(RegData, ind_id) {
     indikator <- RegData |>
       dplyr::filter(regstatus==1) |>
       dplyr::mutate(
-        var = case_when(
+        var = dplyr::case_when(
           Treatment_GroupInterdisciplinary2018 != 0 ~ 1,
           Treatment_GroupInterdisciplinary != 0 ~ 1,
           Treatment_InvidualInterdisciplinary != 0 ~ 1,
