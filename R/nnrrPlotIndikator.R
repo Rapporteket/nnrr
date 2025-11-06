@@ -128,99 +128,116 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
   plotly::ggplotly(p, tooltip = "text")
 
 
-  #
-  #
-  #
-  #   CType <- c("2022" = "black", "2023" = "black", "2024" = "steelblue")
-  #   LType <- c("2022" = 19, "2023" = 1, "2024" = 24)
-  #   x11()
-  #   ggplot(Andel, aes(SykehusNavn, rad3)) +
-  #     geom_col(width = 4 / 5, fill = "steelblue") +
-  #     coord_flip() +
-  #     scale_y_continuous(expand = c(0, 0)) +
-  #     theme(
-  #       panel.grid.major.y = element_blank(),
-  #       panel.grid.minor.y = element_blank(),
-  #       axis.ticks.y = element_blank(),
-  #       panel.grid.major.x = element_blank(),
-  #       panel.grid.minor.x = element_blank(),
-  #       axis.ticks.x = element_blank(),
-  #       panel.background = element_rect(fill = "white"),
-  #       plot.title = element_text(vjust = 5,
-  #                                 hjust = 0.5),
-  #       plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
-  #     ) +
-  #     labs(title = tittel,
-  #          y = "Andel (%)",
-  #          x = element_blank()) +
-  #     geom_point(aes(SykehusNavn, rad2), shape = 19) +
-  #     geom_point(aes(SykehusNavn, rad1), shape = 1) +
-  #     scale_color_manual(name = "legend", values = CType) +
-  #     scale_shape_manual(name = "legend", values = LType) +
-  #     theme(legend.position = "bottomright", legend.title = element_blank())
-  #
-  #   Andel <- tribble(
-  #     ~SykehusNavn, ~rad1, ~rad2, ~rad3,
-  #     "UNN-Harstad",  NA    , NA   , NA   ,
-  #     "Kirkenes", NA    , NA   , NA   ,
-  #     "Drammen",  0.386,  0   ,  1.29,
-  #     "Stavern", 12.7  ,  5.34,  3.95,
-  #     "NLSH", 34.0  , 33.3 , 14.3 ,
-  #     "SI-Ottestad", NA    , 12.5 , 14.9 ,
-  #     "St. Olavs", 21.6  , 16.1 , 17.3 ,
-  #     "Levanger", NA    , 11.3 , 19.1 ,
-  #     "Nasjonalt", 30.4  , 27.3 , 29.8 ,
-  #     "UNN-Tromsø", 21.3  , 21.9 , 32.5 ,
-  #     "Haukeland", 43.5  , 34.7 , 33.0 ,
-  #     "Kristiansand", 31.9  , 34.0 , 34.2 ,
-  #     "Sandnessjøen", 39.6  , 20.7 , 36.8 ,
-  #     "OUS", 41.0  , 34.2 , 42.1 ,
-  #     "Stord", NA    , NA   , 60.7 ,
-  #     "Ålesund", 60.1  , 64.8 , 62.5 ,
-  #     "Stavanger", 38.1  , 65.8 , 63.5
-  #   )
-  #
-  #   CType1 <- c("2024" = "steelblue")
-  #   CType <- c("2022" = "black", "2023" = "black")
-  #   LType <- c("2022" = 1, "2023" = 19)
-  #   x11()
-  #   ggplot(Andel, aes(SykehusNavn, rad3, fill = "2024")) +
-  #     geom_col(width = 4 / 5) +
-  #     coord_flip() +
-  #     scale_y_continuous(limits = c(0, 1.1*max(Andel[-1], na.rm = T)),
-  #                        expand = c(0, 0)) +
-  #     labs(title = tittel, y = "Andel (%)", x = element_blank()) +
-  #     geom_point(aes(SykehusNavn, rad2, color = "2023", shape = "2023")) +
-  #     geom_point(aes(SykehusNavn, rad1, color = "2022", shape = "2022")) +
-  #     scale_color_manual(name = "legend", values = CType) +
-  #     scale_shape_manual(name = "legend", values = LType) +
-  #     scale_fill_manual(name = "legend", values = CType1) +
-  #     theme(
-  #       legend.position = "top",
-  #       legend.title = element_blank(),
-  #       panel.grid.major.y = element_blank(),
-  #       panel.grid.minor.y = element_blank(),
-  #       axis.ticks.y = element_blank(),
-  #       panel.grid.major.x = element_blank(),
-  #       panel.grid.minor.x = element_blank(),
-  #       axis.ticks.x = element_blank(),
-  #       panel.background = element_rect(fill = "white"),
-  #       plot.title = element_text(vjust = 5, hjust = 0.5),
-  #       plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
-  #     )
+
+
+  library(plotly)
+  library(dplyr)
+
+  data_long <- Andel_long
+  latest_year <- 2025
+  # Create Plotly figure
+  fig <- plot_ly()
+  gjsikt <- 0.9
+
+  # Add background zones
+  fig <- fig %>%
+    layout(
+      shapes = list(
+        list(type = "rect", x0 = 0, x1 = 40, y0 = -0.5, y1 = nlevels(data_long$SykehusNavn)-0.5,
+             fillcolor = "#F0DEDB", opacity = gjsikt, line = list(width = 0), layer = "below"),
+        list(type = "rect", x0 = 40, x1 = 50, y0 = -0.5, y1 = nlevels(data_long$SykehusNavn)-0.5,
+             fillcolor = "#F5F0D5", opacity = gjsikt, line = list(width = 0), layer = "below"),
+        list(type = "rect", x0 = 50, x1 = max(data_long$andel, na.rm = T)*1.1,
+             y0 = -0.5, y1 = nlevels(data_long$SykehusNavn)-0.5,
+             fillcolor = "#A7EBCE", opacity = gjsikt, line = list(width = 0), layer = "below")
+      )
+    )
 
 
 
+  # Points for previous years
+  previous_years <- setdiff(unique(data_long$year), latest_year)
+  symbols <- c("circle-open", "circle")
+  colors <- c("black", "black")
+
+  for (i in seq_along(previous_years)) {
+    fig <- fig %>%
+      add_trace(
+        type = "scatter",
+        mode = "markers",
+        data = data_long %>% filter(year == previous_years[i]),
+        x = ~andel,
+        y = ~SykehusNavn,
+        name = as.character(previous_years[i]),
+        marker = list(symbol = symbols[i], size = 10, color = colors[i]),
+        customdata = ~paste("År:", year, "<br>Antall:", Antall, "<br>N:", N),
+        hovertemplate = "<b>%{y}</b><br>Andel: %{x:.1f}%<br>%{customdata}<extra></extra>"
+      )
+  }
+
+  # Filter latest year and remove NA values for andel
+  latest_data <- data_long %>%
+    filter(year == latest_year & !is.na(andel))
+
+  # Create color vector for filtered data
+  bar_colors <- ifelse(latest_data$SykehusNavn == "Nasjonalt",
+                       "#87CEFA",  # Light blue for Nasjonalt
+                       "steelblue") # Default blue for others
+
+  latest_data2 <- data_long %>%
+    filter(year == latest_year)
+  # For hover text, handle NA explicitly
+  hover_text <- ifelse(
+    is.na(latest_data2$andel),
+    paste0("<b>", latest_data2$SykehusNavn, "</b><br>Andel: Missing<br>N: ",
+           latest_data2$N),
+    paste0("<b>", latest_data2$SykehusNavn, "</b><br>Andel: ",
+           sprintf("%.1f", latest_data2$andel), "%<br>Antall: ",
+           latest_data2$Antall, "<br>N: ", latest_data2$N))
 
 
+  # Add bar trace
+  fig <- fig %>%
+    add_trace(
+      type = "bar",
+      data = latest_data,
+      x = ~andel,
+      y = ~SykehusNavn,
+      orientation = "h",
+      name = as.character(latest_year),
+      marker = list(color = bar_colors),
+      text = hover_text,
+      hoverinfo = "text"  # Use custom hover text
 
+      # customdata = ~paste("Antall:", Antall, "<br>N:", N),
+      # hovertemplate = "<b>%{y}</b><br>Andel: %{x:.1f}%<br>%{customdata}<extra></extra>"
+    )
 
+  fig <- fig %>%
+    layout(
+      title = list(text = "Andel tverrfaglig behandlet",
+                   y = 0.98,
+                   font = list(size = 24)),  # Increase title font size)
+      xaxis = list(title = "Andel (%)", range = c(0, max(data_long$andel)*1.1)),
+      yaxis = list(
+        title = "",
+        automargin = TRUE,
+        tickfont = list(size = 14),  # smaller font for labels
+        ticklabelposition = "inside" # moves labels closer to bars
+      ),
+      barmode = "overlay",
+      legend = list(
+        orientation = "h",
+        yanchor = "top",
+        y = 1.05,        # Place legend ABOVE the plot area
+        xanchor = "center",
+        x = 0.5
+      ),
+      plot_bgcolor = "white",
+      margin = list(t = 120)  # Large top margin to create space for title + legend
+    )
 
-
-
-
-
-
+  fig
 
 }
 

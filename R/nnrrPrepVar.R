@@ -188,7 +188,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   ###########################
 
   if (valgtVar=='tilbake_jobb_6mnd') {
-    tittel <- "Andel tilbake i arbeid"
+    tittel <- "Andel fullt tilbake i jobb"
     grtxt <- c("Nei", "Ja")
     RegData <- RegData |>
       dplyr::filter(regstatus==1,
@@ -204,7 +204,7 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='tilbake_jobb_12mnd') {
-    tittel <- "Andel tilbake i arbeid"
+    tittel <- "Andel fullt tilbake i jobb"
     grtxt <- c("Nei", "Ja")
     RegData <- RegData |>
       dplyr::filter(regstatus==1,
@@ -221,8 +221,8 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='mer_jobb_6mnd') {
-    tittel <- c("Andel tilbake i arbeid eller",
-                "med lavere grad av sykemelding")
+    tittel <- c("Andel med økt",
+                "arbeidsdeltagelse")
     grtxt <- c("Nei", "Ja")
     RegData <- RegData |>
       dplyr::filter(regstatus==1,
@@ -239,8 +239,8 @@ nnrrPrepVar <- function(RegData, valgtVar)
   }
 
   if (valgtVar=='mer_jobb_12mnd') {
-    tittel <- c("Andel tilbake i arbeid eller",
-                "med lavere grad av sykemelding")
+    tittel <- c("Andel med økt",
+                "arbeidsdeltagelse")
     grtxt <- c("Nei", "Ja")
     RegData <- RegData |>
       dplyr::filter(regstatus==1,

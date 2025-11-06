@@ -746,25 +746,25 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tilbake_i_arbeid.pdf}
-\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i arbeid.}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i fullt arbeid.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}tilbake_i_arbeid_tverrfaglig.pdf}
-\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i arbeid blant de tverrfaglig utredede.}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i fullt arbeid og har mottatt tverrfaglig behandling}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}mer_arbeid.pdf}
-\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i arbeid eller har lavere grad sykemelding.}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i fullt arbeid eller har lavere grad sykemelding.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}mer_arbeid_tverrfaglig.pdf}
-\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i arbeid eller har lavere grad sykemelding blant de tverrfaglig utredede.}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling er tilbake i fullt arbeid eller har lavere grad sykemelding og har mottatt tverrfaglig behandling}
 \end{figure}
 
 
