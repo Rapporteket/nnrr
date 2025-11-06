@@ -184,18 +184,6 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
                        "#87CEFA",  # Light blue for Nasjonalt
                        "steelblue") # Default blue for others
 
-  latest_data2 <- data_long %>%
-    filter(year == latest_year)
-  # For hover text, handle NA explicitly
-  hover_text <- ifelse(
-    is.na(latest_data2$andel),
-    paste0("<b>", latest_data2$SykehusNavn, "</b><br>Andel: Missing<br>N: ",
-           latest_data2$N),
-    paste0("<b>", latest_data2$SykehusNavn, "</b><br>Andel: ",
-           sprintf("%.1f", latest_data2$andel), "%<br>Antall: ",
-           latest_data2$Antall, "<br>N: ", latest_data2$N))
-
-
   # Add bar trace
   fig <- fig %>%
     add_trace(
@@ -206,11 +194,8 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
       orientation = "h",
       name = as.character(latest_year),
       marker = list(color = bar_colors),
-      text = hover_text,
-      hoverinfo = "text"  # Use custom hover text
-
-      # customdata = ~paste("Antall:", Antall, "<br>N:", N),
-      # hovertemplate = "<b>%{y}</b><br>Andel: %{x:.1f}%<br>%{customdata}<extra></extra>"
+      customdata = ~paste("Antall:", Antall, "<br>N:", N),
+      hovertemplate = "<b>%{y}</b><br>Andel: %{x:.1f}%<br>%{customdata}<extra></extra>"
     )
 
   fig <- fig %>%
