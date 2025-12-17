@@ -20,7 +20,7 @@ nnrrPreprosess <- function(RegData)
   boolske_var <- intersect(c(boolske_var1b, boolske_var1a, boolske_var2), names(RegData))
   RegData[, boolske_var] <-
     apply(RegData[, boolske_var], 2, as.logical)
-  RegData$TreatmentOperation <- as.logical(RegData$TreatmentOperation)
+  # RegData$TreatmentOperation <- as.logical(RegData$TreatmentOperation)
 
   RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
               "S1b_DateOfCompletion_pre", "S1b_DateOfCompletion_post",

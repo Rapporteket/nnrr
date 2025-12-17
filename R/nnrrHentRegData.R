@@ -14,16 +14,16 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
 
   legeskjema <-
     readr::read_csv2(
-        paste0("C:/regdata/nnrr/datadump/data_2025-10-17_1552.csv"))
+        paste0("C:/regdata/nnrr/datadump/data_2025-12-16_1558.csv"))
   pasientsvar_pre <-
     readr::read_csv2(
-      paste0("C:/regdata/nnrr/datadump/data_2025-10-17_1600.csv"))
+      paste0("C:/regdata/nnrr/datadump/data_2025-12-16_1602.csv"))
   pasientsvar_post <-
     readr::read_csv2(
-      paste0("C:/regdata/nnrr/datadump/data_2025-10-17_1604.csv"))
+      paste0("C:/regdata/nnrr/datadump/data_2025-12-16_1607.csv"))
   pasientsvar_post2 <-
     readr::read_csv2(
-      paste0("C:/regdata/nnrr/datadump/data_2025-10-17_1605.csv"))
+      paste0("C:/regdata/nnrr/datadump/data_2025-12-16_1608.csv"))
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){
