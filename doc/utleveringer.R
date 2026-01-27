@@ -1,6 +1,39 @@
 rm(list=ls())
 library(nnrr)
 
+### Bestilling poster Maja 22.01.2026 #########
+
+RegData <- nnrr::nnrrHentRegData()
+
+Tabell1 <- RegData |>
+  filter(is.na(NdiScore),
+         !is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post)&
+           !is.na(RegData$OdiScore_post2)) |>
+  mutate(
+    klinisk_forbedring1 = ifelse(OdiScore-OdiScore_post >= 10, 1, 0),
+    klinisk_forbedring2 = ifelse(OdiScore-OdiScore_post2 >= 10, 1, 0)) |>
+  summarise(
+    bedring1 = sum(klinisk_forbedring1),
+    bedring2 = sum(klinisk_forbedring2),
+    N = n(),
+    .by = Aar
+  )
+
+Tabell2 <- RegData |>
+  filter(
+    !is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post),
+    !is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post2)) |>
+  mutate(
+    klinisk_forbedring1 = ifelse(NdiScore-NdiScore_post >= 10, 1, 0),
+    klinisk_forbedring2 = ifelse(NdiScore-NdiScore_post2 >= 10, 1, 0)) |>
+  summarise(
+    bedring1 = sum(klinisk_forbedring1),
+    bedring2 = sum(klinisk_forbedring2),
+    N = n(),
+    .by = Aar
+  )
+
+
 ### Tall til Ingrid 13.10.2025 #########
 # tittel <- c("Andel tverrfaglig behandlet blant", "pasienter som mottar tolk")
 RegData <- RegData[RegData$NationalInterpreter %in% 1, ]
