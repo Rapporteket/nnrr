@@ -740,7 +740,7 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}odi_klinisk_viktig.pdf}
-\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring i funksjon (ODI) (30 \% eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring i funksjon (ODI) (10 eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]

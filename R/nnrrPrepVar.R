@@ -274,7 +274,8 @@ nnrrPrepVar <- function(RegData, valgtVar)
     tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
     RegData$Variabel <- 0
-    RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post)/RegData$OdiScore >= .3] <- 1
+    RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post) >= 10] <- 1
+    # RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post)/RegData$OdiScore >= .3] <- 1
     grtxt <- c("Nei", "Ja")
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
@@ -283,7 +284,26 @@ nnrrPrepVar <- function(RegData, valgtVar)
     tittel <- "Funksjonsbedring"
     RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post2), ]
     RegData$Variabel <- 0
-    RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post2)/RegData$OdiScore >= .3] <- 1
+    RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post2) >= 10] <- 1
+    # RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post2)/RegData$OdiScore >= .3] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='ndi_klinisk_viktig_6mnd') {
+    tittel <- "Funksjonsbedring"
+    RegData <- RegData[!is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post), ]
+    RegData$Variabel <- 0
+    RegData$Variabel[(RegData$NdiScore - RegData$NdiScore_post) >= 10] <- 1
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  }
+
+  if (valgtVar=='ndi_klinisk_viktig_12mnd') {
+    tittel <- "Funksjonsbedring"
+    RegData <- RegData[!is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post2), ]
+    RegData$Variabel <- 0
+    RegData$Variabel[(RegData$NdiScore - RegData$NdiScore_post2) >= 10] <- 1
     grtxt <- c("Nei", "Ja")
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
