@@ -533,13 +533,13 @@ nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
 
 
 
-valgtVar <- "bedring_smerte_hvile_6mnd"
+valgtVar <- "bedring_smerte_hvile_6mnd_v2"
 plotdata1 <- nnrr::nnrrBeregnAndelTid(
   RegData, valgtVar=valgtVar,
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
   minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
   tidsenhet="Kvartal", datovar = "dato_oppfolg")
-valgtVar <- "bedring_smerte_hvile_12mnd"
+valgtVar <- "bedring_smerte_hvile_12mnd_v2"
 plotdata2 <- nnrr::nnrrBeregnAndelTid(
   RegData, valgtVar=valgtVar,
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
@@ -553,13 +553,13 @@ nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
                             inkl_konf = 0)
 
 
-valgtVar <- "bedring_smerte_aktiv_6mnd"
+valgtVar <- "bedring_smerte_aktiv_6mnd_v2"
 plotdata1 <- nnrr::nnrrBeregnAndelTid(
   RegData, valgtVar=valgtVar,
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
   minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
   tidsenhet="Kvartal", datovar = "dato_oppfolg")
-valgtVar <- "bedring_smerte_aktiv_12mnd"
+valgtVar <- "bedring_smerte_aktiv_12mnd_v2"
 plotdata2 <- nnrr::nnrrBeregnAndelTid(
   RegData, valgtVar=valgtVar,
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
@@ -740,7 +740,7 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr}\textwidth]{\Sexpr{figfolder}odi_klinisk_viktig.pdf}
-\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring i funksjon (ODI) (10 eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring i funksjon (ODI) (10 poeng eller mer) i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
@@ -775,13 +775,13 @@ Det er viktig å merke seg at langt fra alle pasienter fyller ut oppfølgingsskj
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr*0.9}\textwidth]{\Sexpr{figfolder}bedring_smerte_hvile.pdf}
-\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring av smerte (2 poeng eller mer reduksjon) i hvile i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\Sexpr{figstr*0.9}\textwidth]{\Sexpr{figfolder}bedring_smerte_aktiv.pdf}
-\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring av smerte (30 \% eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
+\caption{Andel pasienter som 6 og 12 mnd etter utredning/behandling har hatt klinisk bedring av smerte (2 poeng eller mer reduksjon) i aktivitet i egen spesialisthelsetjeneste sammenlignet med landet for øvrig siste 4 kvartal.}
 \end{figure}
 
 

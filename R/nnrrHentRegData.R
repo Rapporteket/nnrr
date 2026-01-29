@@ -12,18 +12,31 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   registryName <- "nnrr"
   dbType <- "mysql"
 
+  # legeskjema <-
+  #   readr::read_csv2(
+  #       paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2025-12-16_1558.csv"))
+  # pasientsvar_pre <-
+  #   readr::read_csv2(
+  #     paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2025-12-16_1602.csv"))
+  # pasientsvar_post <-
+  #   readr::read_csv2(
+  #     paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2025-12-16_1607.csv"))
+  # pasientsvar_post2 <-
+  #   readr::read_csv2(
+  #     paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2025-12-16_1608.csv"))
+
   legeskjema <-
     readr::read_csv2(
-        paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2025-12-16_1558.csv"))
+      paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1505.csv"))
   pasientsvar_pre <-
     readr::read_csv2(
-      paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2025-12-16_1602.csv"))
+      paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1512.csv"))
   pasientsvar_post <-
     readr::read_csv2(
-      paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2025-12-16_1607.csv"))
+      paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1519.csv"))
   pasientsvar_post2 <-
     readr::read_csv2(
-      paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2025-12-16_1608.csv"))
+      paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1521.csv"))
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){

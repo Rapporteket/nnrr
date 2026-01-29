@@ -1,5 +1,6 @@
 rm(list=ls())
 library(nnrr)
+library(dplyr)
 
 ### Bestilling poster Maja 22.01.2026 #########
 
@@ -33,6 +34,17 @@ Tabell2 <- RegData |>
     .by = Aar
   )
 
+Tab_6mnd <- RegData |>
+  filter(aar_oppfolg %in% 2023:2025,
+         is.na(NdiScore),
+         !is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post)) |>
+  mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg
+  )
+
 
 ### Tall til Ingrid 13.10.2025 #########
 # tittel <- c("Andel tverrfaglig behandlet blant", "pasienter som mottar tolk")
@@ -49,7 +61,7 @@ Tabell <- RegData |>
   dplyr::summarise(
     Antall_tverrfaglig = sum(Variabel),
     N = dplyr::n(),
-                   .by = c(SykehusNavn, Aar))
+    .by = c(SykehusNavn, Aar))
 
 write.csv2(Tabell, "tverrfaglig_tolk.csv", row.names = F, fileEncoding = "Latin1")
 
