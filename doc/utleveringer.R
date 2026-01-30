@@ -1,49 +1,246 @@
 rm(list=ls())
 library(nnrr)
 library(dplyr)
+library(ggplot2)
 
 ### Bestilling poster Maja 22.01.2026 #########
+figfolder <- "C:/Users/kth200/regdata/nnrr/utleveringer/"
 
 RegData <- nnrr::nnrrHentRegData()
-
-Tabell1 <- RegData |>
-  filter(is.na(NdiScore),
-         !is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post)&
-           !is.na(RegData$OdiScore_post2)) |>
-  mutate(
-    klinisk_forbedring1 = ifelse(OdiScore-OdiScore_post >= 10, 1, 0),
-    klinisk_forbedring2 = ifelse(OdiScore-OdiScore_post2 >= 10, 1, 0)) |>
-  summarise(
-    bedring1 = sum(klinisk_forbedring1),
-    bedring2 = sum(klinisk_forbedring2),
-    N = n(),
-    .by = Aar
-  )
-
-Tabell2 <- RegData |>
-  filter(
-    !is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post),
-    !is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post2)) |>
-  mutate(
-    klinisk_forbedring1 = ifelse(NdiScore-NdiScore_post >= 10, 1, 0),
-    klinisk_forbedring2 = ifelse(NdiScore-NdiScore_post2 >= 10, 1, 0)) |>
-  summarise(
-    bedring1 = sum(klinisk_forbedring1),
-    bedring2 = sum(klinisk_forbedring2),
-    N = n(),
-    .by = Aar
-  )
 
 Tab_6mnd <- RegData |>
   filter(aar_oppfolg %in% 2023:2025,
          is.na(NdiScore),
-         !is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post)) |>
+         !is.na(RegData$OdiScore),
+         !is.na(RegData$OdiScore_post)) |>
   mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post >= 10, 1, 0)) |>
   summarise(
     bedring = sum(klinisk_forbedring),
     N = n(),
     .by = aar_oppfolg
+  ) |>
+  mutate(oppf = "6mnd")
+Tab_12mnd <- RegData |>
+  filter(aar_oppfolg2 %in% 2023:2025,
+         is.na(NdiScore),
+         !is.na(RegData$OdiScore),
+         !is.na(RegData$OdiScore_post2)) |>
+  mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post2 >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg2
+  ) |>
+  rename(aar_oppfolg = aar_oppfolg2) |>
+  mutate(oppf = "12mnd")
+
+Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
+  mutate(andel = bedring/N*100,
+         Aar = as.character(aar_oppfolg)) |>
+  arrange(Aar)
+Tabell <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
+N <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = N)
+
+outfile <- paste0(figfolder, "klin_viktig_odi_mangler_ndi.svg")
+FigTypUt <- rapFigurer::figtype(outfile=outfile,
+                                pointsizePDF=11, fargepalett='BlaaOff')
+farger <- FigTypUt$farger
+
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3], border = F,
+                ylim = c(0,1.25*max(Tabell[,-1])), main = "Klinisk viktig endring i ODI",
+                ylab = "Andel %")
+pktStr <- 1.5
+points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
+points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
+legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       legend=names(Tabell[-1]), ncol = 3)
+
+mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
+mtext(c("Etter 6 mnd", "Etter 12 mnd"), side = 1, line = 1, at = xpos)
+if (outfile != "") {dev.off()}
+
+Tab_6mnd <- RegData |>
+  filter(aar_oppfolg %in% 2023:2025,
+         !is.na(NdiScore),
+         !is.na(RegData$OdiScore),
+         !is.na(RegData$OdiScore_post)) |>
+mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg
+  ) |>
+  mutate(oppf = "6mnd")
+Tab_12mnd <- RegData |>
+  filter(aar_oppfolg2 %in% 2023:2025,
+         !is.na(NdiScore),
+         !is.na(RegData$OdiScore),
+         !is.na(RegData$OdiScore_post2)) |>
+  mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post2 >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg2
+  ) |>
+  rename(aar_oppfolg = aar_oppfolg2) |>
+  mutate(oppf = "12mnd")
+
+Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
+  mutate(andel = bedring/N*100,
+         Aar = as.character(aar_oppfolg)) |>
+  arrange(Aar)
+Tabell <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
+N <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = N)
+
+outfile <- paste0(figfolder, "klin_viktig_odi_har_ndi.svg")
+FigTypUt <- rapFigurer::figtype(outfile=outfile,
+                                pointsizePDF=11, fargepalett='BlaaOff')
+farger <- FigTypUt$farger
+
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3], border = F,
+                ylim = c(0,1.25*max(Tabell[,-1])), main = "Klinisk viktig endring i ODI",
+                ylab = "Andel %")
+pktStr <- 1.5
+points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
+points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
+legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       legend=names(Tabell[-1]), ncol = 3)
+
+mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
+mtext(c("Etter 6 mnd", "Etter 12 mnd"), side = 1, line = 1, at = xpos)
+if (outfile != "") {dev.off()}
+
+
+Tab_6mnd <- RegData |>
+  filter(aar_oppfolg %in% 2023:2025,
+         !is.na(NdiScore),
+         !is.na(RegData$NdiScore_post)) |>
+mutate(klinisk_forbedring = ifelse(NdiScore-NdiScore_post >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg
+  ) |>
+  mutate(oppf = "6mnd")
+Tab_12mnd <- RegData |>
+  filter(aar_oppfolg2 %in% 2023:2025,
+         !is.na(NdiScore),
+         !is.na(RegData$NdiScore_post2)) |>
+  mutate(klinisk_forbedring = ifelse(NdiScore-NdiScore_post2 >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg2
+  ) |>
+  rename(aar_oppfolg = aar_oppfolg2) |>
+  mutate(oppf = "12mnd")
+
+Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
+  mutate(andel = bedring/N*100,
+         Aar = as.character(aar_oppfolg)) |>
+  arrange(Aar)
+Tabell <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
+N <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = N)
+
+outfile <- paste0(figfolder, "klin_viktig_ndi.svg")
+FigTypUt <- rapFigurer::figtype(outfile=outfile,
+                                pointsizePDF=11, fargepalett='BlaaOff')
+farger <- FigTypUt$farger
+
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3], border = F,
+                ylim = c(0,1.25*max(Tabell[,-1])), main = "Klinisk viktig endring i NDI",
+                ylab = "Andel %")
+pktStr <- 1.5
+points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
+points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
+legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       legend=names(Tabell[-1]), ncol = 3)
+
+mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
+mtext(c("Etter 6 mnd", "Etter 12 mnd"), side = 1, line = 1, at = xpos)
+if (outfile != "") {dev.off()}
+
+
+
+
+# prop.test(x = Tabell1[1:2, 3], n = Tabell1[1:2, 4],
+#           alternative = "greater")
+
+
+
+# Tabell1 <- RegData |>
+#   filter(is.na(NdiScore),
+#          !is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post)&
+#            !is.na(RegData$OdiScore_post2)) |>
+#   mutate(
+#     klinisk_forbedring1 = ifelse(OdiScore-OdiScore_post >= 10, 1, 0),
+#     klinisk_forbedring2 = ifelse(OdiScore-OdiScore_post2 >= 10, 1, 0)) |>
+#   summarise(
+#     bedring1 = sum(klinisk_forbedring1),
+#     bedring2 = sum(klinisk_forbedring2),
+#     N = n(),
+#     .by = Aar
+#   )
+#
+# Tabell2 <- RegData |>
+#   filter(
+#     !is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post),
+#     !is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post2)) |>
+#   mutate(
+#     klinisk_forbedring1 = ifelse(NdiScore-NdiScore_post >= 10, 1, 0),
+#     klinisk_forbedring2 = ifelse(NdiScore-NdiScore_post2 >= 10, 1, 0)) |>
+#   summarise(
+#     bedring1 = sum(klinisk_forbedring1),
+#     bedring2 = sum(klinisk_forbedring2),
+#     N = n(),
+#     .by = Aar
+#   )
+
+
+
+
+
+
+
+
+
+aar <- sort(unique(tab_oppf$aar))
+ggplot(tab_oppf,
+       aes(x = andel, y = oppf, shape = aar, color = aar)) +
+geom_bar(data = tab_oppf,
+         aes(x = andel, y = oppf),
+         stat = "identity", fill = "steelblue", alpha = 1, width = 4 / 5) +
+  geom_point(size = 3) +
+  scale_shape_manual(values = setNames(
+    c(rev(c(19, 1, 17, 6, 15, 0)[1:(length(aar)-1)]), NA), aar)) +
+  scale_color_manual(values = setNames(
+    c(rep("black", length(aar)-1), "steelblue"), aar)) +
+  scale_x_continuous(limits = c(0, 1.1*max(tab_oppf$andel, na.rm = T)),
+                     expand = c(0, 0)) +
+  labs(title = "tittel", x = "Andel (%)", y = element_blank()) +
+  theme(
+    legend.position = "top",
+    legend.title = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.background = element_rect(fill = "white"),
+    plot.title = element_text(vjust = 5, hjust = 0.5),
+    plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
   )
+
 
 
 ### Tall til Ingrid 13.10.2025 #########
