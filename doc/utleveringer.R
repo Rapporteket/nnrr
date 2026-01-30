@@ -37,7 +37,11 @@ Tab_12mnd <- RegData |>
 Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
   mutate(andel = bedring/N*100,
          Aar = as.character(aar_oppfolg)) |>
-  arrange(Aar)
+  arrange(Aar) |>
+  relocate(Aar, oppf) |>
+  select(-aar_oppfolg)
+write.csv2(Tabell1, paste0(figfolder, "klin_viktig_odi_mangler_ndi.csv"),
+           row.names = F, fileEncoding = "Latin1")
 Tabell <- Tabell1 |>
   tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
 N <- Tabell1 |>
@@ -48,8 +52,9 @@ FigTypUt <- rapFigurer::figtype(outfile=outfile,
                                 pointsizePDF=11, fargepalett='BlaaOff')
 farger <- FigTypUt$farger
 
-xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3], border = F,
-                ylim = c(0,1.25*max(Tabell[,-1])), main = "Klinisk viktig endring i ODI",
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3],
+                border = F, ylim = c(0, 45), #ylim = c(0,1.25*max(Tabell[,-1])),
+                main = "Klinisk viktig endring i ODI",
                 ylab = "Andel %")
 pktStr <- 1.5
 points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
@@ -91,7 +96,11 @@ Tab_12mnd <- RegData |>
 Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
   mutate(andel = bedring/N*100,
          Aar = as.character(aar_oppfolg)) |>
-  arrange(Aar)
+  arrange(Aar) |>
+  relocate(Aar, oppf) |>
+  select(-aar_oppfolg)
+write.csv2(Tabell1, paste0(figfolder, "klin_viktig_odi_har_ndi.csv"),
+           row.names = F, fileEncoding = "Latin1")
 Tabell <- Tabell1 |>
   tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
 N <- Tabell1 |>
@@ -102,8 +111,9 @@ FigTypUt <- rapFigurer::figtype(outfile=outfile,
                                 pointsizePDF=11, fargepalett='BlaaOff')
 farger <- FigTypUt$farger
 
-xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3], border = F,
-                ylim = c(0,1.25*max(Tabell[,-1])), main = "Klinisk viktig endring i ODI",
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3],
+                border = F, ylim = c(0, 45), #ylim = c(0,1.25*max(Tabell[,-1])),
+                main = "Klinisk viktig endring i ODI",
                 ylab = "Andel %")
 pktStr <- 1.5
 points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
@@ -144,7 +154,11 @@ Tab_12mnd <- RegData |>
 Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
   mutate(andel = bedring/N*100,
          Aar = as.character(aar_oppfolg)) |>
-  arrange(Aar)
+  arrange(Aar) |>
+  relocate(Aar, oppf) |>
+  select(-aar_oppfolg)
+write.csv2(Tabell1, paste0(figfolder, "klin_viktig_ndi.csv"),
+           row.names = F, fileEncoding = "Latin1")
 Tabell <- Tabell1 |>
   tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
 N <- Tabell1 |>
@@ -155,8 +169,9 @@ FigTypUt <- rapFigurer::figtype(outfile=outfile,
                                 pointsizePDF=11, fargepalett='BlaaOff')
 farger <- FigTypUt$farger
 
-xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3], border = F,
-                ylim = c(0,1.25*max(Tabell[,-1])), main = "Klinisk viktig endring i NDI",
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[2],
+                border = F, ylim = c(0, 45), #ylim = c(0,1.25*max(Tabell[,-1])),
+                main = "Klinisk viktig endring i NDI",
                 ylab = "Andel %")
 pktStr <- 1.5
 points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
