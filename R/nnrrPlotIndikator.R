@@ -8,8 +8,235 @@
 #'
 #' @export
 #'
+ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
+                            lavDG=NA, inkl_konf=F, ant_aar = 3)
+{
+  indikator=indikatordata$indikator
+  tittel=indikatordata$tittel
+  terskel=indikatordata$terskel
+  minstekrav=indikatordata$minstekrav
+  maal=indikatordata$maal
+  decreasing=indikatordata$decreasing
+  maalretn=indikatordata$maalretn
+
+  Tabell <- indikator |>
+    dplyr::filter(year > max(year) - ant_aar) |>
+    dplyr::summarise(Antall = sum(var),
+                     N = sum(denominator),
+                     .by = c(SykehusNavn, year)) |>
+    dplyr::group_by(year) |>
+    dplyr::group_modify(~ .x |> janitor::adorn_totals(name = "Nasjonalt")) |>
+    dplyr::mutate(Andel = Antall/N*100) |>
+    dplyr::mutate(Andel = ifelse(N < terskel, NA, Andel))
+
+  Andel <- Tabell |>
+    dplyr::select(SykehusNavn, year, Andel) |>
+    dplyr::arrange(year) |>
+    tidyr::pivot_wider(names_from = year,
+                       values_from = c(Andel))
+  N <- Tabell |>
+    dplyr::select(SykehusNavn, year, N) |>
+    dplyr::arrange(year) |>
+    tidyr::pivot_wider(names_from = year,
+                       values_from = c(N))
+
+  Andel[N[[dim(N)[2]]] < terskel, -1] <- NA
+  Andel_long <- Andel |>
+    dplyr::arrange(
+      desc(is.na(!!rlang::sym(dplyr::last(names(Andel))))),
+      !!rlang::sym(dplyr::last(names(Andel)))
+    ) |>
+    dplyr::mutate(
+      SykehusNavn = forcats::fct_inorder(SykehusNavn)
+    ) |>
+    tidyr::pivot_longer(cols = 2:dim(Andel)[2],
+                        names_to = "year",
+                        values_to = "andel") |>
+    merge(Tabell |> dplyr::select(year, SykehusNavn, Antall, N),
+          by = c("year", "SykehusNavn"), all.x = TRUE)
+
+
+  aar <- sort(unique(Andel_long$year))
+  # library(ggplot2)
+  # library(plotly)
+  # library(dplyr)
+  bakgrunn_gronn <- data.frame(
+    xmin = 50,
+    xmax = Inf,
+    ymin = 0,
+    ymax = dim(Andel)[1] + 1,
+    color = "#A7EBCE"
+  )
+  bakgrunn_gul <- data.frame(
+    xmin = 40,
+    xmax = 50,
+    ymin = 0,
+    ymax = dim(Andel)[1] + 1,
+    color = "#F5F0D5"
+  )
+  bakgrunn_rod <- data.frame(
+    xmin = 0,
+    xmax = 40,
+    ymin = 0,
+    ymax = dim(Andel)[1] + 1,
+    color = "#F0DEDB"
+  )
+  alpha <- .8
+
+  # x11()
+  p <- ggplot(Andel_long,
+              aes(x = andel, y = SykehusNavn, shape = year, color = year,
+                  text = paste("Sykehus:", SykehusNavn, "<br>Antall:",
+                               Antall, "<br>N:", N, "<br>Andel:", sprintf("%.1f", andel)))) +
+    geom_rect(data = bakgrunn_gronn,
+              aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+              fill = bakgrunn_gronn$color,
+              alpha = alpha, inherit.aes = FALSE) +
+    geom_rect(data = bakgrunn_gul,
+              aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+              fill = bakgrunn_gul$color,
+              alpha = alpha, inherit.aes = FALSE) +
+    geom_rect(data = bakgrunn_rod,
+              aes(xmin = xmin, xmax = xmax, ymin = ymin, ymax = ymax),
+              fill = bakgrunn_rod$color,
+              alpha = alpha, inherit.aes = FALSE) +
+    geom_bar(data = Andel_long %>% dplyr::filter(year == dplyr::last(aar)),
+             aes(x = andel, y = SykehusNavn),
+             stat = "identity", fill = "steelblue", alpha = 1, width = 4 / 5) +
+    geom_point(size = 3) +
+    scale_shape_manual(values = setNames(
+      c(rev(c(19, 1, 17, 6, 15, 0)[1:(length(aar)-1)]), NA), aar)) +
+    scale_color_manual(values = setNames(
+      c(rep("black", length(aar)-1), "steelblue"), aar)) +
+    scale_x_continuous(limits = c(0, 1.1*max(Andel_long$andel, na.rm = T)),
+                       expand = c(0, 0)) +
+    labs(title = tittel, x = "Andel (%)", y = element_blank()) +
+    theme(
+      legend.position = "top",
+      legend.title = element_blank(),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.background = element_rect(fill = "white"),
+      plot.title = element_text(vjust = 5, hjust = 0.5),
+      plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
+    )
+
+}
+
+plotlyIndikator <- function(indikatordata, graaUt=NA, outfile = '',
+                            lavDG=NA, inkl_konf=F, ant_aar = 3) {
+  library(plotly)
+  library(dplyr)
+
+  data_long <- Andel_long
+  latest_year <- 2025
+  # Create Plotly figure
+  fig <- plot_ly()
+  gjsikt <- 0.9
+
+  # Add background zones
+  fig <- fig %>%
+    layout(
+      shapes = list(
+        list(type = "rect", x0 = 0, x1 = 40, y0 = -0.5, y1 = nlevels(data_long$SykehusNavn)-0.5,
+             fillcolor = "#F0DEDB", opacity = gjsikt, line = list(width = 0), layer = "below"),
+        list(type = "rect", x0 = 40, x1 = 50, y0 = -0.5, y1 = nlevels(data_long$SykehusNavn)-0.5,
+             fillcolor = "#F5F0D5", opacity = gjsikt, line = list(width = 0), layer = "below"),
+        list(type = "rect", x0 = 50, x1 = max(data_long$andel, na.rm = T)*1.1,
+             y0 = -0.5, y1 = nlevels(data_long$SykehusNavn)-0.5,
+             fillcolor = "#A7EBCE", opacity = gjsikt, line = list(width = 0), layer = "below")
+      )
+    )
+
+
+
+  # Points for previous years
+  previous_years <- setdiff(unique(data_long$year), latest_year)
+  symbols <- c("circle-open", "circle")
+  colors <- c("black", "black")
+
+  for (i in seq_along(previous_years)) {
+    fig <- fig %>%
+      add_trace(
+        type = "scatter",
+        mode = "markers",
+        data = data_long %>% dplyr::filter(year == previous_years[i]),
+        x = ~andel,
+        y = ~SykehusNavn,
+        name = as.character(previous_years[i]),
+        marker = list(symbol = symbols[i], size = 10, color = colors[i]),
+        customdata = ~paste("År:", year, "<br>Antall:", Antall, "<br>N:", N),
+        hovertemplate = "<b>%{y}</b><br>Andel: %{x:.1f}%<br>%{customdata}<extra></extra>"
+      )
+  }
+
+  # Filter latest year and remove NA values for andel
+  latest_data <- data_long %>%
+    filter(year == latest_year & !is.na(andel))
+
+  # Create color vector for filtered data
+  bar_colors <- ifelse(latest_data$SykehusNavn == "Nasjonalt",
+                       "#87CEFA",  # Light blue for Nasjonalt
+                       "steelblue") # Default blue for others
+
+  # Add bar trace
+  fig <- fig %>%
+    add_trace(
+      type = "bar",
+      data = latest_data,
+      x = ~andel,
+      y = ~SykehusNavn,
+      orientation = "h",
+      name = as.character(latest_year),
+      marker = list(color = bar_colors),
+      customdata = ~paste("Antall:", Antall, "<br>N:", N),
+      hovertemplate = "<b>%{y}</b><br>Andel: %{x:.1f}%<br>%{customdata}<extra></extra>"
+    )
+
+  fig <- fig %>%
+    layout(
+      title = list(text = "Andel tverrfaglig behandlet",
+                   y = 0.98,
+                   font = list(size = 24)),  # Increase title font size)
+      xaxis = list(title = "Andel (%)", range = c(0, max(data_long$andel)*1.1)),
+      yaxis = list(
+        title = "",
+        automargin = TRUE,
+        tickfont = list(size = 14),  # smaller font for labels
+        ticklabelposition = "inside" # moves labels closer to bars
+      ),
+      barmode = "overlay",
+      legend = list(
+        orientation = "h",
+        yanchor = "top",
+        y = 1.05,        # Place legend ABOVE the plot area
+        xanchor = "center",
+        x = 0.5
+      ),
+      plot_bgcolor = "white",
+      margin = list(t = 120)  # Large top margin to create space for title + legend
+    )
+
+  fig
+}
+
+
+#' Gi en visuell fremstilling av registerets indikatorer over tid
+#'
+#' @param indikatordata En dataramme med følgende kolonner:
+#'                 - ReshId
+#'                 - year
+#'                 - Teller
+#'                 - Sykehusnavn
+#'
+#' @export
+#'
 nnrrPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
-                             lavDG=NA, inkl_konf=F)
+                              lavDG=NA, inkl_konf=F)
 {
   indikator=indikatordata$indikator
   tittel=indikatordata$tittel
@@ -26,22 +253,25 @@ nnrrPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
   height=indikatordata$height
   maalretn=indikatordata$maalretn
 
-  indikator <- indikator[indikator$year > max(indikator$year)-3, ] # behold bare siste 3 år
-
-  Tabell <- indikator %>% dplyr::group_by(SykehusNavn, year) %>%
+  Tabell <- indikator |>
+    dplyr::filter(year > max(year)-3) |>
     dplyr::summarise(Antall = sum(var),
                      N = dplyr::n(),
-                     Andel = Antall/N*100)
+                     # Andel = Antall/N*100,
+                     .by = c(SykehusNavn, year)) |>
+    dplyr::group_by(year) |>
+    dplyr::group_modify(~ .x |> janitor::adorn_totals(name = "Nasjonalt")) |>
+    dplyr::mutate(Andel = Antall/N*100) |>
+    dplyr::mutate(Andel = ifelse(N < terskel, NA, Andel))
 
-  AntTilfeller <- tidyr::spread(Tabell[, -c(4,5)], 'year', 'Antall') %>%
-    janitor::adorn_totals(name = "Nasjonalt")
+  AntTilfeller <- tidyr::spread(Tabell[, -c(4,5)], 'year', 'Antall')
 
-  N <- tidyr::spread(Tabell[, -c(3,5)], 'year', 'N') %>%
-    janitor::adorn_totals(name = "Nasjonalt")
+  N <- tidyr::spread(Tabell[, -c(3,5)], 'year', 'N')
   N[is.na(N)] <- 0
 
   # Andeler, inkludert nasjonalt
-  andeler <- dplyr::bind_cols(AntTilfeller[,1], AntTilfeller[,-1]/N[,-1] * 100)
+  andeler <- tidyr::spread(Tabell[, -c(3,4)], 'year', 'Andel')
+    # dplyr::bind_cols(AntTilfeller[,1], AntTilfeller[,-1]/N[,-1] * 100)
 
   # Fjern år med færre registreringer enn terskelverdi og sykehus med for lav dekningsgrad
   andeler[N < terskel] <- NA
@@ -49,9 +279,9 @@ nnrrPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
 
   # Ordne rekkefølge, stigende eller synkende
   if (decreasing){
-    rekkefolge <- order(andeler[, dim(andeler)[2]], decreasing = decreasing, na.last = F)
+    rekkefolge <- order(andeler[[dim(andeler)[2]]], decreasing = decreasing, na.last = F)
   } else {
-    rekkefolge <- order(andeler[, dim(andeler)[2]], decreasing = decreasing, na.last = F)
+    rekkefolge <- order(andeler[[dim(andeler)[2]]], decreasing = decreasing, na.last = F)
   }
 
   andeler <- andeler[rekkefolge, ]
@@ -92,7 +322,7 @@ nnrrPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
     andeler$SykehusNavn[dim(andeler)[1]] <- paste0('(N, ', names(andeler)[dim(andeler)[2]], ')')
     KI <- cbind(c(NA, NA), KI, c(NA, NA))
   } else {
-    andeler <- rbind(andeler, c(NA,NA,NA))
+    andeler <- rbind(andeler, c(NA,NA,NA,NA))
     andeler$SykehusNavn[dim(andeler)[1]] <- ''
   }
 
@@ -212,3 +442,186 @@ nnrrPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
   if ( outfile != '') {dev.off()}
 
 }
+
+
+# {
+#
+# library(dplyr)
+# library(tidyr)
+# library(ggplot2)
+# library(scales)
+# library(patchwork)
+#
+# # ----------------------------
+# # PARAMETERS
+# # ----------------------------
+# years_show  <- 2023:2025
+# bar_year    <- 2025
+# target_pct  <- 30
+# small_n_cut <- 30
+#
+# title_text  <- "Andel tverrfaglig behandlet"
+# df <- TabellData
+#
+# # ----------------------------
+# # 1) Aggregate: hospital x year -> rate + N
+# # ----------------------------
+# agg <- df %>%
+#   mutate(
+#     year = as.integer(year),
+#     var = as.numeric(var),
+#     denominator = as.numeric(denominator)
+#   ) %>%
+#   filter(year %in% years_show) %>%
+#   group_by(SykehusNavn, year) %>%
+#   summarise(
+#     N = sum(denominator, na.rm = TRUE),
+#     numer = sum(var, na.rm = TRUE),
+#     rate_pct = ifelse(N > 0, 100 * numer / N, NA_real_),
+#     .groups = "drop"
+#   )
+#
+# # ----------------------------
+# # 2) Order hospitals by bar_year (2025) descending
+# # ----------------------------
+# order_levels <- agg %>%
+#   filter(year == bar_year) %>%
+#   arrange(desc(rate_pct)) %>%
+#   pull(SykehusNavn)
+#
+# # Put hospitals without 2025 data at the bottom
+# order_levels <- c(order_levels, setdiff(unique(agg$SykehusNavn), order_levels))
+#
+# agg <- agg %>%
+#   mutate(SykehusNavn = factor(SykehusNavn, levels = rev(order_levels)))  # rev => top is highest
+#
+# # ----------------------------
+# # 3) Create data for bars (2025) and points (2023/2024)
+# # ----------------------------
+# bars <- agg %>%
+#   filter(year == bar_year) %>%
+#   mutate(
+#     pct_label = ifelse(is.na(rate_pct), "", paste0(round(rate_pct), " %"))
+#   )
+#
+# pts <- agg %>%
+#   filter(year %in% c(2023, 2024)) %>%
+#   mutate(year_f = factor(year))
+#
+# # ----------------------------
+# # 4) Build N table data (2023/2024/2025)
+# # ----------------------------
+# N_tab <- agg %>%
+#   mutate(
+#     year_chr = as.character(year),
+#     N_print = case_when(
+#       year == bar_year & N < small_n_cut ~ "N<30",
+#       TRUE ~ as.character(N)
+#     )
+#   ) %>%
+#   select(SykehusNavn, year_chr, N_print) %>%
+#   pivot_wider(names_from = year_chr, values_from = N_print) %>%
+#   # ensure columns exist even if missing
+#   mutate(
+#     `2023` = if (!"2023" %in% names(.)) NA_character_ else `2023`,
+#     `2024` = if (!"2024" %in% names(.)) NA_character_ else `2024`,
+#     `2025` = if (!"2025" %in% names(.)) NA_character_ else `2025`
+#   ) %>%
+#   mutate(SykehusNavn = factor(SykehusNavn, levels = levels(agg$SykehusNavn))) %>%
+#   arrange(SykehusNavn)
+#
+# # ----------------------------
+# # 5) Main panel: green target region + 2025 bars + 2023/2024 points
+# # ----------------------------
+# p_main <- ggplot() +
+#   # target region >= 30%
+#   annotate(
+#     "rect",
+#     xmin = target_pct, xmax = Inf,
+#     ymin = -Inf, ymax = Inf,
+#     fill = "#2fbf87", alpha = 0.75
+#   ) +
+#   # 2025 bars
+#   geom_col(
+#     data = bars,
+#     aes(y = SykehusNavn, x = rate_pct),
+#     fill = "#5aa6d6", width = 0.75
+#   ) +
+#   # target line at 30
+#   geom_vline(xintercept = target_pct, color = "white", linewidth = 1.1) +
+#   annotate(
+#     "text",
+#     x = target_pct + 1.0, y = Inf,
+#     label = "Mål",
+#     angle = 90, vjust = 1.5, size = 3.2
+#   ) +
+#   # percent labels next to bars (like your PDF)
+#   geom_text(
+#     data = bars,
+#     aes(y = SykehusNavn, x = 0, label = pct_label),
+#     hjust = -0.05, size = 3.0
+#   ) +
+#   # 2023/2024 points
+#   geom_point(
+#     data = pts,
+#     aes(y = SykehusNavn, x = rate_pct, shape = year_f),
+#     size = 2.3, stroke = 0.9, color = "black"
+#   ) +
+#   scale_shape_manual(
+#     values = c("2023" = 1, "2024" = 16),  # open circle, filled circle
+#     breaks = c("2023", "2024"),
+#     name = NULL
+#   ) +
+#   scale_x_continuous(
+#     limits = c(0, 70),
+#     breaks = seq(0, 70, 10),
+#     expand = expansion(mult = c(0.02, 0.02))
+#   ) +
+#   labs(
+#     title = title_text,
+#     x = "Andel (%)",
+#     y = NULL
+#   ) +
+#   theme_minimal(base_size = 11) +
+#   theme(
+#     panel.grid.major.y = element_blank(),
+#     panel.grid.minor = element_blank(),
+#     plot.title = element_text(hjust = 0.5, face = "bold"),
+#     legend.position = "top",
+#     axis.text.y = element_text(color = "black"),
+#     plot.margin = margin(10, 5, 10, 5)
+#   )
+#
+# # ----------------------------
+# # 6) Right-side N table panel
+# # ----------------------------
+# p_table <- ggplot(N_tab, aes(y = SykehusNavn)) +
+#   geom_text(aes(x = 1, label = `2023`), size = 3) +
+#   geom_text(aes(x = 2, label = `2024`), size = 3) +
+#   geom_text(aes(x = 3, label = `2025`), size = 3) +
+#   annotate("text", x = 2, y = Inf, label = "N", vjust = 1.5, size = 3.2) +
+#   annotate("text", x = 1, y = Inf, label = "2023", vjust = 3.0, size = 3) +
+#   annotate("text", x = 2, y = Inf, label = "2024", vjust = 3.0, size = 3) +
+#   annotate("text", x = 3, y = Inf, label = "2025", vjust = 3.0, size = 3) +
+#   scale_x_continuous(limits = c(0.5, 3.5), breaks = NULL) +
+#   labs(x = NULL, y = NULL) +
+#   theme_void(base_size = 11) +
+#   theme(plot.margin = margin(25, 10, 10, 0))
+#
+# # ----------------------------
+# # 7) Combine into final plot
+# # ----------------------------
+# final_plot <- p_main + p_table + plot_layout(widths = c(4.8, 1.4))
+# final_plot
+#
+#
+# # final_plot <- patchwork::wrap_plots(p_main, p_table, widths = c(4.8, 1.4))
+# # final_plot
+#
+#
+#
+# }
+
+
+
+

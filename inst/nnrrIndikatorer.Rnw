@@ -35,49 +35,51 @@ knitr::opts_knit$set(root.dir = './')
 # setwd('c:/GIT/nnrr/doc/')
 rm(list=ls())
 library(nnrr)
-library(tidyverse)
+# library(tidyverse)
+library(dplyr)
 library(lubridate)
 options(dplyr.summarise.inform = FALSE)
 
-rap_aar <- 2023
+rap_aar <- 2025
 
-icd10 <- read.table('~/mydata/nnrr/icd10.csv', sep=';', header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
+datasti <- "C:/regdata/nnrr/behandlingskvalitet/"
 RegData <- nnrr::nnrrHentRegData()
 
 RegDataAll <- RegData
-RegData <- RegData[which(RegData$Aar >= 2018 & RegData$Aar <= rap_aar), ]
-Oppf_data <- RegDataAll[which(RegDataAll$aar_oppfolg>= 2018 & RegDataAll$aar_oppfolg <= rap_aar), ]
+RegData <- RegData[which(RegData$Aar >= 2022 & RegData$Aar <= rap_aar), ]
+Oppf_data <- RegDataAll[which(RegDataAll$aar_oppfolg>= 2022 & RegDataAll$aar_oppfolg <= rap_aar), ]
 Oppf_data$Aar <- Oppf_data$aar_oppfolg
-
-rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post', 'pasientsvar_post2'))
 
 kobling_resh_shusnavn <- RegData[match(unique(RegData$UnitId), RegData$UnitId), c("UnitId", "SykehusNavn")]
 
-map_resh_orgnr <- data.frame(orgnr_sh = c(974589095, 974749025,
-                                          974557746, 974795787,
-                                          974795639, 974703300,
-                                          974795477, 974733013,
-                                          974754118, 974747138,
-                                          974631326, 974575396,
-                                          993562718),
-                             resh = c(109834, 104293,
-                                      102959,  601032,
-                                      700735, 4211588,
-                                      102169, 114174,
-                                      105821, 4212982,
-                                      103736, 700138,
-                                      700701))
+map_resh_orgnr <- data.frame(
+  orgnr_sh = c(974589095, 974749025,
+               974557746, 974795787,
+               974795639, 974703300,
+               974795477, 974733013,
+               974754118, 974747138,
+               974631326, 974575396,
+               993562718, 874631752,
+               996328112, 974795930),
+  resh = c(109834, 104293,
+           102959,  601032,
+           700735, 4211588,
+           102169, 114174,
+           105821, 4212982,
+           103736, 700138,
+           700701, 4216667,
+           701433, 101831))
 
 # kobling_resh_shusnavn[kobling_resh_shusnavn$UnitId %in% setdiff(kobling_resh_shusnavn$UnitId, map_resh_orgnr$resh), ] #sykehus som mangler i mapping
 
 format_ut <- ".svg"
-figfolder <- "~/mydata/nnrr/indikatorer_2023/"
+figfolder <- paste0(datasti, "indikatorer_2024/")
 if (!dir.exists(figfolder)) {
   dir.create(figfolder)
 }
 
 figstr <- 0.61
-# tmp <- Sys.setlocale(category = "LC_ALL", locale = "nb_NO.UTF-8")
+# knitr::knit2pdf("nnrrIndikatorer.Rnw")
 @
 
 \begin{document}
@@ -90,8 +92,12 @@ skjema1b$tverrfaglig_behandlet <- 0
 skjema1b$tverrfaglig_behandlet[skjema1b$Treatment_GroupInterdisciplinary2018 != 0 | skjema1b$Treatment_GroupInterdisciplinary != 0] <- 1
 skjema1b$tverrfaglig_behandlet[skjema1b$Treatment_InvidualInterdisciplinary != 0] <- 1
 
-tabell1 <- nnrrIndikatorTabell(skjema1b, indikator = 'tverrfaglig_behandlet')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel tverrfaglig behandlet'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(skjema1b |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'tverrfaglig_behandlet')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel tverrfaglig behandlet'),
+      include.rownames=FALSE)
 
 
 ######### Indikator #####################################################################
@@ -132,7 +138,8 @@ aux <- aux[!is.na(aux$OdiScore) & !is.na(aux$OdiScore_post), ]
 # aux$odidiff_klin_viktig[aux$OdiScore - aux$OdiScore_post >= 10] <- 1
 
 aux$odidiff_klin_viktig <- 0
-aux$odidiff_klin_viktig[(aux$OdiScore - aux$OdiScore_post)/aux$OdiScore >= .3] <- 1
+# aux$odidiff_klin_viktig[(aux$OdiScore - aux$OdiScore_post)/aux$OdiScore >= .3] <- 1
+aux$odidiff_klin_viktig[(aux$OdiScore - aux$OdiScore_post) >= 10] <- 1
 
 ######### Indikator #####################################################################
 indikator <- aux[, c("UnitId", "aar_oppfolg", "odidiff_klin_viktig", "SykehusNavn")]
@@ -144,8 +151,15 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_bedret_funksjon"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'odidiff_klin_viktig')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i ODI (reduksjon $\\geq$ 30 \\%)'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'odidiff_klin_viktig')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption=paste0('Andel med klinisk viktig endring i ODI
+                     (minimum 10 poeng reduksjon). I hele perioden er det ',
+                     sum(aux$OdiScore[which(aux$Aar > rap_aar-4)] < 10), '
+                     pasienter som har prescore $<$ 10')),
+      include.rownames=FALSE)
 #########################################################################################
 @
 
@@ -165,10 +179,17 @@ aux <- Oppf_data[which(Oppf_data$regstatus==1 & Oppf_data$regstatus_post==1), ]
 aux <- aux[!is.na(aux$NdiScore) & !is.na(aux$NdiScore_post), ]
 aux$ndidiff_klin_viktig <- 0
 aux$ndidiff_klin_viktig[aux$NdiScore - aux$NdiScore_post >= 10] <- 1
-aux$ndidiff_klin_viktig[(aux$NdiScore - aux$NdiScore_post)/aux$NdiScore >= .3] <- 1
+# aux$ndidiff_klin_viktig[(aux$NdiScore - aux$NdiScore_post)/aux$NdiScore >= .3] <- 1
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'ndidiff_klin_viktig')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med klinisk viktig endring i NDI (reduksjon $\\geq$ 30 \\%)'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'ndidiff_klin_viktig')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption=paste0('Andel med klinisk viktig endring i NDI
+                     (minimum 10 poeng reduksjon). I hele perioden er det ',
+                     sum(aux$OdiScore[which(aux$Aar > rap_aar-4)] < 10), '
+                     pasienter som har prescore $<$ 10')),
+      include.rownames=FALSE)
 
 ######### Indikator #####################################################################
 datasett_indikator7ndi <- aux[, c("UnitId", "SykehusNavn", "Aar", "ndidiff_klin_viktig")]
@@ -182,8 +203,13 @@ aux <- aux[!is.na(aux$OdiScore) & !is.na(aux$OdiScore_post), ]
 aux$minimal_funksjonsnedsettelse <- 0
 aux$minimal_funksjonsnedsettelse[aux$OdiScore_post <= 23] <- 1
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'minimal_funksjonsnedsettelse')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med minimal funksjonsnedsettelse etter 6 mnd. (ODI score oppfølging $\\leq$ 23)'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'minimal_funksjonsnedsettelse')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel med minimal funksjonsnedsettelse etter 6
+                     mnd. (ODI score oppfølging $\\leq$ 23)'),
+      include.rownames=FALSE)
 
 ######### Indikator #####################################################################
 # datasett_indikator8minimal_funksjonsnedsettelseODI <- aux[, c("UnitId", "SykehusNavn", "Aar", "minimal_funksjonsnedsettelse")]
@@ -222,8 +248,13 @@ aux <- aux[!is.na(aux$NdiScore) & !is.na(aux$NdiScore_post), ]
 aux$minimal_funksjonsnedsettelse <- 0
 aux$minimal_funksjonsnedsettelse[aux$NdiScore_post <= 20] <- 1
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'minimal_funksjonsnedsettelse')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med minimal funksjonsnedsettelse etter 6 mnd. (NDI score oppfølging $\\leq$ 20)'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'minimal_funksjonsnedsettelse')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel med minimal funksjonsnedsettelse etter
+                     6 mnd. (NDI score oppfølging $\\leq$ 20)'),
+      include.rownames=FALSE)
 
 ######### Indikator #####################################################################
 datasett_indikator8minimal_funksjonsnedsettelseNDI <- aux[, c("UnitId", "SykehusNavn", "Aar", "minimal_funksjonsnedsettelse")]
@@ -251,13 +282,22 @@ datasett_indikator8minimal_funksjonsnedsettelseNDI <- aux[, c("UnitId", "Sykehus
 
 <<'Indikator 9: andel med klinisk viktig endring smerte', results='asis', echo=FALSE>>=
 
-aux <- Oppf_data %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesNoActivity) &
-                              !is.na(PainExperiencesNoActivity_post) & PainExperiencesNoActivity != 0)
+aux <- Oppf_data %>%
+  filter(
+    regstatus_pre == 1 &
+      regstatus_post == 1 &
+      !is.na(PainExperiencesNoActivity) &
+      !is.na(PainExperiencesNoActivity_post) &
+      PainExperiencesNoActivity != 0)
 
-aux$pstEndringSmerteHvile <- (aux$PainExperiencesNoActivity - aux$PainExperiencesNoActivity_post)/aux$PainExperiencesNoActivity*100
+# aux$pstEndringSmerteHvile <-
+#   (aux$PainExperiencesNoActivity - aux$PainExperiencesNoActivity_post)/
+#   aux$PainExperiencesNoActivity*100
 
 aux$Indikator <- 0
-aux$Indikator[aux$pstEndringSmerteHvile >= 30 ] <- 1
+# aux$Indikator[aux$pstEndringSmerteHvile >= 30 ] <- 1
+aux$Indikator[(aux$PainExperiencesNoActivity -
+                 aux$PainExperiencesNoActivity_post) >= 2] <- 1
 
 ######### Indikator #####################################################################
 indikator <- aux[, c("UnitId", "Aar", "Indikator", "SykehusNavn")]
@@ -268,8 +308,17 @@ indikator$OrgNrShus <- map_resh_orgnr$orgnr_sh[match(indikator$ReshId, map_resh_
 indikator$ind_id <- "nnrr_bedring_smerte_hvile"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% eller mer reduksjon i smerte i hvile. Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget.'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'Indikator')
+print(xtable::xtable(
+  tabell1,
+  digits=c(0,0,0,0,0,1),
+  caption=paste0(
+    'Andel med 2 poeng eller mer reduksjon i smerte i hvile. Individer med
+    smertescore = 0 ved inklusjon er fjernet fra utvalget. Det er ',
+    sum(aux$PainExperiencesNoActivity[aux$Aar > rap_aar-4] < 2), ' pasienter som
+    har prescore 1 over hele perioden.') ),
+  include.rownames=FALSE)
 
 #########################################################################################
 @
@@ -287,13 +336,21 @@ if (format_ut != "pdf") {
 <<'Indikator 9: andel med klinisk viktig endring smerte forts', results='asis', echo=FALSE>>=
 #### Smerte i aktivitet
 
-aux <- Oppf_data %>% filter(regstatus_pre == 1 & regstatus_post == 1 & !is.na(PainExperiencesActivity) &
-                              !is.na(PainExperiencesActivity_post) & PainExperiencesActivity != 0)
+aux <- Oppf_data %>%
+  filter(regstatus_pre == 1 &
+           regstatus_post == 1 &
+           !is.na(PainExperiencesActivity) &
+           !is.na(PainExperiencesActivity_post) &
+           PainExperiencesActivity != 0)
 
-aux$pstEndringSmerteAktiv <- (aux$PainExperiencesActivity - aux$PainExperiencesActivity_post)/aux$PainExperiencesActivity*100
+# aux$pstEndringSmerteAktiv <-
+#   (aux$PainExperiencesActivity - aux$PainExperiencesActivity_post)/
+#   aux$PainExperiencesActivity*100
 
 aux$Indikator <- 0
-aux$Indikator[aux$pstEndringSmerteAktiv >= 30 ] <- 1
+# aux$Indikator[aux$pstEndringSmerteAktiv >= 30 ] <- 1
+aux$Indikator[(aux$PainExperiencesActivity -
+                 aux$PainExperiencesActivity_post) >= 2 ] <- 1
 
 ######### Indikator #####################################################################
 indikator <- aux[, c("UnitId", "Aar", "Indikator", "SykehusNavn")]
@@ -305,8 +362,17 @@ indikator$ind_id <- "nnrr_bedring_smerte_aktiv"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 #########################################################################################
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Indikator')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel med 30 \\% eller mer reduksjon i smerte i aktivitet.  Individer med smertescore = 0 ved inklusjon er fjernet fra utvalget'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'Indikator')
+print(xtable::xtable(
+  tabell1,
+  digits=c(0,0,0,0,0,1),
+  caption=paste0(
+    'Andel med 2 poeng eller mer reduksjon i smerte i aktivitet Individer med
+    smertescore = 0 ved inklusjon er fjernet fra utvalget. Det er ',
+    sum(aux$PainExperiencesActivity[aux$Aar > rap_aar-4] < 2), ' pasienter som
+    har prescore 1 over hele perioden.')),
+  include.rownames=FALSE)
 @
 
 <<'Fig. Klinisk viktig bedring av smerte aktiv', include=FALSE, echo=FALSE, eval=T>>=
@@ -382,8 +448,19 @@ aux$tilbake_i_arbeid <- 0
 aux$tilbake_i_arbeid[which((aux$WorkingPercent_post - aux$WorkingPercent) >= 0 &
                              aux$WorkingStatus == 1)] <- 1
 
-tabell2 <- nnrrIndikatorTabell(aux, indikator = 'tilbake_i_arbeid')
-print(xtable::xtable(tabell2, digits=c(0,0,0,0,0,1), caption='Andel delvis/fullt tilbake i arbeid. Utvalget består av alle som det finnes oppfølgingsdata på og er registrert som sykemeldt ved inklusjon. Hvis de i tillegg er registrert som i 100 \\% arbeid ved inklusjon fjernes de fra utvalget. For å regnes som tilbake i arbeid skal de ha registrert arbeidsstatus som Inntektsgivende arbeid, samt ha en prosentvis stilling ved oppfølging som er større eller lik den ved inklusjon.'), include.rownames=FALSE)
+tabell2 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'tilbake_i_arbeid')
+print(xtable::xtable(tabell2,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel delvis/fullt tilbake i arbeid. Utvalget
+                     består av alle som det finnes oppfølgingsdata på og er
+                     registrert som sykemeldt ved inklusjon. Hvis de i tillegg
+                     er registrert som i 100 \\% arbeid ved inklusjon fjernes
+                     de fra utvalget. For å regnes som tilbake i arbeid skal
+                     de ha registrert arbeidsstatus som Inntektsgivende arbeid,
+                     samt ha en prosentvis stilling ved oppfølging som er større
+                     eller lik den ved inklusjon.'),
+      include.rownames=FALSE)
 @
 
 
@@ -495,8 +572,12 @@ if (format_ut != "pdf") {
   nnrrFigIndikator(indikator, 'Pasientopplevd bedring av behandling', outfile=outfile, maal = 40, minstekrav = 30)
 }
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'NytteAvBehandling')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Pasientrapportert nytte av behandling'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'NytteAvBehandling')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Pasientrapportert nytte av behandling'),
+      include.rownames=FALSE)
 
 @
 
@@ -523,8 +604,12 @@ indikator$ind_id <- "nnrr_misfornoeyd"
 Indikatorer <- bind_rows(Indikatorer, indikator)
 
 
-tabell1 <- nnrrIndikatorTabell(aux, indikator = 'Fornoyd')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med eller nøytral til behandlingen'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(aux |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'Fornoyd')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel fornøyd med eller nøytral til behandlingen'),
+      include.rownames=FALSE)
 
 #########################################################################################
 @
@@ -533,10 +618,10 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel fornøyd med
 <<'Fig. Fornoyd med behandling', include=FALSE, echo=FALSE, eval=T>>=
 outfile <- "fornoyd_med_behandling.pdf"
 outfile <- paste0(figfolder, outfile)
-nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 95, maalretn = 'hoy')
+nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=80, maal = 90, maalretn = 'hoy')
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
-  nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=85, maal = 95, maalretn = 'hoy')
+  nnrrFigIndikator(indikator, 'Andel fornøyd med eller nøytral til behandling', outfile=outfile, minstekrav=80, maal = 90, maalretn = 'hoy')
 }
 
 @
@@ -551,8 +636,12 @@ if (format_ut != "pdf") {
 
 <<'Indikator 13: Andel oppfølginger utfylt', results='asis', echo=FALSE>>=
 
-tabell1 <- nnrrIndikatorTabell(Oppf_data, indikator = 'regstatus_post')
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel oppfølgingsskjema utfylt'), include.rownames=FALSE)
+tabell1 <- nnrrIndikatorTabell(Oppf_data |> dplyr::filter(Aar > rap_aar-4),
+                               indikator = 'regstatus_post')
+print(xtable::xtable(tabell1,
+                     digits=c(0,0,0,0,0,1),
+                     caption='Andel oppfølgingsskjema utfylt'),
+      include.rownames=FALSE)
 
 @
 
@@ -581,7 +670,9 @@ tabell1 <- aux %>%
   arrange(-`Andel (%)`) %>% mutate(År = NA)
 
 tabell1$År[1] <- rap_aar
-print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel som mottar mestringsorientert samtale'), include.rownames=FALSE)
+print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1),
+                     caption='Andel som mottar mestringsorientert samtale'),
+      include.rownames=FALSE)
 
 #########################################################################################
 @
@@ -590,8 +681,8 @@ print(xtable::xtable(tabell1, digits=c(0,0,0,0,0,1), caption='Andel som mottar m
 outfile <- "mestringsorientert_samtale.pdf"
 outfile <- paste0(figfolder, outfile)
 nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'),
-                   minstekrav = 85, maal = 95,
-                   outfile=outfile)
+                 minstekrav = 85, maal = 95,
+                 outfile=outfile)
 if (format_ut != "pdf") {
   outfile <- paste0(substr(outfile, 1, nchar(outfile)-4), format_ut)
   nnrrFigIndikator(indikator, c('Andel som mottar', 'mestringsorientert samtale'),
@@ -608,131 +699,114 @@ if (format_ut != "pdf") {
 
 
 
-<<'DG-tall NNRR', results='asis', echo=FALSE, message=FALSE>>=
+<<'DG-tall NNRR', results='asis', echo=FALSE, message=FALSE, include=FALSE>>=
 
-dg_ny <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2023.csv",
-                          locale = readr::locale(encoding = "Latin1"))
+# dg_gml <- read.csv2("~/regdata/nnrr/dg_2023nnrr.csv") |>
+#   dplyr::filter(ind_id == "nnrr_dg")
+#
+# dg_2024 <- tribble(
+#   ~Sykehus, ~var, ~denominator, ~orgnr,
+#   "Haukeland universitetssykehus", 741, 802, 974557746,
+#   "Oslo Universitetssykehus", 1397, 1800, 974589095,
+#   "Stavanger", 506, 632, 974703300,
+#   "St. Olavs Hospital", 952, 1248, 974749025,
+#   "Sørlandet sykehus", 767, 1026, 974733013,
+#   "Sykehuset i Vestfold Rehabilitering Stavern", 966, 1395, 974575396,
+#   "Vestre Viken Drammen", 264, 378, 974631326,
+#   "UNN Tromsø", 440, 529, 974795787,
+#   "Møre og Romsdal, Ålesund", 105, 119, 974747138,
+#   "Helgelandssykehuset, Sandnessjøen", 58, 62, 974795477,
+#   "UNN Harstad", 27, 43, 974795639,
+#   "Nordlandssykehuset", 87, 110, 993562718,
+#   "Sykehuset Innlandet", 102, 131, 874631752,
+#   "Levanger", 61, 100, 974754118,
+#   "Helse Fonna", 12, 15, 996328112
+# ) |>
+#   dplyr::mutate(year = 2024,
+#                 context = "caregiver",
+#                 ind_id = "nnrr_dg") |>
+#   dplyr::select(-Sykehus)
+#
+# dg_samlet <- dplyr::bind_rows(dg_gml, dg_2024)
 
-
-map_dg2 <- data.frame(enhet=c("Helgelandssykehuset, SandnessjÃ¸en",
-                              "St. Olavs Hospital",
-                              "UNN Harstad",
-                              "UNN TromsÃ¸",
-                              "Stavanger",
-                              "Oslo Universitetssykehus",
-                              "MÃ¸re og Romsdal, Ã\u0085lesund",
-                              "SÃ¸rlandet sykehus",
-                              "Helse Bergen, Haukeland universitetssykehus",
-                              "Vestre Viken Drammen", "Levanger",
-                              "Sykehuset i Vestfold Rehabilitering Stavern",
-                              "Nordlandssykehuset"),
-                      avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
-                                  4212982, 114174, 102959, 103736, 105821, 700138,
-                                  700701))
-
-dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
-dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
-dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
-dg_ny$year <- 2023
-dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
-dg_ny$ind_id <- "nnrr_dg"
-dg_ny$context <- "caregiver"
-
-dg_gml <- readr::read_csv2("~/mydata/nnrr/nnrr_dg_shusviser_2022.csv",
-                          locale = readr::locale(encoding = "Latin1"))
-
-Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
-names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
-Indikatorer$context <- "caregiver"
-Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
-
-Indikatorer <- dplyr::bind_rows(Indikatorer, dg_ny) %>%
-  dplyr::bind_rows(dg_gml)
-
-write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
-           row.names = F, fileEncoding = "UTF-8")
+Indikatorer <- Indikatorer |>
+  dplyr::rename(
+    orgnr = OrgNrShus,
+    year = Aar,
+    var = Teller,
+    denominator = Nevner
+  ) |>
+  dplyr::mutate(context = "caregiver") |>
+  dplyr::select(context, orgnr, year, var, denominator, ind_id) #|>
+# dplyr::bind_rows(dg_samlet)
 
 
+write.csv2(
+  Indikatorer,
+  paste0("C:/regdata/nnrr/behandlingskvalitet/beh_kval_", Sys.Date(), ".csv"),
+  row.names = F)
 
+dg <- openxlsx::read.xlsx(
+  "C:/regdata/nnrr/behandlingskvalitet/Dekningsgrad Halvårstall 2025.xlsx") |>
+  dplyr::mutate(
+    RESH = stringr::str_trim(RESH) |> as.numeric(),
+    orgnr = map_resh_orgnr$orgnr_sh[match(RESH, map_resh_orgnr$resh)],
+    year = 2025,
+    ind_id = "nnrr_dg",
+    context = "caregiver") |>
+  dplyr::filter(!is.na(RESH)) |>
+  dplyr::rename(var = Registreringer,
+                denominator = Innrapportert.aktuelle) |>
+  dplyr::select(context, orgnr, year, var, denominator, ind_id)
 
+write.csv2(
+  dg,
+  paste0("C:/regdata/nnrr/behandlingskvalitet/dg_", Sys.Date(), ".csv"),
+  row.names = F)
 
-
-# nokkeltall_pr_forlop <-  RegData %>% group_by(Aar) %>%
-#   summarise("Antall forlop" = n(),
-#             "Andel kvinner" = sum(ErMann==0)/n(),
-#             Gjennomsnittsalder = mean(PatientAge),
-#             "Andel i arbeid ved utredning" = sum(Working)/n(),
-#             "Andel smertevarighet 3 mnd eller mer" = sum(as.numeric(PainDurationNow) %in% 3:5)/sum(as.numeric(PainDurationNow) %in% 1:5))
+#
+# dg_ny <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2023.csv",
+#                           locale = readr::locale(encoding = "Latin1"))
 #
 #
-# regdata_unik_pr_aar <- RegData %>% group_by(Aar, PasientGUID) %>%
-#   summarise(PatientAge = first(PatientAge, order_by = S1b_DateOfCompletion),
-#             ErMann = first(ErMann, order_by = S1b_DateOfCompletion),
-#             Working = first(Working, order_by = S1b_DateOfCompletion),
-#             PainDurationNow = first(PainDurationNow, order_by = S1b_DateOfCompletion))
+# map_dg2 <- data.frame(enhet=c("Helgelandssykehuset, SandnessjÃ¸en",
+#                               "St. Olavs Hospital",
+#                               "UNN Harstad",
+#                               "UNN TromsÃ¸",
+#                               "Stavanger",
+#                               "Oslo Universitetssykehus",
+#                               "MÃ¸re og Romsdal, Ã\u0085lesund",
+#                               "SÃ¸rlandet sykehus",
+#                               "Helse Bergen, Haukeland universitetssykehus",
+#                               "Vestre Viken Drammen", "Levanger",
+#                               "Sykehuset i Vestfold Rehabilitering Stavern",
+#                               "Nordlandssykehuset"),
+#                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
+#                                   4212982, 114174, 102959, 103736, 105821, 700138,
+#                                   700701))
 #
+# dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
+# dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
+# dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
+# dg_ny$year <- 2023
+# dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
+# dg_ny$ind_id <- "nnrr_dg"
+# dg_ny$context <- "caregiver"
 #
-# nokkeltall_pr_pas <-  regdata_unik_pr_aar %>% group_by(Aar) %>%
-#   summarise("Antall pasienter" = n(),
-#             "Andel kvinner" = sum(ErMann==0)/n(),
-#             Gjennomsnittsalder = mean(PatientAge),
-#             "Andel i arbeid ved utredning" = sum(Working)/n(),
-#             "Andel smertevarighet 3 mnd eller mer" = sum(as.numeric(PainDurationNow) %in% 3:5)/sum(as.numeric(PainDurationNow) %in% 1:5))
+# dg_gml <- readr::read_csv2("~/mydata/nnrr/nnrr_dg_shusviser_2022.csv",
+#                            locale = readr::locale(encoding = "Latin1"))
 #
 # Indikatorer <- Indikatorer[, c(6,2,3,5,7)]
 # names(Indikatorer) <- c("orgnr",	"year",	"var",	"denominator",	"ind_id")
 # Indikatorer$context <- "caregiver"
 # Indikatorer <- Indikatorer[Indikatorer$year >= 2018, ]
-# # Indikatorer <- Indikatorer[!(Indikatorer$ind_id == "nnrr_jobb" & Indikatorer$year > 2020 ), ] # Fjerner arbeidsind for nyere registrernger
-# # Ny variant kommer
-# # write.csv2(Indikatorer, paste0('C:/GIT/data/nnrr/nnrr_ind_', Sys.Date(), '.csv'), row.names = F, fileEncoding = "UTF-8")
 #
-# dg <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_raa.csv",
-#                        locale = readr::locale(encoding = "Latin1"),
-#                        show_col_types = FALSE)
-# # dg <- read.csv2("C:/GIT/data/nnrr/dg_nnrr_raa.csv")
-# dg$orgnr <- map_resh_orgnr$orgnr_sh[match(dg$reshid, map_resh_orgnr$resh)]
+# Indikatorer <- dplyr::bind_rows(Indikatorer, dg_ny) %>%
+#   dplyr::bind_rows(dg_gml)
 #
+# # write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
+# #            row.names = F, fileEncoding = "UTF-8")
 #
-# map_dg2 <- data.frame(enhet=c("Sandnessjøen", "St Olavs", "Harstad", "Tromsø",
-#                               "Stavanger", "Oslo", "Møre og Romsdal", "Kristiansand",
-#                               "Haukeland", "Drammen", "Levanger", "Stavern"),
-#                       avdresh = c(102169, 104293, 700735, 601032, 4211588, 109834,
-#                                   4212982, 114174, 102959, 103736, 105821, 700138))
-#
-# dg_ny <- readr::read_csv2("~/mydata/nnrr/Dekningsgrad 2021 NNRR.csv",
-#                           locale = readr::locale(encoding = "Latin1"))
-# dg_ny$reshid <- map_dg2$avdresh[match(dg_ny$Enhet, map_dg2$enhet)]
-# dg_ny$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_ny$reshid, map_resh_orgnr$resh)]
-# dg_ny <- dg_ny[!is.na(dg_ny$orgnr), ]
-# dg_ny$year <- 2021
-# names(dg_ny)[2:3] <- c("denominator", "var")
-# dg_ny <- dg_ny[,c("orgnr", "year", "var", "denominator")]
-#
-# dg_2022 <- readr::read_csv2("~/mydata/nnrr/dg_nnrr_2022.csv",
-#                           locale = readr::locale(encoding = "Latin1"))
-# dg_2022$reshid <- map_dg2$avdresh[match(dg_2022$Enhet, map_dg2$enhet)]
-# dg_2022$orgnr <- map_resh_orgnr$orgnr_sh[match(dg_2022$reshid, map_resh_orgnr$resh)]
-# dg_2022 <- dg_2022[!is.na(dg_2022$orgnr), ]
-# dg_2022$year <- 2022
-# names(dg_2022)[c(2,5)] <- c("denominator", "var")
-# dg_2022 <- dg_2022[,c("orgnr", "year", "var", "denominator")]
-#
-# dg_ny <- dplyr::bind_rows(dg_ny, dg_2022)
-#
-# # dg$shus2 <- qmongrdata::SykehusNavnStruktur$SykehusNavn[match(dg$orgnr, qmongrdata::SykehusNavnStruktur$OrgNrShus)]
-# #
-# dg <- dg[,c("orgnr", "aar", "teller", "nevner")]
-# names(dg) <- c("orgnr", "year", "var", "denominator")
-#
-# dg <- dplyr::bind_rows(dg, dg_ny)
-# dg$ind_id <- "nnrr_dg"
-# dg$context <- "caregiver"
-#
-# Indikatorer <- dplyr::bind_rows(Indikatorer, dg)
-#
-# write.csv2(Indikatorer, paste0('~/mydata/nnrr/indikatorer_nnrr_', Sys.Date(), '.csv'),
-#            row.names = F, fileEncoding = "UTF-8")
 @
 
 

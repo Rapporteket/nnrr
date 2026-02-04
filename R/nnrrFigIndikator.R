@@ -27,9 +27,9 @@ nnrrFigIndikator <- function(indikatordata,
                              maalretn='hoy')
 {
 
-  # tittel='testtittel'; terskel=30; minstekrav = 85; maal = 95; skriftStr=1.3; pktStr=1.4;
+  # tittel='testtittel'; terskel=30; minstekrav = NA; maal = NA; skriftStr=1.3; pktStr=1.4;
   # legPlass='top'; minstekravTxt='Min.'; maalTxt='Mål'; graaUt=NA; decreasing=F; outfile = '';
-  # lavDG=NA; width=800; height=700; inkl_konf=F; maalretn='hoy'
+  # lavDG=NA; width=800; height=700; inkl_konf=F; maalretn='hoy'; indikatordata=indikator;
 
   indikatordata <- indikatordata[indikatordata$Aar > max(indikatordata$Aar)-3, ] # behold bare siste 3 år
 
@@ -65,7 +65,8 @@ nnrrFigIndikator <- function(indikatordata,
 
   # Skjul også tidligere år hvis siste år er sensurert pga. for få reg.
   # andeler[as.vector(N[, dim(andeler)[2]]<terskel), 2:3] <- NA
-  andeler[as.vector(N[, dim(andeler)[2]]<terskel), 2:(dim(andeler)[2]-1)] <- NA
+  andeler[as.vector(N[, dim(andeler)[2]]<terskel),
+          2:max(2, dim(andeler)[2]-1)] <- NA
 
 
   # Beregn konfidensintervaller

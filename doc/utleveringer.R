@@ -1,5 +1,614 @@
 rm(list=ls())
 library(nnrr)
+library(dplyr)
+library(ggplot2)
+
+### Bestilling poster Maja 22.01.2026 #########
+figfolder <- "C:/Users/kth200/regdata/nnrr/utleveringer/"
+
+RegData <- nnrr::nnrrHentRegData()
+
+Tab_6mnd <- RegData |>
+  filter(aar_oppfolg %in% 2023:2025,
+         is.na(NdiScore),
+         !is.na(RegData$OdiScore),
+         !is.na(RegData$OdiScore_post)) |>
+  mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg
+  ) |>
+  mutate(oppf = "6mnd")
+Tab_12mnd <- RegData |>
+  filter(aar_oppfolg2 %in% 2023:2025,
+         is.na(NdiScore),
+         !is.na(RegData$OdiScore),
+         !is.na(RegData$OdiScore_post2)) |>
+  mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post2 >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg2
+  ) |>
+  rename(aar_oppfolg = aar_oppfolg2) |>
+  mutate(oppf = "12mnd")
+
+Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
+  mutate(andel = bedring/N*100,
+         Aar = as.character(aar_oppfolg)) |>
+  arrange(Aar) |>
+  relocate(Aar, oppf) |>
+  select(-aar_oppfolg)
+write.csv2(Tabell1, paste0(figfolder, "klin_viktig_odi_mangler_ndi.csv"),
+           row.names = F, fileEncoding = "Latin1")
+Tabell <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
+N <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = N)
+
+outfile <- paste0(figfolder, "klin_viktig_odi_mangler_ndi.svg")
+FigTypUt <- rapFigurer::figtype(outfile=outfile,
+                                pointsizePDF=11, fargepalett='BlaaOff')
+farger <- FigTypUt$farger
+
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3],
+                border = F, ylim = c(0, 45), #ylim = c(0,1.25*max(Tabell[,-1])),
+                main = "Klinisk viktig endring i ODI",
+                ylab = "Andel %")
+pktStr <- 1.5
+points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
+points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
+legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       legend=names(Tabell[-1]), ncol = 3)
+
+mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
+mtext(c("Etter 6 mnd", "Etter 12 mnd"), side = 1, line = 1, at = xpos)
+if (outfile != "") {dev.off()}
+
+Tab_6mnd <- RegData |>
+  filter(aar_oppfolg %in% 2023:2025,
+         !is.na(NdiScore),
+         !is.na(RegData$OdiScore),
+         !is.na(RegData$OdiScore_post)) |>
+mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg
+  ) |>
+  mutate(oppf = "6mnd")
+Tab_12mnd <- RegData |>
+  filter(aar_oppfolg2 %in% 2023:2025,
+         !is.na(NdiScore),
+         !is.na(RegData$OdiScore),
+         !is.na(RegData$OdiScore_post2)) |>
+  mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post2 >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg2
+  ) |>
+  rename(aar_oppfolg = aar_oppfolg2) |>
+  mutate(oppf = "12mnd")
+
+Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
+  mutate(andel = bedring/N*100,
+         Aar = as.character(aar_oppfolg)) |>
+  arrange(Aar) |>
+  relocate(Aar, oppf) |>
+  select(-aar_oppfolg)
+write.csv2(Tabell1, paste0(figfolder, "klin_viktig_odi_har_ndi.csv"),
+           row.names = F, fileEncoding = "Latin1")
+Tabell <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
+N <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = N)
+
+outfile <- paste0(figfolder, "klin_viktig_odi_har_ndi.svg")
+FigTypUt <- rapFigurer::figtype(outfile=outfile,
+                                pointsizePDF=11, fargepalett='BlaaOff')
+farger <- FigTypUt$farger
+
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3],
+                border = F, ylim = c(0, 45), #ylim = c(0,1.25*max(Tabell[,-1])),
+                main = "Klinisk viktig endring i ODI",
+                ylab = "Andel %")
+pktStr <- 1.5
+points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
+points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
+legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       legend=names(Tabell[-1]), ncol = 3)
+
+mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
+mtext(c("Etter 6 mnd", "Etter 12 mnd"), side = 1, line = 1, at = xpos)
+if (outfile != "") {dev.off()}
+
+
+Tab_6mnd <- RegData |>
+  filter(aar_oppfolg %in% 2023:2025,
+         !is.na(NdiScore),
+         !is.na(RegData$NdiScore_post)) |>
+mutate(klinisk_forbedring = ifelse(NdiScore-NdiScore_post >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg
+  ) |>
+  mutate(oppf = "6mnd")
+Tab_12mnd <- RegData |>
+  filter(aar_oppfolg2 %in% 2023:2025,
+         !is.na(NdiScore),
+         !is.na(RegData$NdiScore_post2)) |>
+  mutate(klinisk_forbedring = ifelse(NdiScore-NdiScore_post2 >= 10, 1, 0)) |>
+  summarise(
+    bedring = sum(klinisk_forbedring),
+    N = n(),
+    .by = aar_oppfolg2
+  ) |>
+  rename(aar_oppfolg = aar_oppfolg2) |>
+  mutate(oppf = "12mnd")
+
+Tabell1 <- bind_rows(Tab_6mnd, Tab_12mnd) |>
+  mutate(andel = bedring/N*100,
+         Aar = as.character(aar_oppfolg)) |>
+  arrange(Aar) |>
+  relocate(Aar, oppf) |>
+  select(-aar_oppfolg)
+write.csv2(Tabell1, paste0(figfolder, "klin_viktig_ndi.csv"),
+           row.names = F, fileEncoding = "Latin1")
+Tabell <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = andel)
+N <- Tabell1 |>
+  tidyr::pivot_wider(id_cols = oppf, names_from = Aar, values_from = N)
+
+outfile <- paste0(figfolder, "klin_viktig_ndi.svg")
+FigTypUt <- rapFigurer::figtype(outfile=outfile,
+                                pointsizePDF=11, fargepalett='BlaaOff')
+farger <- FigTypUt$farger
+
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[2],
+                border = F, ylim = c(0, 45), #ylim = c(0,1.25*max(Tabell[,-1])),
+                main = "Klinisk viktig endring i NDI",
+                ylab = "Andel %")
+pktStr <- 1.5
+points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
+points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
+legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       legend=names(Tabell[-1]), ncol = 3)
+
+mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
+mtext(c("Etter 6 mnd", "Etter 12 mnd"), side = 1, line = 1, at = xpos)
+if (outfile != "") {dev.off()}
+
+
+
+
+# prop.test(x = Tabell1[1:2, 3], n = Tabell1[1:2, 4],
+#           alternative = "greater")
+
+
+
+# Tabell1 <- RegData |>
+#   filter(is.na(NdiScore),
+#          !is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post)&
+#            !is.na(RegData$OdiScore_post2)) |>
+#   mutate(
+#     klinisk_forbedring1 = ifelse(OdiScore-OdiScore_post >= 10, 1, 0),
+#     klinisk_forbedring2 = ifelse(OdiScore-OdiScore_post2 >= 10, 1, 0)) |>
+#   summarise(
+#     bedring1 = sum(klinisk_forbedring1),
+#     bedring2 = sum(klinisk_forbedring2),
+#     N = n(),
+#     .by = Aar
+#   )
+#
+# Tabell2 <- RegData |>
+#   filter(
+#     !is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post),
+#     !is.na(RegData$NdiScore) & !is.na(RegData$NdiScore_post2)) |>
+#   mutate(
+#     klinisk_forbedring1 = ifelse(NdiScore-NdiScore_post >= 10, 1, 0),
+#     klinisk_forbedring2 = ifelse(NdiScore-NdiScore_post2 >= 10, 1, 0)) |>
+#   summarise(
+#     bedring1 = sum(klinisk_forbedring1),
+#     bedring2 = sum(klinisk_forbedring2),
+#     N = n(),
+#     .by = Aar
+#   )
+
+
+
+
+
+
+
+
+
+aar <- sort(unique(tab_oppf$aar))
+ggplot(tab_oppf,
+       aes(x = andel, y = oppf, shape = aar, color = aar)) +
+geom_bar(data = tab_oppf,
+         aes(x = andel, y = oppf),
+         stat = "identity", fill = "steelblue", alpha = 1, width = 4 / 5) +
+  geom_point(size = 3) +
+  scale_shape_manual(values = setNames(
+    c(rev(c(19, 1, 17, 6, 15, 0)[1:(length(aar)-1)]), NA), aar)) +
+  scale_color_manual(values = setNames(
+    c(rep("black", length(aar)-1), "steelblue"), aar)) +
+  scale_x_continuous(limits = c(0, 1.1*max(tab_oppf$andel, na.rm = T)),
+                     expand = c(0, 0)) +
+  labs(title = "tittel", x = "Andel (%)", y = element_blank()) +
+  theme(
+    legend.position = "top",
+    legend.title = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.background = element_rect(fill = "white"),
+    plot.title = element_text(vjust = 5, hjust = 0.5),
+    plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
+  )
+
+
+
+### Tall til Ingrid 13.10.2025 #########
+# tittel <- c("Andel tverrfaglig behandlet blant", "pasienter som mottar tolk")
+RegData <- RegData[RegData$NationalInterpreter %in% 1, ]
+RegData <- RegData[RegData$regstatus==1, ]
+RegData$Variabel <- 0
+RegData$Variabel[RegData$Treatment_GroupInterdisciplinary2018 != 0 |
+                   RegData$Treatment_GroupInterdisciplinary != 0] <- 1
+RegData$Variabel[RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
+grtxt <- c("Nei", "Ja")
+RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+
+Tabell <- RegData |>
+  dplyr::summarise(
+    Antall_tverrfaglig = sum(Variabel),
+    N = dplyr::n(),
+    .by = c(SykehusNavn, Aar))
+
+write.csv2(Tabell, "tverrfaglig_tolk.csv", row.names = F, fileEncoding = "Latin1")
+
+
+######### Utlevering Erlend Hoftun Farbu 30.06.2025  ###########################
+
+legeskjema <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-06-30_1315.csv")) |>
+  dplyr::rename(PasientFnr = "_PasientFnr")
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-06-30_1137.csv"))
+
+flere_hovedskjemaGuid <- pasientsvar_pre |>
+  dplyr::count(HovedskjemaGUID) |>
+  dplyr::filter(n > 1) |> dplyr::select(HovedskjemaGUID) |> unlist()
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <- pasientsvar_pre |>
+    dplyr::filter(!(HovedskjemaGUID %in% flere_hovedskjemaGuid))
+}
+
+variabler <- readxl::read_xlsx(
+  "~/regdata/nnrr/utleveringer/Bestillingsskjema for datauttrekk NNRR_juni2025.xlsx",
+  sheet = 1, range = "A32:B109")
+
+legeskjema <- legeskjema |>
+  dplyr::filter(S1b_DateOfCompletion >= "2021-01-01",
+                S1b_DateOfCompletion < "2024-01-01") |>
+  dplyr::select(c("SkjemaGUID", "PasientFnr", "PasientGUID",
+                  "S1b_DateOfCompletion", "UnitTitleWithPath", "UnitId",
+                  "TreatmentEvaluationByDoctor",
+                  "TreatmentEvaluationByPhysiotherapist",
+                  "TreatmentEvaluationByNurse",
+                  "TreatmentEvaluationByPsychologist",
+                  "TreatmentEvaluationBySocionom",
+                  "TreatmentEvaluationOther",
+                  intersect(names(legeskjema), variabler$Behandler)))
+pasientsvar_pre <- pasientsvar_pre |>
+  dplyr::select(c(intersect(names(pasientsvar_pre), variabler$Baseline),
+                  "HovedskjemaGUID"))
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre')) |>
+  dplyr::select(-SkjemaGUID)
+
+write.csv2(RegData, "~/regdata/nnrr/utleveringer/farbu_juni2025.csv",
+           row.names = F, fileEncoding = "Latin1")
+
+
+######### Utlevering Thomas Kadar juni 2025  ###################################
+
+legeskjema <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-04-23_1444.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-04-23_1458.csv"))
+pasientsvar_post <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-04-23_1503.csv"))
+pasientsvar_post2 <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-04-23_1507.csv"))
+
+flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <- names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post <- pasientsvar_post[!(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <- names(table(pasientsvar_post2$HovedskjemaGUID))[table(pasientsvar_post2$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post2 <- pasientsvar_post2[!(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+variabler <- readxl::read_xlsx(
+  "~/regdata/nnrr/utleveringer/Bestillingsskjema for datauttrekk NNRR_mai2025.xlsx",
+  sheet = 1, range = "A33:D117")
+
+legeskjema <- legeskjema |>
+  dplyr::filter(S1b_DateOfCompletion >= "2021-01-01") |>
+  dplyr::select(c(intersect(names(legeskjema), variabler$behandler), "SkjemaGUID"))
+pasientsvar_pre <- pasientsvar_pre |>
+  dplyr::select(c(intersect(names(pasientsvar_pre), variabler$baseline), "HovedskjemaGUID"))
+pasientsvar_post <- pasientsvar_post |>
+  dplyr::select(c(intersect(names(pasientsvar_post), variabler$oppf6mnd), "HovedskjemaGUID"))
+pasientsvar_post2 <- pasientsvar_post2 |>
+  dplyr::select(c(intersect(names(pasientsvar_post2), variabler$oppf12mnd), "HovedskjemaGUID"))
+
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre')) |>
+  merge(pasientsvar_post, by.x = 'SkjemaGUID',
+        by.y = 'HovedskjemaGUID', suffixes = c('', '_post'),
+        all.x = TRUE) |>
+  merge(pasientsvar_post2, by.x = 'SkjemaGUID',
+        by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'),
+        all.x = TRUE) |>
+  dplyr::select(-SkjemaGUID)
+
+write.csv2(RegData, "~/regdata/nnrr/utleveringer/kadar_juni2025.csv",
+           row.names = F, fileEncoding = "Latin1")
+
+######### Utlevering ukjent mars 2025  #######################################
+legeskjema <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0912.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0918.csv"))
+pasientsvar_post <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0924.csv"))
+pasientsvar_post2 <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0928.csv"))
+
+legeskjema <- legeskjema |>
+  dplyr::filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2021-01-01",
+                as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") <= "2025-02-04",
+                FormStatus == 2,
+                SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)
+pasientsvar_pre <- pasientsvar_pre |>
+  dplyr::filter(FormStatus == 2,
+                HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post <- pasientsvar_post |>
+  dplyr::filter(FormStatus == 2,
+                HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post2 <- pasientsvar_post2 |>
+  dplyr::filter(FormStatus == 2,
+                HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+
+write.csv2(
+  legeskjema,
+  "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/legeskjema.csv",
+  fileEncoding = "Latin1", na = "", row.names = FALSE)
+write.csv2(
+  pasientsvar_pre,
+  "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/pasientsvar_pre.csv",
+  fileEncoding = "Latin1", na = "", row.names = FALSE)
+write.csv2(
+  pasientsvar_post,
+  "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/pasientsvar_post.csv",
+  fileEncoding = "Latin1", na = "", row.names = FALSE)
+write.csv2(
+  pasientsvar_post2,
+  "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/pasientsvar_post2.csv",
+  fileEncoding = "Latin1", na = "", row.names = FALSE)
+
+
+
+######### Utlevering Emberland mars 2025  #######################################
+
+varliste <- read.csv2("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/nnrr_var_utlevering21jan2025.csv")
+
+legeskjema <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1611_v2.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1620_v2.csv"))
+pasientsvar_post <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1627.csv"))
+pasientsvar_post2 <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-02-27_1629.csv"))
+
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <-
+    pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post <-
+    pasientsvar_post[!(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_post2$HovedskjemaGUID))[table(pasientsvar_post2$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post2 <-
+    pasientsvar_post2[!(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+legeskjema <- legeskjema |>
+  dplyr::filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2021-01-01",
+                as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") <= "2025-01-22") |>
+  dplyr::filter(SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)
+
+pasientsvar_pre <- pasientsvar_pre |>
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post <- pasientsvar_post |>
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post2 <- pasientsvar_post2 |>
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+
+Utflatet <- merge(pasientsvar_pre,
+                  legeskjema |> dplyr::select(-PasientGUID),
+                  by.x = "HovedskjemaGUID", by.y = "SkjemaGUID",
+                  suffixes = c("_baseline", "")) |>
+  merge(pasientsvar_post |> dplyr::select(-PasientGUID),
+        by = "HovedskjemaGUID",
+        suffixes = c("", "_6mnd"), all.x = TRUE) |>
+  merge(pasientsvar_post2 |> dplyr::select(-PasientGUID),
+        by = "HovedskjemaGUID",
+        suffixes = c("", "_12mnd"), all.x = TRUE)
+
+# readr::write_csv2(
+#   Utflatet,
+#   "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/Utflatet_2025_03_03.csv"
+#   )
+
+write.csv2(Utflatet,
+           "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/utleveringer/Utflatet_2025_03_03.csv",
+           fileEncoding = "Latin1", na = "", row.names = FALSE
+)
+
+
+######### Utlevering Emberland nov 2024  #######################################
+
+legeskjema <-
+  readr::read_csv2(
+    paste0("~/mydata/nnrr/data_beh_2024-11-07_1551.csv"))
+pasientsvar_pre <-
+  readr::read_csv2(
+    paste0("~/mydata/nnrr/data_pre_2024-11-07_1554.csv"))
+pasientsvar_post <-
+  readr::read_csv2(
+    paste0("~/mydata/nnrr/data_6mnd_2024-11-07_1559.csv"))
+pasientsvar_post2 <-
+  readr::read_csv2(
+    paste0("~/mydata/nnrr/data_12mnd_2024-11-07_1602.csv"))
+
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <-
+    pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post <-
+    pasientsvar_post[!(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_post2$HovedskjemaGUID))[table(pasientsvar_post2$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_post2 <-
+    pasientsvar_post2[!(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+variabler <- read.csv("~/mydata/nnrr/emberland.csv")
+
+pasientsvar_pre <-
+  pasientsvar_pre[, intersect(variabler$Baseline[variabler$Baseline!=""],
+                              names(pasientsvar_pre))]
+legeskjema <-
+  legeskjema[, intersect(variabler$Behandler[variabler$Behandler!=""],
+                         names(legeskjema))]
+pasientsvar_post <-
+  pasientsvar_post[, intersect(variabler$pas6mnd[variabler$pas6mnd!=""],
+                               names(pasientsvar_post))]
+pasientsvar_post2 <-
+  pasientsvar_post2[, intersect(variabler$pas12mnd[variabler$pas12mnd!=""],
+                                names(pasientsvar_post2))]
+
+legeskjema <- legeskjema %>%
+  dplyr::filter(as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") >= "2022-01-01",
+                as.Date(S1b_DateOfCompletion, format="%d.%m.%Y") <= "2022-12-31") %>%
+  dplyr::filter(SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID)
+
+pasientsvar_pre <- pasientsvar_pre %>%
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post <- pasientsvar_post %>%
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+pasientsvar_post2 <- pasientsvar_post2 %>%
+  dplyr::filter(HovedskjemaGUID %in% legeskjema$SkjemaGUID)
+
+Utflatet <- merge(pasientsvar_pre,
+                  legeskjema %>% dplyr::select(-PasientGUID),
+                  by.x = "HovedskjemaGUID", by.y = "SkjemaGUID") %>%
+  merge(pasientsvar_post %>% dplyr::select(-PasientGUID),
+        by = "HovedskjemaGUID",
+        suffixes = c("", "_6mnd"), all.x = TRUE) %>%
+  merge(pasientsvar_post2 %>% dplyr::select(-PasientGUID),
+        by = "HovedskjemaGUID",
+        suffixes = c("", "_12mnd"), all.x = TRUE)
+
+readr::write_csv2(legeskjema, "~/mydata/nnrr/legeskjema_2024_11_08.csv")
+readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/pasientsvar_pre_2024_11_08.csv")
+readr::write_csv2(pasientsvar_post, "~/mydata/nnrr/pasientsvar_6mnd_2024_11_08.csv")
+readr::write_csv2(pasientsvar_post2, "~/mydata/nnrr/pasientsvar_12mnd_2024_11_08.csv")
+readr::write_csv2(Utflatet, "~/mydata/nnrr/Utflatet_2024_11_08.csv")
+
+# pre:
+# "IsPainMedicineNoPrescription" "IsPainMedicinePrescription"
+# "DateOfCompletion"
+# post, begge:
+# "ProfessionalCapability"       "IsPainMedicineNoPrescription"
+# "IsPainMedicinePrescription"
+
+
+
+######### Utlevering John Bjørneboe okt 2024  ##################################
+pasientsvar_pre <-
+  readr::read_csv2(
+    '~/mydata/nnrr/data_pre_2024-09-13_0921.csv')
+legeskjema <-
+  readr::read_csv2(
+    '~/mydata/nnrr/data_beh_2024-09-13_0903.csv')
+
+flere_hovedskjemaGuid <-
+  names(table(pasientsvar_pre$HovedskjemaGUID))[
+    table(pasientsvar_pre$HovedskjemaGUID)>1]
+if (!is.null(flere_hovedskjemaGuid)){
+  pasientsvar_pre <- pasientsvar_pre[
+    !(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+}
+
+RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+                 by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'))
+
+RegData$FormDate <- as.Date(RegData$FormDate, format="%d.%m.%Y")
+
+RegData <- RegData[which(RegData$FormDate >= "2022-01-01" & RegData$FormDate <= "2024-08-01"), ]
+
+write.csv2(RegData, "~/mydata/nnrr/nnrrdata2024_10_30.csv", row.names = F,
+           fileEncoding = "Latin1", na = "")
+
+
 
 ########### Utlevering Marte Glad 12.09.2024   ################################
 library(dplyr)
@@ -15,7 +624,7 @@ pasientsvar_pre <- read.csv2('~/mydata/nnrr/data_pre_2024-09-13_0921.csv') %>%
   select(var_pre$Variabelnavn) %>%
   select(-PasientGUID, -Skjematype, -S1b_DateOfCompletion)
 legeskjema <- read.csv2('~/mydata/nnrr/data_beh_2024-09-13_0903.csv') %>%
-  select(intersect(var_beh$Variabelnavn, names(.))) %>%
+  select(intersect(var_beh$Variabelnavn, names(.)), PatientGender, PatientAge) %>%
   select(-Skjematype)
 oppf6mnd <- read.csv2('~/mydata/nnrr/data_6mnd_2024-09-13_0927.csv') %>%
   select(var_6mnd$Variabelnavn) %>%
@@ -35,7 +644,7 @@ regdata <- legeskjema %>%
   merge(oppf12mnd, by.x = "SkjemaGUID", by.y = "HovedskjemaGUID",
         suffixes = c("", "_oppf12mnd"))
 
-write.csv2(regdata, "~/mydata/nnrr/data_nystad_20240916.csv", row.names = F)
+write.csv2(regdata, "~/mydata/nnrr/data_nystad_20241018.csv", row.names = F)
 
 #### Utlevering Andreas Sandvik - 13.06.2024 ########
 library(dplyr)
@@ -56,8 +665,8 @@ var_6mnd <- readxl::read_xlsx(
 #   select(var_6mnd$varnavn)
 pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1230_paspre.csv') %>%
   select(var_pre$varnavn)
-legeskjema <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1222_behandler.csv') %>%
-  select(var_beh$varnavn)
+legeskjema <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1222_beh.csv') %>%
+  select(var_beh$varnavn, PatientGender, PatientAge)
 oppf6mnd <- readr::read_csv2('~/mydata/nnrr/data_2024-08-14_1237_pas6mnd.csv') %>%
   select(var_6mnd$varnavn)
 
@@ -91,11 +700,11 @@ oppf6mnd <- oppf6mnd %>% filter(HovedskjemaGUID %in% pasientsvar_pre$Hovedskjema
 duplikater <- oppf6mnd %>% filter(n()>1, .by = HovedskjemaGUID) %>%
   arrange(HovedskjemaGUID)
 
-readr::write_csv2(data_koblet_filtrert, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_data_koblet.csv")
-readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_pasientsvar_pre.csv")
-readr::write_csv2(legeskjema, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_behandlerskjema.csv")
-readr::write_csv2(oppf6mnd, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_pasientsvar_6md.csv")
-readr::write_csv2(duplikater, "~/mydata/nnrr/Utlevering_anders_sandvik_aug2024/masterNNRR_2024-08-14_duplikat6mnd.csv")
+readr::write_csv2(data_koblet_filtrert, "~/mydata/nnrr/masterNNRR_2024-10-18_data_koblet.csv")
+readr::write_csv2(pasientsvar_pre, "~/mydata/nnrr/masterNNRR_2024-10-18_pasientsvar_pre.csv")
+readr::write_csv2(legeskjema, "~/mydata/nnrr/masterNNRR_2024-10-18_behandlerskjema.csv")
+readr::write_csv2(oppf6mnd, "~/mydata/nnrr/masterNNRR_2024-10-18_pasientsvar_6md.csv")
+readr::write_csv2(duplikater, "~/mydata/nnrr/masterNNRR_2024-10-18_duplikat6mnd.csv")
 
 #### Utlevering Kjetil - pasienter som mangler pasientskjema 08.05.2024 ########
 library(dplyr)

@@ -90,7 +90,7 @@ nnrrTidsplot_6og12mnd <- function(plotdata1,
       plot(AndelHoved,  font.main=1,  type='o', pch="'", col=fargeHoved, xaxt='n',
            frame.plot = FALSE,  xaxp=c(1,length(Tidtxt),length(Tidtxt)-1),xlim = c(1,length(Tidtxt)),
            cex=2, lwd=3, xlab=xaksetxt, ylab="Andel (%)", ylim=c(0,ymax), yaxs = 'i',
-           sub='(Tall ved punktene angir antall intervensjoner)', cex.sub=cexgr)
+           sub='(Tall ved punktene angir nevneren)', cex.sub=cexgr)
 
       lines(xskala, AndelHoved2, col="red", lwd=3)
       points(xskala, AndelHoved2, pch="'", cex=2, col="red")

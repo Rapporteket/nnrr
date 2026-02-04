@@ -31,10 +31,10 @@ NNRR består av fire skjemaer:
 Skjemaene har felter som i MRS-løsningen er delt inn i følgende datatyper:
 
 * Dato/Tid
-* Enkeltvalg
-* Tall
+* Enum
+* Number
 * Text
-* Avkrysning
+* Bool
 * Id (Guid)
 
 De tre NNRR-skjemaene har (ifølge kodebok hentet fra MRS-løsningen) følgende fordeling av datatyper.
@@ -47,12 +47,17 @@ library(knitr)
 library(printr)
 library(tidyverse)
 
-rap_aar <- 2023
+rap_aar <- 2024
 
-kodebok1a <- xlsx::read.xlsx("~/mydata/nnrr/kodebok_nnrr_april2024.xlsx", sheetIndex = 6, header = T)
-kodebok1b <- xlsx::read.xlsx("~/mydata/nnrr/kodebok_nnrr_april2024.xlsx", sheetIndex = 7, header = T)
-kodebok2 <- xlsx::read.xlsx("~/mydata/nnrr/kodebok_nnrr_april2024.xlsx", sheetIndex = 5, header = T)
-kodebok3 <- xlsx::read.xlsx("~/mydata/nnrr/kodebok_nnrr_april2024.xlsx", sheetIndex = 4, header = T)
+# kodebok1a <- xlsx::read.xlsx("~/mydata/nnrr/kodebok_nnrr_april2024.xlsx", sheetIndex = 6, header = T)
+# kodebok1b <- xlsx::read.xlsx("~/mydata/nnrr/kodebok_nnrr_april2024.xlsx", sheetIndex = 7, header = T)
+# kodebok2 <- xlsx::read.xlsx("~/mydata/nnrr/kodebok_nnrr_april2024.xlsx", sheetIndex = 5, header = T)
+# kodebok3 <- xlsx::read.xlsx("~/mydata/nnrr/kodebok_nnrr_april2024.xlsx", sheetIndex = 4, header = T)
+
+kodebok1a <- readxl::read_xlsx("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/metadata_NNRR_2025.03.11-PROD-OCU.xlsx", sheet = 6)
+kodebok1b <- readxl::read_xlsx("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/metadata_NNRR_2025.03.11-PROD-OCU.xlsx", sheet = 3)
+kodebok2 <- readxl::read_xlsx("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/metadata_NNRR_2025.03.11-PROD-OCU.xlsx", sheet = 9)
+kodebok3 <- readxl::read_xlsx("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/metadata_NNRR_2025.03.11-PROD-OCU.xlsx", sheet = 21)
 
 
 felttyper <- sort(unique(c(kodebok1a$Felttype, kodebok1b$Felttype, kodebok2$Felttype, kodebok3$Felttype)))
@@ -79,15 +84,15 @@ row.names(Oppsum) <- c('Skjema 1a', 'Skjema 1b', 'Skjema 2', 'Skjema 3')
 knitr::kable(Oppsum, caption = 'Antallet felter på NNRR sine skjema etter felttype')
 ```
 
-Denne rapporten fokuserer på tre datatyper, Avkrysning, Enkeltvalg og Numerisk siden disse utgjør festeparten av feltene. Her følger en kort forklaring til datatypene.
+Denne rapporten fokuserer på tre datatyper, Bool, Enum og Numerisk siden disse utgjør festeparten av feltene. Her følger en kort forklaring til datatypene.
 
-### Avkrysning
+### Bool
 
 Dette er boolske variabler (True/False) med default-verdi "False". Avkrysningsboksene er typisk organisert under overskrifter hvor én eller flere kryss forventes satt. Det finnes derfor ingen fasit på hvor mange bokser som skal være avkrysset ved en komplett utfylling.
 
-### Enkeltvalg
+### Enum
 
-Dette er kategoriske variabler hvor ett alternativ velges fra en liste. I de fleste tilfeller er manglende verdier kodet som -1 men i noen tilfeller kodes de med 0. I presentasjon av utfyllingsgrad brukes kun de Enkeltvalg-variablene som er kodet numerisk i datadumpen, hvilket gjør at en del variabler faller bort fra vurderingen. I tillegg må det presiseres at ikke alle registrerte nødvendigvis skal svare på alle spørsmål. F.eks. finnes det nakkespesifikke verktøy som ikke skal benyttes av de med utelukkende ryggsmerter.
+Dette er kategoriske variabler hvor ett alternativ velges fra en liste. I de fleste tilfeller er manglende verdier kodet som -1 men i noen tilfeller kodes de med 0. I presentasjon av utfyllingsgrad brukes kun de Enum-variablene som er kodet numerisk i datadumpen, hvilket gjør at en del variabler faller bort fra vurderingen. I tillegg må det presiseres at ikke alle registrerte nødvendigvis skal svare på alle spørsmål. F.eks. finnes det nakkespesifikke verktøy som ikke skal benyttes av de med utelukkende ryggsmerter.
 
 ### Numerisk
 
@@ -102,24 +107,38 @@ Disse variablene er som regel én av tre typer:
 datoFra <- paste0(rap_aar, "-01-01")
 datoTil <- paste0(rap_aar, "-12-31")
 
-skjema1a <-
-  readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-04-09_1333.csv')
+# skjema1a <-
+#   readr::read_csv2(
+#     '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2024-04-09_1333.csv')
+# skjema1b <-
+#   readr::read_csv2(
+#     '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-04-09_1333.csv')
+# skjema2 <-
+#   readr::read_csv2(
+#     '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-04-09_1333.csv')
+# skjema3 <-
+#   readr::read_csv2(
+#     '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-04-09_1333.csv')
+
 skjema1b <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2024-04-09_1333.csv')
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0912.csv"))
+skjema1a <-
+  readr::read_csv2(
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0918.csv"))
 skjema2 <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+6+måneder+etter+behandling_2024-04-09_1333.csv')
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0924.csv"))
 skjema3 <-
   readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+12+måneder+etter+behandling_2024-04-09_1333.csv')
+    paste0("C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/data_2025-03-26_0928.csv"))
 
-dato_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Dato/tid')]
+
+dato_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'DateTime')]
 dato_var1a <- intersect(dato_var1a, names(skjema1a))
-dato_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Dato/tid')]
+dato_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'DateTime')]
 dato_var1b <- intersect(dato_var1b, names(skjema1b))
-dato_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Dato/tid')]
+dato_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'DateTime')]
 dato_var2 <- intersect(dato_var2, names(skjema2))
 skjema1a[, dato_var1a] <- mutate_all(skjema1a[, dato_var1a], funs(as.Date(., format="%d.%m.%Y")))
 skjema1b[, dato_var1b] <- mutate_all(skjema1b[, dato_var1b], funs(as.Date(., format="%d.%m.%Y")))
@@ -134,18 +153,19 @@ skjema2$Hoveddato <- skjema2$DateOfCompletion
 skjema2 <- skjema2[which(skjema2$Hoveddato >= datoFra & skjema2$Hoveddato <= datoTil), ]
 
 
-boolske_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Avkrysning')]
-enum_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Enkeltvalg')]
-numerisk_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) %in% c('Tall'))]
-boolske_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Avkrysning')]
-enum_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Enkeltvalg')]
+boolske_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Bool')]
+enum_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) == 'Enum')]
+numerisk_var1a <- as.character(kodebok1a$Variabelnavn)[which(as.character(kodebok1a$Felttype) %in% c('Number'))]
+boolske_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Bool')]
+boolske_var1b <- intersect(names(skjema1b), boolske_var1b)
+enum_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) == 'Enum')]
 # enum_var1b <- c('NeckSurgery', 'PelvisSurgery', 'PrevSickLeave', 'RadiologicalF_Spondylolisthesis', 'RadiologicalF_Scoliosis_Subcategory', 'Treatment_InvidualInterdisciplinary', 'Treatment_GroupInterdisciplinary')
-numerisk_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) %in% c('Tall'))]
-boolske_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Avkrysning')]
+numerisk_var1b <- as.character(kodebok1b$Variabelnavn)[which(as.character(kodebok1b$Felttype) %in% c('Number'))]
+boolske_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Bool')]
 boolske_var2 <- intersect(boolske_var2, names(skjema2))
-enum_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Enkeltvalg')]
+enum_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) == 'Enum')]
 enum_var2 <- intersect(enum_var2, names(skjema2))
-numerisk_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) %in% c('Tall'))]
+numerisk_var2 <- as.character(kodebok2$Variabelnavn)[which(as.character(kodebok2$Felttype) %in% c('Number'))]
 numerisk_var2 <- intersect(numerisk_var2, names(skjema2))
 
 skjema1a[, boolske_var1a] <- apply(skjema1a[, boolske_var1a], 2, as.logical)
@@ -228,11 +248,11 @@ skjema2[, numerisk_var2] <- apply(skjema2[, numerisk_var2], 2, function(x){as.nu
 
 ```{r, echo = FALSE, warning=FALSE}
 dobbel_1a <- names(sort(table(skjema1a$HovedskjemaGUID), decreasing = T)[sort(table(skjema1a$HovedskjemaGUID), 
-                                                                           decreasing = T)>1])
+                                                                              decreasing = T)>1])
 dobbel_2 <- names(sort(table(skjema2$HovedskjemaGUID), decreasing = T)[sort(table(skjema2$HovedskjemaGUID), 
-                                                                           decreasing = T)>1])
+                                                                            decreasing = T)>1])
 dobbel_1b <- names(sort(table(skjema1b$SkjemaGUID), decreasing = T)[sort(table(skjema1b$SkjemaGUID), 
-                                                                           decreasing = T)>1])
+                                                                         decreasing = T)>1])
 
 mangler1b <- length(setdiff(skjema1a$HovedskjemaGUID, skjema1b$SkjemaGUID))
 mangler1a <- length(setdiff(skjema1b$SkjemaGUID, skjema1a$HovedskjemaGUID))
