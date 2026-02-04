@@ -13,16 +13,26 @@ indikatorfig_UI <- function(id){
       id = ns("id_indikator_panel"),
       selectInput(
         inputId = ns("valgtVar"), label = "Velg indikator",
-        choices = c("Andel tverrfaglig behandlet" = "nnrr_tverrfaglig_behandling",
-                    "Klinisk viktig endring i ODI" = "nnrr_bedret_funksjon",
-                    "Andel med minimal funksjonsnedsettelse" = "nnrr_funksjons_nedsettelse",
-                    "Bedring av smerte i hvile" = "nnrr_bedring_smerte_hvile",
-                    "Bedring av smerte i aktivitet" = "nnrr_bedring_smerte_aktiv",
-                    "Andel tilbake i jobb" = "nnrr_jobb_ny_v1",
-                    "Andel tilbake i jobb el. lavere grad sykemelding" = "nnrr_jobb_ny_v2",
-                    "Pasientopplevd bedring av behandling" = "nnrr_bedring_av_behandling",
-                    "Andel fornøyd med behandling" = "nnrr_misfornoeyd"
-        )
+        choices =
+          c("Andel tverrfaglig behandlet" =
+              "nnrr_tverrfaglig_behandling",
+            "Klinisk viktig endring i ODI" =
+              "nnrr_bedret_funksjon",
+            "Andel med minimal funksjonsnedsettelse" =
+              "nnrr_funksjons_nedsettelse",
+            "Bedring av smerte i hvile" =
+              "nnrr_bedring_smerte_hvile",
+            "Bedring av smerte i aktivitet" =
+              "nnrr_bedring_smerte_aktiv",
+            "Andel tilbake i jobb" =
+              "nnrr_jobb_ny_v1",
+            "Andel tilbake i jobb el. lavere grad sykemelding" =
+              "nnrr_jobb_ny_v2",
+            "Pasientopplevd bedring av behandling" =
+              "nnrr_bedring_av_behandling",
+            "Andel fornøyd med behandling" =
+              "nnrr_misfornoeyd"
+          )
       ),
       uiOutput(outputId = ns('tilAar_ui')),
       # selectInput(inputId = ns("valgtShus"), label = "Fjern sykehus pga. lav dekningsgrad",
@@ -37,7 +47,8 @@ indikatorfig_UI <- function(id){
     mainPanel(
       tabsetPanel(id = ns("tab"),
                   tabPanel("Figur", value = "fig",
-                           plotOutput(ns("Figur1"), height="auto"), downloadButton(ns("lastNedBilde"), "Last ned figur")),
+                           plotOutput(ns("Figur1"), height="auto"),
+                           downloadButton(ns("lastNedBilde"), "Last ned figur")),
                   tabPanel("Tabell", value = "tab",
                            # uiOutput(ns("utvalg")),
                            # br(),
@@ -132,6 +143,18 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
 
           class = "display"
         ) %>% DT::formatRound(columns = "Andel", digits = 1)
+      )
+
+      output$lastNedBilde <- downloadHandler(
+        filename = function(){
+          fs::path_sanitize(paste0("indikator_", input$valgtVar, Sys.time(), '.', input$bildeformat))
+        },
+
+        content = function(file){
+          nnrr::nnrrPlotIndikator(indikatordata = tabellReager(),
+                                  graaUt=NA, outfile = file,
+                                  lavDG=NA, inkl_konf=F)
+        }
       )
 
 
