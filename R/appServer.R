@@ -26,17 +26,6 @@ appServer <- function(input, output, session) {
     map_orgname = shiny::req(map_avdeling)
   )
 
-
-  registryName <- "nnrr"
-
-  # userFullName <- rapbase::getUserFullName(session)
-  # userRole <- rapbase::getUserRole(session)
-  # userReshId <- rapbase::getUserReshId(session)
-  # hospitalName <- RegData$SykehusNavn[match(userReshId, RegData$UnitId)]
-
-  # rapbase::navbarWidgetServer("nnrrNavbarWidget", "nnrr",
-  #                             caller = "nnrr")
-
   fordelingsfigServer("fordelingsfig_id", reshID = user$org,
                       RegData = RegData, userRole = user$role, hvd_session = session)
 
@@ -58,111 +47,109 @@ appServer <- function(input, output, session) {
   # Administrative tabeller
   # nnrr::admtab_server("admtabell", SkjemaOversikt)
   #
-  # #forløpstype brukerkontroll
-  # output$forlopstype_ui <- shiny::renderUI({
-  #
-  #   forlopstyper <- sort(unique(as.numeric(ForlopsOversikt$ForlopsType1Num)))
-  #   names(forlopstyper) <- ForlopsOversikt$ForlopsType1[match(forlopstyper, ForlopsOversikt$ForlopsType1Num)]
-  #   names(forlopstyper)[forlopstyper==0] <- "Ingen"
-  #   selectInput(inputId = "forlopstype", label = "Velg forløpstype(r)",
-  #               choices = forlopstyper, multiple = T, selected = c(3, 5, 7, 4, 6, 8))
-  # })
-  #
-  # #Registeringer per enhet----
-  # output$tabell_id <- shiny::renderTable({
-  #   data <- ForlopsOversikt %>%
-  #     dplyr::filter(HovedDato >= input$dato_id[1] & HovedDato <= input$dato_id[2]) %>%
-  #     dplyr::filter(ForlopsType1Num %in% input$forlopstype) %>%
-  #     dplyr::filter(BasisRegStatus %in% input$regstatus) %>%
-  #     dplyr::select("SykehusNavn", "ForlopsType1") %>%
-  #     table() %>%
-  #     addmargins() %>%
-  #     as.data.frame.matrix() %>%
-  #     tidyr::as_tibble(rownames = "Enhet")
-  # }, digits = 0)
 
-  # Eksempelrapport
-  # output$exReport <- shiny::renderUI({
-  #   rapbase::renderRmd(
-  #     system.file("eksSamlerapport.Rmd", package = "nnrr"),
-  #     outputType = "html_fragment",
-  #     params = list(
-  #       author = userFullName,
-  #       hospitalName = hospitalName,
-  #       tableFormat = "html",
-  #       reshId = userReshId,
-  #       registryName = registryName,
-  #       userRole = userRole
-  #     )
-  #   )
-  # })
-  #
-  # output$downloadReport <- shiny::downloadHandler(
-  #   filename = function() {
-  #     basename(tempfile(pattern = "nnrr_eksRapport",
-  #                       fileext = paste0(".", input$formatReport)))
-  #   },
-  #   content = function(file) {
-  #     fn <- rapbase::renderRmd(
-  #       system.file("eksSamlerapport.Rmd", package = "nnrr"),
-  #       outputType = input$formatReport,
-  #       params = list(
-  #         author = userFullName,
-  #         hospitalName = hospitalName,
-  #         tableFormat = input$formatReport,
-  #         reshId = userReshId,
-  #         registryName = registryName,
-  #         userFullName = userFullName,
-  #         userRole = userRole
-  #       )
-  #     )
-  #     file.rename(fn, file)
-  #   }
-  # )
+  ##############################################################################
+  ################ Subscription, Dispatchment and Stats ########################
+
+  ## Objects currently shared among subscription and dispathcment
+  orgs <- as.list(setNames(map_avdeling$UnitId, map_avdeling$orgname))
+  org <- rapbase::autoReportOrgServer("nnrrDispatch", orgs)
+
+  subParamNames <- shiny::reactive(c("reshID"))
+  subParamValues <- shiny::reactive(user$org())
+
+  ## Subscription
+
+  rapbase::autoReportServer(
+    id = "nnrrSubscription",
+    registryName = "nnrr",
+    type = "subscription",
+    paramNames = subParamNames,
+    paramValues = subParamValues,
+    reports = list(
+      Kvartalsrapport = list(
+        synopsis = "NNRR: Kvartalsrapport",
+        fun = "strikkRnwAbo",
+        paramNames = c("baseName", "reshID"),
+        paramValues = c("KvartalsrapportNNRR_rapporteket", 999999)
+      )
+    ),
+    orgs = orgs,
+    freq = "quarter",
+    user = user,
+    runAutoReportButton = TRUE
+  )
+
+  ## Dispatchment
 
 
+  vis_rapp <- reactiveVal(FALSE)
+  observeEvent(user$role(), {
+    vis_rapp(user$role() == "SC")
+  })
+  disParamNames <- shiny::reactive(c("reshID"))
+  disParamValues <- shiny::reactive(c(org$value()))
 
-  # dummy report and orgs to subscribe and dispatch
-  # orgs <- list(
-  #   TestOrg = 999999
-  # )
-  # report <- list(
-  #   Veiledning = list(
-  #     synopsis = "Testrapport kun for illustrasjon",
-  #     fun = "reportProcessor",
-  #     paramNames = c("report", "outputFormat", "title"),
-  #     paramValues = c("veiledning", "pdf", "Testrapport")
-  #   )#,
-    # Eksempelrapport = list(
-    #   synopsis = "Eksempelrapport med data fra nnrr",
-    #   fun = "reportProcessor",
-    #   paramNames = c("report", "outputFormat", "title"),
-    #   paramValues = c("eksSamlerapport", "pdf", "Eksempelrapport")
-    # )
-  # )
+  rapbase::autoReportServer(
+    id = "nnrrDispatch",
+    registryName = "nnrr",
+    type = "dispatchment",
+    org = org$value,
+    paramNames = disParamNames,
+    paramValues = disParamValues,
+    reports = list(
+      Kvartalsrapport = list(
+        synopsis = "NNRR: Kvartalsrapport",
+        fun = "strikkRnwAbo",
+        paramNames = c("baseName", "reshID"),
+        paramValues = c("KvartalsrapportNNRR_rapporteket", 999999)
+      )
+    ),
+    orgs = orgs,
+    eligible = vis_rapp,
+    freq = "quarter",
+    user = user,
+    runAutoReportButton = TRUE
+  )
 
-  # # subscribe
-  # rapbase::autoReportServer(
-  #   "nnrrSubscription", registryName = registryName, type = "subscription",
-  #   reports = report, orgs = orgs
-  # )
-  #
-  # # dispatch
-  # org <- rapbase::autoReportOrgServer("nnrrDispatchOrg", orgs)
-  # fileFormat <- rapbase::autoReportFormatServer("nnrrDispatchFormat")
-  # paramNames <- shiny::reactive(c("outputFormat"))
-  # paramValues <- shiny::reactive(c(fileFormat()))
-  # rapbase::autoReportServer(
-  #   "nnrrDispatch", registryName = registryName, type = "dispatchment",
-  #   org = org$value,
-  #   paramNames = paramNames, paramValues = paramValues, reports = report,
-  #   orgs = orgs
-  # )
+  ## Metadata
+  meta <- shiny::reactive({
+    rapbase::describeRegistryDb("data")
+  })
 
-  # use stats
-  rapbase::statsServer("nnrrStats", registryName = registryName, app_id = Sys.getenv("FALK_APP_ID"))
+  output$metaControl <- shiny::renderUI({
+    tabs <- names(meta())
+    selectInput("metaTab", "Velg tabell:", tabs)
+  })
 
-  # export
-  # rapbase::exportGuideServer("nnrrExport", registryName)
-  # rapbase::exportUCServer("nnrrExport", registryName)
+
+  output$metaDataTable <- DT::renderDataTable(
+    meta()[[input$metaTab]], rownames = FALSE,
+    options = list(lengthMenu=c(25, 50, 100, 200, 400))
+  )
+
+  output$metaData <- shiny::renderUI({
+    DT::dataTableOutput("metaDataTable")
+  })
+
+  ## Stats
+  observe(
+    rapbase::statsServer("nnrrStats",
+                         registryName = "nnrr",
+                         app_id = Sys.getenv("FALK_APP_ID"),
+                         eligible = (user$role() == "SC"))
+  )
+  rapbase::statsGuideServer("nnrrStatsGuide", registryName = "nnrr")
+
+
+  ##############################################################################
+  # Eksport  ###################################################################
+  # brukerkontroller
+  rapbase::exportUCServer("nnrrExport", "nnrr")
+
+  ## veileding
+  rapbase::exportGuideServer("nnrrExportGuide", "nnrr")
+
+  ##############################################################################
+
 }

@@ -751,9 +751,11 @@ nnrrPrepVar <- function(RegData, valgtVar)
     tittel <- c('Pasientrapportert behandling på', 'nakke- og ryggpoliklinikk')
     RegData <- RegData[RegData$regstatus_post==1, ]
     N <- dim(RegData)[1]
-    RegData$TreatmentOperation[is.na(RegData$TreatmentOperation)] <- 0
-    RegData$ingen_beh <- !RegData$TreatmentOperation & !RegData$TreatmentPostIndividual &
-      !RegData$TreatmentPostGroupbased & !RegData$TreatmentPostHospitalExtendedExamination
+   # RegData$TreatmentOperation[is.na(RegData$TreatmentOperation)] <- 0
+    RegData$ingen_beh <- #!RegData$TreatmentOperation &
+      !RegData$TreatmentPostIndividual &
+      !RegData$TreatmentPostGroupbased &
+      !RegData$TreatmentPostHospitalExtendedExamination
     AntVar <- apply(RegData[,c("ingen_beh", "TreatmentPostIndividual", "TreatmentPostGroupbased",
                                "TreatmentPostHospitalExtendedExamination")],
                     2, function(x){sum(as.numeric(x), na.rm = T)})

@@ -127,10 +127,64 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
 
 }
 
+
+#' Gi en visuell fremstilling av registerets indikatorer over tid
+#'
+#' @param indikatordata En dataramme med følgende kolonner:
+#'
+#' @export
+#'
 plotlyIndikator <- function(indikatordata, graaUt=NA, outfile = '',
                             lavDG=NA, inkl_konf=F, ant_aar = 3) {
   library(plotly)
   library(dplyr)
+
+  indikator=indikatordata$indikator
+  tittel=indikatordata$tittel
+  terskel=indikatordata$terskel
+  minstekrav=indikatordata$minstekrav
+  maal=indikatordata$maal
+  decreasing=indikatordata$decreasing
+  maalretn=indikatordata$maalretn
+
+  Tabell <- indikator |>
+    dplyr::filter(year > max(year) - ant_aar) |>
+    dplyr::summarise(Antall = sum(var),
+                     N = sum(denominator),
+                     .by = c(SykehusNavn, year)) |>
+    dplyr::group_by(year) |>
+    dplyr::group_modify(~ .x |> janitor::adorn_totals(name = "Nasjonalt")) |>
+    dplyr::mutate(Andel = Antall/N*100) |>
+    dplyr::mutate(Andel = ifelse(N < terskel, NA, Andel))
+
+  Andel <- Tabell |>
+    dplyr::select(SykehusNavn, year, Andel) |>
+    dplyr::arrange(year) |>
+    tidyr::pivot_wider(names_from = year,
+                       values_from = c(Andel))
+  N <- Tabell |>
+    dplyr::select(SykehusNavn, year, N) |>
+    dplyr::arrange(year) |>
+    tidyr::pivot_wider(names_from = year,
+                       values_from = c(N))
+
+  Andel[N[[dim(N)[2]]] < terskel, -1] <- NA
+  Andel_long <- Andel |>
+    dplyr::arrange(
+      desc(is.na(!!rlang::sym(dplyr::last(names(Andel))))),
+      !!rlang::sym(dplyr::last(names(Andel)))
+    ) |>
+    dplyr::mutate(
+      SykehusNavn = forcats::fct_inorder(SykehusNavn)
+    ) |>
+    tidyr::pivot_longer(cols = 2:dim(Andel)[2],
+                        names_to = "year",
+                        values_to = "andel") |>
+    merge(Tabell |> dplyr::select(year, SykehusNavn, Antall, N),
+          by = c("year", "SykehusNavn"), all.x = TRUE)
+
+
+  aar <- sort(unique(Andel_long$year))
 
   data_long <- Andel_long
   latest_year <- 2025

@@ -27,8 +27,10 @@ samledok_UI <- function(id){
     mainPanel(
       tabsetPanel(
         id= ns("tabs"),
-        tabPanel("Kvartalsrapport for din avdeling", value = "kvartalsrapport",
-                 downloadButton(ns("lastNed_kvartal"), "Last ned kvartalsrapport")))
+        tabPanel("Kvartalsrapport for din avdeling",
+                 value = "kvartalsrapport",
+                 downloadButton(ns("lastNed_kvartal"),
+                                "Last ned kvartalsrapport")))
     )
   )
 }
