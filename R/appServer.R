@@ -26,17 +26,6 @@ appServer <- function(input, output, session) {
     map_orgname = shiny::req(map_avdeling)
   )
 
-
-  registryName <- "nnrr"
-
-  # userFullName <- rapbase::getUserFullName(session)
-  # userRole <- rapbase::getUserRole(session)
-  # userReshId <- rapbase::getUserReshId(session)
-  # hospitalName <- RegData$SykehusNavn[match(userReshId, RegData$UnitId)]
-
-  # rapbase::navbarWidgetServer("nnrrNavbarWidget", "nnrr",
-  #                             caller = "nnrr")
-
   fordelingsfigServer("fordelingsfig_id", reshID = user$org,
                       RegData = RegData, userRole = user$role, hvd_session = session)
 
