@@ -50,7 +50,7 @@ indikatorfig_UI <- function(id){
                            plotOutput(ns("Figur1"), height="auto"),
                            downloadButton(ns("lastNedBilde"), "Last ned figur")),
                   tabPanel("Figur plotly", value = "fig2",
-                           plotlyOutput(ns("plotlyfig"), height="auto"),
+                           plotlyOutput(ns("plotlyfig"), height = "600px"),
                            downloadButton(ns("lastNedBilde2"), "Last ned figur")),
                   tabPanel("Tabell", value = "tab",
                            # uiOutput(ns("utvalg")),
