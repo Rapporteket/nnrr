@@ -127,6 +127,13 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
 
 }
 
+
+#' Gi en visuell fremstilling av registerets indikatorer over tid
+#'
+#' @param indikatordata En dataramme med følgende kolonner:
+#'
+#' @export
+#'
 plotlyIndikator <- function(indikatordata, graaUt=NA, outfile = '',
                             lavDG=NA, inkl_konf=F, ant_aar = 3) {
   library(plotly)
