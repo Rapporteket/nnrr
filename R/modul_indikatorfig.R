@@ -50,8 +50,11 @@ indikatorfig_UI <- function(id){
                            plotOutput(ns("Figur1"), height="auto"),
                            downloadButton(ns("lastNedBilde"), "Last ned figur")),
                   tabPanel("Figur plotly", value = "fig2",
-                           plotlyOutput(ns("plotlyfig"), height = "600px"),
+                           plotly::plotlyOutput(ns("plotlyfig"), height = "600px"),
                            downloadButton(ns("lastNedBilde2"), "Last ned figur")),
+                  tabPanel("Figur ggplot", value = "fig",
+                           plotOutput(ns("ggplotfig"), height="auto"),
+                           downloadButton(ns("lastNedBilde3"), "Last ned figur")),
                   tabPanel("Tabell", value = "tab",
                            # uiOutput(ns("utvalg")),
                            # br(),
@@ -108,8 +111,14 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
       }, width = 700, height = 700)
 
 
-      output$plotlyfig <- renderPlotly({
+      output$plotlyfig <- plotly::renderPlotly({
         nnrr::plotlyIndikator(indikatordata = tabellReager(),
+                              graaUt=NA, outfile = '',
+                              lavDG=NA, inkl_konf=F, ant_aar = 3)
+      })
+
+      output$ggplotfig <- renderPlot({
+        nnrr::ggPlotIndikator(indikatordata = tabellReager(),
                               graaUt=NA, outfile = '',
                               lavDG=NA, inkl_konf=F, ant_aar = 3)
       })
