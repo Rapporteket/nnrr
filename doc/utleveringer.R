@@ -111,7 +111,7 @@ FigTypUt <- rapFigurer::figtype(outfile=outfile,
                                 pointsizePDF=11, fargepalett='BlaaOff')
 farger <- FigTypUt$farger
 
-xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3],
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[1],
                 border = F, ylim = c(0, 45), #ylim = c(0,1.25*max(Tabell[,-1])),
                 main = "Klinisk viktig endring i ODI",
                 ylab = "Andel %")
@@ -119,7 +119,7 @@ pktStr <- 1.5
 points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
 points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
 legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
-       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[1]),
        legend=names(Tabell[-1]), ncol = 3)
 
 mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
@@ -177,7 +177,7 @@ pktStr <- 1.5
 points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
 points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
 legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
-       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[2]),
        legend=names(Tabell[-1]), ncol = 3)
 
 mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)

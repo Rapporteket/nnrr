@@ -32,6 +32,8 @@ knitr::opts_knit$set(root.dir = './')
 <<LastData, include=FALSE, cache=FALSE>>=
 library(nnrr)
 
+if (!exists("RegData")) {RegData <- nnrr::nnrrHentRegData()}
+
 datoTil <- datoTil %>% as.Date() %>%
   lubridate::floor_date(unit = 'quarter') - lubridate::days(1)
 datoFra <- (datoTil + lubridate::days(1)) %m-% lubridate::years(1)
