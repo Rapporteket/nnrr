@@ -7,22 +7,14 @@ appUi <- function() {
 
   # br_valg <- nnrrBrukerkontroller()
 
-  shiny::addResourcePath("rap", system.file("www", package = "rapbase"))
   appTitle <- "NNRR"
 
   shiny::tagList(
 
     shiny::navbarPage(
-      title = shiny::div(
-        shiny::a(
-          shiny::includeHTML(
-            system.file("www/logo.svg", package = "rapbase")
-          )
-        ),
-        appTitle
-      ),
+      title = rapbase::regTitle(appTitle),
       windowTitle = appTitle,
-      theme = "rap/bootstrap.css",
+      theme = rapbase::rapTheme(),
       id = "tabs",
 
       shiny::tabPanel(

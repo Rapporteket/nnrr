@@ -21,9 +21,9 @@ Imports:
   janitor,
   DT,
   kableExtra,
-  rapbase,
+  rapbase (>= 3.6.0),
   rapFigurer
 Remotes:
-  Rapporteket/rapbase@*release,
+  Rapporteket/rapbase,
   Rapporteket/rapFigurer
 RoxygenNote: 7.3.2
