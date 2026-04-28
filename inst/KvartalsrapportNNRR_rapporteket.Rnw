@@ -615,28 +615,31 @@ nnrrFigAndelGrvar_6og12mnd(RegData, valgtVar1 = "fornoyd_6mnd",
                            grtittel="Behandling i spesialisthelsetjenesten")
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert_6mnd.pdf")
-nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_6mnd", datoFra=datoFra,
-                  datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
-                  minald=0, maxald=130, erMann=99, outfile=outfile,
-                  reshID=reshID, grvar="beh_spes_v3",
-                  grtittel="Behandling i spesialisthelsetjenesten")
+nnrrFigAndelGrvar(
+  RegData, valgtVar="opplevd_nytte_beh_6mnd", datoFra=datoFra,
+  datoTil=datoTil, enhetsUtvalg=1, datovar="dato_oppfolg",
+  minald=0, maxald=130, erMann=99, outfile=outfile,
+  reshID=reshID, grvar="beh_spes_v3",
+  grtittel="Behandling i spesialisthelsetjenesten")
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert_12mnd.pdf")
-nnrrFigAndelGrvar(RegData, valgtVar="opplevd_nytte_beh_12mnd",
-                  datoFra=datoFra, datoTil=datoTil,
-                  enhetsUtvalg=1, datovar="dato_oppfolg2",
-                  minald=0, maxald=130, erMann=99, outfile=outfile,
-                  reshID=reshID, grvar="beh_spes_v3",
-                  grtittel="Behandling i spesialisthelsetjenesten")
+nnrrFigAndelGrvar(
+  RegData, valgtVar="opplevd_nytte_beh_12mnd",
+  datoFra=datoFra, datoTil=datoTil,
+  enhetsUtvalg=1, datovar="dato_oppfolg2",
+  minald=0, maxald=130, erMann=99, outfile=outfile,
+  reshID=reshID, grvar="beh_spes_v3",
+  grtittel="Behandling i spesialisthelsetjenesten")
 
 outfile <- paste0(figfolder, "opplevd_nytte_beh_gruppert.pdf")
-nnrrFigAndelGrvar_6og12mnd(RegData, valgtVar1="opplevd_nytte_beh_6mnd",
-                           valgtVar2="opplevd_nytte_beh_12mnd",
-                           datoFra=datoFra, datoTil=datoTil,
-                           enhetsUtvalg=1, datovar="dato_oppfolg2",
-                           minald=0, maxald=130, erMann=99, outfile=outfile,
-                           reshID=reshID, grvar="beh_spes_v3",
-                           grtittel="Behandling i spesialisthelsetjenesten")
+nnrrFigAndelGrvar_6og12mnd(
+  RegData, valgtVar1="opplevd_nytte_beh_6mnd",
+  valgtVar2="opplevd_nytte_beh_12mnd",
+  datoFra=datoFra, datoTil=datoTil,
+  enhetsUtvalg=1, datovar="dato_oppfolg2",
+  minald=0, maxald=130, erMann=99, outfile=outfile,
+  reshID=reshID, grvar="beh_spes_v3",
+  grtittel="Behandling i spesialisthelsetjenesten")
 @
 
 \begin{figure}[ht]
