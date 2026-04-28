@@ -25,6 +25,6 @@ Imports:
   rapFigurer,
   plotly
 Remotes:
-  Rapporteket/rapbase@*release,
+  Rapporteket/rapbase,
   Rapporteket/rapFigurer
 RoxygenNote: 7.3.2
