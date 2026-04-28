@@ -165,11 +165,25 @@ nnrrPreprosess <- function(RegData)
                                                                                         'Permanent uførepensjon'))
   # RegData$Tverrfaglig_vurdering_antall <- rowSums(RegData[, c("FirstMedExamDoctor", "FirstMedExamNurse", "FirstMedExamPhys", "FirstMedExamOther")])
   RegData$Tverrfaglig_vurdering_antall <-
-    rowSums(RegData[, c("TreatmentEvaluationByDoctor", "TreatmentEvaluationByPhysiotherapist",
-                        "TreatmentEvaluationByNurse", "TreatmentEvaluationByPsychologist",
-                        "TreatmentEvaluationBySocionom", "TreatmentEvaluationOther")])
+    rowSums(RegData[, c("TreatmentEvaluationByDoctor",
+                        "TreatmentEvaluationByPhysiotherapist",
+                        "TreatmentEvaluationByNurse",
+                        "TreatmentEvaluationByPsychologist",
+                        "TreatmentEvaluationBySocionom",
+                        "TreatmentEvaluationOther")])
+  RegData$Tverrfaglig_vurdering_antall2 <-
+    rowSums(RegData[, c("TreatmentEvaluationByDoctor",
+                        "TreatmentEvaluationByPhysiotherapist",
+                        "TreatmentEvaluationByNurse",
+                        "TreatmentEvaluationByPsychologist",
+                        "TreatmentEvaluationBySocionom",
+                        "TreatmentEvaluationOther")], na.rm = TRUE)
   RegData$Tverrfaglig_vurdering <- 0
-  RegData$Tverrfaglig_vurdering[RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
+  RegData$Tverrfaglig_vurdering[
+    RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
+  RegData$Tverrfaglig_vurdering2 <- 0
+  RegData$Tverrfaglig_vurdering2[
+    RegData$Tverrfaglig_vurdering_antall2 >= 2] <- 1
 
   RegData$beh_spes <- 0
   RegData$beh_spes[(RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0) &
