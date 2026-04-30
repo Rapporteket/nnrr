@@ -15,5 +15,5 @@ nnrrHentRegData(datoFra = "2017-01-01", datoTil = "2099-01-01")
 RegData data frame
 }
 \description{
-Provides NNRR data from staging
+Provides NNRR data
 }
