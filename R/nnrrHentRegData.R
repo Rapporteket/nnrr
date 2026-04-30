@@ -9,36 +9,21 @@
 
 nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
 
-  registryName <- "data"
+  registryName <- "nnrr"
   dbType <- "mysql"
 
-  # if (rapbase::isRapContext()) {
-    legeskjema <- rapbase::loadRegData(
-      registryName,
-      "SELECT * FROM behandlerskjema_1")
-    pasientsvar_pre <- rapbase::loadRegData(
-      registryName,
-      "SELECT * FROM pasientskjema_foer_behand_2")
-    pasientsvar_post <- rapbase::loadRegData(
-      registryName,
-      "SELECT * FROM pasientskjema_6_maaneder__3")
-    pasientsvar_post2 <- rapbase::loadRegData(
-      registryName,
-      "SELECT * FROM pasientskjema_12_maaneder_8")
-  # } else {
-  #   legeskjema <-
-  #     readr::read_csv2(
-  #       paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1505.csv"))
-  #   pasientsvar_pre <-
-  #     readr::read_csv2(
-  #       paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1512.csv"))
-  #   pasientsvar_post <-
-  #     readr::read_csv2(
-  #       paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1519.csv"))
-  #   pasientsvar_post2 <-
-  #     readr::read_csv2(
-  #       paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1521.csv"))
-  # }
+  legeskjema <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM behandlerskjema_1")
+  pasientsvar_pre <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM pasientskjema_foer_behand_2")
+  pasientsvar_post <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM pasientskjema_6_maaneder__3")
+  pasientsvar_post2 <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM pasientskjema_12_maaneder_8")
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[
     table(pasientsvar_pre$HovedskjemaGUID)>1]
