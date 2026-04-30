@@ -18,13 +18,13 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
       "SELECT * FROM behandlerskjema_1")
     pasientsvar_pre <- rapbase::loadRegData(
       registryName,
-      "SELECT * FROM pasientskjema_for_behandling_2")
+      "SELECT * FROM pasientskjema_foer_behand_2")
     pasientsvar_post <- rapbase::loadRegData(
       registryName,
-      "SELECT * FROM pasientskjema_6_maaneder_etter_behandling_3")
+      "SELECT * FROM pasientskjema_6_maaneder__3")
     pasientsvar_post2 <- rapbase::loadRegData(
       registryName,
-      "SELECT * FROM pasientskjema_12_maaneder_etter_behandling_8")
+      "SELECT * FROM pasientskjema_12_maaneder_8")
   } else {
     legeskjema <-
       readr::read_csv2(
