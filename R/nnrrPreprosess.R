@@ -171,66 +171,98 @@ nnrrPreprosess <- function(RegData)
                         "TreatmentEvaluationByPsychologist",
                         "TreatmentEvaluationBySocionom",
                         "TreatmentEvaluationOther")])
-  RegData$Tverrfaglig_vurdering_antall2 <-
-    rowSums(RegData[, c("TreatmentEvaluationByDoctor",
-                        "TreatmentEvaluationByPhysiotherapist",
-                        "TreatmentEvaluationByNurse",
-                        "TreatmentEvaluationByPsychologist",
-                        "TreatmentEvaluationBySocionom",
-                        "TreatmentEvaluationOther")], na.rm = TRUE)
-  RegData$Tverrfaglig_vurdering <- 0
-  RegData$Tverrfaglig_vurdering[
-    RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
-  RegData$Tverrfaglig_vurdering2 <- 0
-  RegData$Tverrfaglig_vurdering2[
-    RegData$Tverrfaglig_vurdering_antall2 >= 2] <- 1
+  # RegData$Tverrfaglig_vurdering <- 0
+  # RegData$Tverrfaglig_vurdering[
+  #   RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
+  RegData <- RegData |>
+    dplyr::mutate(Tverrfaglig_vurdering = ifelse(
+      Treatment_InvidualInterdisciplinary %in% 1:3 |
+        Treatment_GroupInterdisciplinary2018 %in% 1:4, 1, 0)
+    )
+
 
   RegData$beh_spes <- 0
-  RegData$beh_spes[(RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0) &
-                     (RegData$Treatment_GroupInterdisciplinary == 0 & RegData$Treatment_GroupInterdisciplinary2018 == 0)] <- 1
-  RegData$beh_spes[(RegData$Treatment_GroupInterdisciplinary != 0 | RegData$Treatment_GroupInterdisciplinary2018 != 0) &
-                     (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 2
-  RegData$beh_spes[(RegData$Treatment_GroupInterdisciplinary != 0 | RegData$Treatment_GroupInterdisciplinary2018 != 0) &
-                     (RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0)] <- 3
-  RegData$beh_spes <- factor(RegData$beh_spes, levels = 0:3, labels = c("Ingen", "Individuell", "Gruppe", "Begge"))
+  RegData$beh_spes[
+    (RegData$Treatment_IndividualFollowUp1to2Times |
+       RegData$Treatment_InvidualInterdisciplinary != 0) &
+      (RegData$Treatment_GroupInterdisciplinary == 0 &
+         RegData$Treatment_GroupInterdisciplinary2018 == 0)] <- 1
+  RegData$beh_spes[
+    (RegData$Treatment_GroupInterdisciplinary != 0 |
+       RegData$Treatment_GroupInterdisciplinary2018 != 0) &
+      (!RegData$Treatment_IndividualFollowUp1to2Times &
+         RegData$Treatment_InvidualInterdisciplinary == 0)] <- 2
+  RegData$beh_spes[
+    (RegData$Treatment_GroupInterdisciplinary != 0 |
+       RegData$Treatment_GroupInterdisciplinary2018 != 0) &
+      (RegData$Treatment_IndividualFollowUp1to2Times |
+         RegData$Treatment_InvidualInterdisciplinary != 0)] <- 3
+  RegData$beh_spes <- factor(
+    RegData$beh_spes,
+    levels = 0:3, labels =
+      c("Ingen", "Individuell", "Gruppe", "Begge"))
 
 
   RegData$beh_spes_v2 <- 0
-  RegData$beh_spes_v2[(RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0) &
-                        (RegData$Treatment_GroupInterdisciplinary == 0 & RegData$Treatment_GroupInterdisciplinary2018 == 0)] <- 1
-  RegData$beh_spes_v2[(RegData$Treatment_GroupInterdisciplinary == 1 | RegData$Treatment_GroupInterdisciplinary2018 == 1) &
-                        (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 2
-  RegData$beh_spes_v2[(RegData$Treatment_GroupInterdisciplinary == 2 | RegData$Treatment_GroupInterdisciplinary2018 %in% 2:3) &
-                        (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 3
-  RegData$beh_spes_v2[(RegData$Treatment_GroupInterdisciplinary == 3 | RegData$Treatment_GroupInterdisciplinary2018 == 4) &
-                        (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 4
-  RegData$beh_spes_v2[(RegData$Treatment_GroupInterdisciplinary != 0 | RegData$Treatment_GroupInterdisciplinary2018 != 0) &
-                        (RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0)] <- 5
-  RegData$beh_spes_v2 <- factor(RegData$beh_spes_v2, levels = 0:5, labels = c("Ingen", "Individuell", "Gruppe, 1-3 ganger",
-                                                                              "Gruppe, 4-10 ganger", "Gruppe, >10 ganger", "Begge"))
+  RegData$beh_spes_v2[
+    (RegData$Treatment_IndividualFollowUp1to2Times |
+       RegData$Treatment_InvidualInterdisciplinary != 0) &
+      (RegData$Treatment_GroupInterdisciplinary == 0 &
+         RegData$Treatment_GroupInterdisciplinary2018 == 0)] <- 1
+  RegData$beh_spes_v2[
+    (RegData$Treatment_GroupInterdisciplinary == 1 |
+       RegData$Treatment_GroupInterdisciplinary2018 == 1) &
+      (!RegData$Treatment_IndividualFollowUp1to2Times &
+         RegData$Treatment_InvidualInterdisciplinary == 0)] <- 2
+  RegData$beh_spes_v2[
+    (RegData$Treatment_GroupInterdisciplinary == 2 |
+       RegData$Treatment_GroupInterdisciplinary2018 %in% 2:3) &
+      (!RegData$Treatment_IndividualFollowUp1to2Times &
+         RegData$Treatment_InvidualInterdisciplinary == 0)] <- 3
+  RegData$beh_spes_v2[
+    (RegData$Treatment_GroupInterdisciplinary == 3 |
+       RegData$Treatment_GroupInterdisciplinary2018 == 4) &
+      (!RegData$Treatment_IndividualFollowUp1to2Times &
+         RegData$Treatment_InvidualInterdisciplinary == 0)] <- 4
+  RegData$beh_spes_v2[
+    (RegData$Treatment_GroupInterdisciplinary != 0 |
+       RegData$Treatment_GroupInterdisciplinary2018 != 0) &
+      (RegData$Treatment_IndividualFollowUp1to2Times |
+         RegData$Treatment_InvidualInterdisciplinary != 0)] <- 5
+  RegData$beh_spes_v2 <- factor(
+    RegData$beh_spes_v2,
+    levels = 0:5,
+    labels = c("Ingen", "Individuell", "Gruppe, 1-3 ganger",
+               "Gruppe, 4-10 ganger", "Gruppe, >10 ganger", "Begge"))
   RegData$Treatment_IndividualFollowUp1to2Times <-
     ifelse(is.na(RegData$Treatment_IndividualFollowUp1to2Times),
            FALSE, RegData$Treatment_IndividualFollowUp1to2Times)
 
   RegData$beh_spes_v3 <- 0
   RegData$beh_spes_v3[
-    (RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0) &
+    (RegData$Treatment_IndividualFollowUp1to2Times |
+       RegData$Treatment_InvidualInterdisciplinary != 0) &
       (RegData$Treatment_GroupInterdisciplinary2018 == 0)] <- 1
   RegData$beh_spes_v3[
     (RegData$Treatment_GroupInterdisciplinary2018 == 1) &
-      (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 2
+      (!RegData$Treatment_IndividualFollowUp1to2Times &
+         RegData$Treatment_InvidualInterdisciplinary == 0)] <- 2
   RegData$beh_spes_v3[
     (RegData$Treatment_GroupInterdisciplinary2018 %in% 2) &
-      (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 3
+      (!RegData$Treatment_IndividualFollowUp1to2Times &
+         RegData$Treatment_InvidualInterdisciplinary == 0)] <- 3
   RegData$beh_spes_v3[
     (RegData$Treatment_GroupInterdisciplinary2018 %in% 3) &
-      (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 4
+      (!RegData$Treatment_IndividualFollowUp1to2Times &
+         RegData$Treatment_InvidualInterdisciplinary == 0)] <- 4
   RegData$beh_spes_v3[
     (RegData$Treatment_GroupInterdisciplinary2018 == 4) &
-      (!RegData$Treatment_IndividualFollowUp1to2Times & RegData$Treatment_InvidualInterdisciplinary == 0)] <- 5
+      (!RegData$Treatment_IndividualFollowUp1to2Times &
+         RegData$Treatment_InvidualInterdisciplinary == 0)] <- 5
   RegData$beh_spes_v3[
     (RegData$Treatment_GroupInterdisciplinary2018 != 0) &
-      (RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0)] <- 6
+      (RegData$Treatment_IndividualFollowUp1to2Times |
+         RegData$Treatment_InvidualInterdisciplinary != 0)] <- 6
   RegData$beh_spes_v3 <- factor(
     RegData$beh_spes_v3,
     levels = 0:6,
