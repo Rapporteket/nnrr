@@ -893,7 +893,8 @@ readr::write_csv2(kobling, "C:/GIT/data/nnrr/nnrr_kobling_v2.csv")
 ########## Utlevering hianor 15.02.2023 #######################################
 kobling <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-16_0840.csv')
 kobling <- kobling[match(unique(kobling$PasientGUID), kobling$PasientGUID), ]
-pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
+# debugging rapporteket, fjern kommentar for gjenskapning
+# pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
 # legeskjema <- read.table('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv',
 #                          sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 legeskjema <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv')
@@ -927,9 +928,9 @@ readr::write_csv2(pasientsvar_post, "~/mydata/nnrr/skjema2_15022023.csv")
 readr::write_csv2(kobling, "~/mydata/nnrr/nnrr_kobling.csv")
 
 ######### Utlevering John Bjørneboe 14.02.2023  ########################################
-pasientsvar_pre <-
-  readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
+# pasientsvar_pre <- # debugging rapporteket, fjern kommentar for gjenskapning
+#   readr::read_csv2(
+#     '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
 legeskjema <-
   readr::read_csv2(
     '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv')
