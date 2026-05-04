@@ -9,7 +9,7 @@
 
 nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
 
-  registryName <- "nnrr"
+  registryName <- "data"
   dbType <- "mysql"
 
   legeskjema <- rapbase::loadRegData(
