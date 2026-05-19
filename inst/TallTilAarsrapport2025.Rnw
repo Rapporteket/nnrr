@@ -100,24 +100,38 @@ print(xtable::xtable(
 
 
 <<'Tab oppfølgingsrate, 6 og 12 mnd', results='asis', echo=FALSE, warning=F>>=
-# RegDataAll <- RegDataAll[RegDataAll$regstatus_pre == 1, ]
 
-tab_oppf_alle <- RegDataAll[RegDataAll$regstatus_pre == 1, ] %>% group_by(SykehusNavn) %>%
-  summarise("Ant.aktuell.6mnd" = sum(regstatus[Besoksdato >= paste0(rap_aar-1, "-07-01") &
-                                                 Besoksdato <= paste0(rap_aar, "-06-30")]),
-            "Ant.aktuell.12mnd" = sum(regstatus[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-                                                  Besoksdato <= paste0(rap_aar-1, "-12-31")]),
-            "Andel.6mnd" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-07-01") &
-                                                Besoksdato <= paste0(rap_aar, "-06-30")])/Ant.aktuell.6mnd*100,
-            # "Andel.6mnd_v2" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-            #                                        Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100,
-            "Andel.12mnd" = sum(regstatus_post2[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-                                                  Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100,
-            "Andel.begge" = sum(regstatus_post[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-                                                 Besoksdato <= paste0(rap_aar-1, "-12-31")] &
-                                  regstatus_post2[Besoksdato >= paste0(rap_aar-1, "-01-01") &
-                                                    Besoksdato <= paste0(rap_aar-1, "-12-31")])/Ant.aktuell.12mnd*100
-  )
+tab_oppf_alle <- RegDataAll[RegDataAll$regstatus_pre == 1, ] %>%
+  group_by(SykehusNavn) %>%
+  summarise(
+    "Ant.aktuell.6mnd" = sum(
+      regstatus[Besoksdato >= paste0(rap_aar-1, "-07-01") &
+                  Besoksdato <= paste0(rap_aar, "-06-30")]),
+    "Ant.aktuell.12mnd" = sum(
+      regstatus[Besoksdato >= paste0(rap_aar-1, "-01-01") &
+                  Besoksdato <= paste0(rap_aar-1, "-12-31")]),
+    "fulgtopp.6mnd" = sum(
+      regstatus_post[
+        Besoksdato >= paste0(rap_aar-1, "-07-01") &
+          Besoksdato <= paste0(rap_aar, "-06-30")]),
+    "fulgtopp.12mnd" = sum(
+      regstatus_post2[
+        Besoksdato >= paste0(rap_aar-1, "-01-01") &
+          Besoksdato <= paste0(rap_aar-1, "-12-31")]),
+    "fulgtopp.begge" = sum(
+      regstatus_post[
+        Besoksdato >= paste0(rap_aar-1, "-01-01") &
+          Besoksdato <= paste0(rap_aar-1, "-12-31")] &
+        regstatus_post2[
+          Besoksdato >= paste0(rap_aar-1, "-01-01") &
+            Besoksdato <= paste0(rap_aar-1, "-12-31")])
+  ) |> janitor::adorn_totals() |>
+  mutate(Andel.6mnd = fulgtopp.6mnd/Ant.aktuell.6mnd*100,
+         Andel.12mnd = fulgtopp.12mnd/Ant.aktuell.12mnd*100,
+         Andel.begge = fulgtopp.begge/Ant.aktuell.12mnd*100) |>
+  select(SykehusNavn, Ant.aktuell.6mnd, Ant.aktuell.12mnd,
+         Andel.6mnd, Andel.12mnd, Andel.begge)
+
 tab_oppf_alle <- tab_oppf_alle[tab_oppf_alle$Ant.aktuell.6mnd>0 | tab_oppf_alle$Ant.aktuell.12mnd>0, ]
 
 tab_oppf_alle$Andel.6mnd <- paste0(round(tab_oppf_alle$Andel.6mnd, 1), "% (", tab_oppf_alle$Ant.aktuell.6mnd, ")")
@@ -126,6 +140,9 @@ tab_oppf_alle$Andel.begge <- paste0(round(tab_oppf_alle$Andel.begge, 1), "% (", 
 tab_oppf_alle <- tab_oppf_alle[, c("SykehusNavn", "Andel.6mnd", "Andel.12mnd", "Andel.begge")]
 tab_oppf_alle[, c("Andel.6mnd", "Andel.12mnd", "Andel.begge")][tab_oppf_alle[, c("Andel.6mnd", "Andel.12mnd", "Andel.begge")] == "NaN% (0)"] <- "(0)"
 names(tab_oppf_alle)[1] <- "Sykehus"
+
+write.csv2(tab_oppf_alle, paste0(tabfolder, "tab_oppfolging.csv"),
+           row.names = F, fileEncoding = "Latin1")
 
 print(xtable::xtable(tab_oppf_alle, digits=0, align=c('l', 'l', rep('r', ncol(tab_oppf_alle)-1)), caption = paste0('Oversikt over oppfølgingsprosent per enhet, antall aktuelle i parentes. Andel.6mnd gjelder konsultasjoner i perioden 1.juli ', rap_aar-1, ' til 30. juni ', rap_aar, ", mens Andel.12mnd og Andel.begge gjelder konsultasjoner i ", (rap_aar-1)), sanitize.text.function = identity), include.rownames=FALSE)
 @
@@ -1472,9 +1489,12 @@ write.csv2(tab15_v2, paste0(tabfolder, "tab_behandling_spestjeneste.csv"),
 
 
 <<'Tab: Behandlingsløype forts.', results='asis', echo=FALSE, warning=F>>=
-tab16 <- RegData[, c( "SykehusNavn", "Treatment_TrainingActivation",
-                      "Treatment_WorkFollowUp", "Treatment_CognitiveApproach",
-                      "Treatment_Education", "Treatment_AttentionAndBodyawareness_Training")] %>%
+tab16 <- RegData |>
+  filter(Treatment_TreatmentInSpecialistServices == 1) |>
+  select("SykehusNavn", "Treatment_TrainingActivation",
+         "Treatment_WorkFollowUp", "Treatment_CognitiveApproach",
+         "Treatment_Education",
+         "Treatment_AttentionAndBodyawareness_Training") %>%
   group_by (SykehusNavn) %>%
   summarise(
     'Trening / aktivisering' = sum(Treatment_TrainingActivation),
@@ -1489,9 +1509,10 @@ tab16[, -c(1, dim(tab16)[2])] <- tab16[, -c(1, dim(tab16)[2])]/tab16$N*100
 tab16[, -c(1, dim(tab16)[2])] <- sapply(tab16[, -c(1, dim(tab16)[2])], function(x) {sprintf("%.1f%%", x)})
 tab16 <- tab16[tab16$N > 0, ]
 
-print(xtable::xtable(tab16, digits=0, align=c('l', 'l', rep('R{0.5in}', ncol(tab16)-1)),
-                     caption = 'Type individuell eller tverrfaglig behandling'),
-      include.rownames=FALSE, size = "\\small")
+print(xtable::xtable(
+  tab16, digits=0, align=c('l', 'l', rep('R{0.7in}', ncol(tab16)-1)),
+  caption = 'Type individuell eller tverrfaglig behandling'),
+  include.rownames=FALSE, size = "\\small")
 
 write.csv2(tab16, paste0(tabfolder, "tab_type_behandling.csv"),
            row.names = F, fileEncoding = "Latin1")
