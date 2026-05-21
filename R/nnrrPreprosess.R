@@ -175,11 +175,11 @@ nnrrPreprosess <- function(RegData)
   RegData$Tverrfaglig_vurdering[
     RegData$Tverrfaglig_vurdering_antall >= 2] <- 1
 
-  # RegData <- RegData |>
-  #   dplyr::mutate(Tverrfaglig_behandling = ifelse(
-  #     Treatment_InvidualInterdisciplinary %in% 1:3 |
-  #       Treatment_GroupInterdisciplinary2018 %in% 1:4, 1, 0)
-  #   )
+  RegData <- RegData |>
+    dplyr::mutate(Tverrfaglig_behandling = ifelse(
+      Treatment_InvidualInterdisciplinary %in% 1:3 |
+        Treatment_GroupInterdisciplinary2018 %in% 1:4, 1, 0)
+    )
 
 
   RegData$beh_spes <- 0
