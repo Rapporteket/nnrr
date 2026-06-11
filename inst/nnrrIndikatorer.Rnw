@@ -693,22 +693,24 @@ if (format_ut != "pdf") {
 #
 # dg_samlet <- dplyr::bind_rows(dg_gml, dg_2024)
 
-# Indikatorer <- Indikatorer |>
-#   dplyr::rename(
-#     orgnr = OrgNrShus,
-#     year = Aar,
-#     var = Teller,
-#     denominator = Nevner
-#   ) |>
-#   dplyr::mutate(context = "caregiver") |>
-#   dplyr::select(context, orgnr, year, var, denominator, ind_id) #|>
-# # dplyr::bind_rows(dg_samlet)
-#
-#
-# write.csv2(
-#   Indikatorer,
-#   paste0("C:/regdata/nnrr/behandlingskvalitet/beh_kval_", Sys.Date(), ".csv"),
-#   row.names = F)
+Indikatorer <- Indikatorer |>
+  dplyr::rename(
+    orgnr = OrgNrShus,
+    year = Aar,
+    var = Teller,
+    denominator = Nevner
+  ) |>
+  dplyr::mutate(context = "caregiver") |>
+  dplyr::select(context, orgnr, year, var, denominator, ind_id) |>
+  dplyr::filter(year >= 2021)
+
+
+
+write.csv2(
+  Indikatorer,
+  paste0("C:/Users/kth200/regdata/nnrr/behandlingskvalitet/beh_kval_",
+         Sys.Date(), ".csv"),
+  row.names = F)
 #
 # dg <- openxlsx::read.xlsx(
 #   "C:/regdata/nnrr/behandlingskvalitet/Dekningsgrad Halvårstall 2025.xlsx") |>
