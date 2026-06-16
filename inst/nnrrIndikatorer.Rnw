@@ -730,7 +730,8 @@ dg <- openxlsx::read.xlsx(
 
 write.csv2(
   dg,
-  paste0("C:/Users/kth200/regdata/nnrr/behandlingskvalitet/dg_", Sys.Date(), ".csv"),
+  paste0("C:/Users/kth200/regdata/nnrr/behandlingskvalitet/dg_",
+         Sys.Date(), ".csv"),
   row.names = F)
 
 #
