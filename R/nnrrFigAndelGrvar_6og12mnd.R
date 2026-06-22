@@ -8,13 +8,14 @@
 #'
 #' @export
 #'
-nnrrFigAndelGrvar_6og12mnd <- function(RegData, valgtVar1="opplevd_nytte_beh_6mnd",
-                              valgtVar2="opplevd_nytte_beh_12mnd",
-                              datoFra='2014-01-01', datoTil='2050-12-31',
-                              enhetsUtvalg=1, datovar="Besoksdato",
-                              minald=0, maxald=130, erMann=99, outfile='',
-                              reshID, inkl_konf=0, grvar="beh_spes",
-                              grtittel="Behandling i spesialisthelsetjenesten")
+nnrrFigAndelGrvar_6og12mnd <- function(
+    RegData, valgtVar1="opplevd_nytte_beh_6mnd",
+    valgtVar2="opplevd_nytte_beh_12mnd",
+    datoFra='2014-01-01', datoTil='2050-12-31',
+    enhetsUtvalg=1, datovar="Besoksdato",
+    minald=0, maxald=130, erMann=99, outfile='',
+    reshID, inkl_konf=0, grvar="beh_spes",
+    grtittel="Behandling i spesialisthelsetjenesten")
 {
 
   # valgtVar1="opplevd_nytte_beh_6mnd"; valgtVar2="opplevd_nytte_beh_12mnd";
@@ -109,8 +110,12 @@ nnrrFigAndelGrvar_6og12mnd <- function(RegData, valgtVar1="opplevd_nytte_beh_6mn
 
   #-----------Figur---------------------------------------
 
-  tittel <- PlotParams1$tittel; grtxt <- as.character(tabell_hoved[[1]]); grtxt2 <- PlotParams1$grtxt2;
-  subtxt <- PlotParams1$subtxt; cexgr <- PlotParams1$cexgr; retn <- "H" #retn <- PlotParams1$retn;
+  tittel <- PlotParams1$tittel;
+  grtxt <- as.character(tabell_hoved[[1]]);
+  grtxt2 <- PlotParams1$grtxt2;
+  subtxt <- PlotParams1$subtxt;
+  cexgr <- PlotParams1$cexgr;
+  retn <- "H" #retn <- PlotParams1$retn;
   FigTypUt <- rapFigurer::figtype(outfile=outfile, fargepalett='BlaaOff')
 
   NutvTxt <- length(utvalgTxt)
@@ -147,23 +152,6 @@ nnrrFigAndelGrvar_6og12mnd <- function(RegData, valgtVar1="opplevd_nytte_beh_6mn
 
   par('fig'=c(0, 1, 0, 1))
   if ( outfile != '') {dev.off()}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

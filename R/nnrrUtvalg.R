@@ -44,7 +44,7 @@ nnrrUtvalg <- function(RegData,
     which(RegData$ErMann == erMann)
   } else indAlle
   indTverr <- if (tverrfaglig %in% 0:1) {
-    which(RegData$Tverrfaglig_vurdering == tverrfaglig)
+    which(RegData$Tverrfaglig_behandling == tverrfaglig)
   } else indAlle
   indHSCL <- if (minHSCL > 1 | maxHSCL < 4) {
     which(RegData$HSCL10.Score >= minHSCL & RegData$HSCL10.Score <= maxHSCL)

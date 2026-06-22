@@ -11,9 +11,15 @@
 #'
 #' @export
 #'
-nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', datoTil='2050-01-01', reshID,
-                                    minald=0, maxald=120, erMann=99, outfile='', sammenlign = 1,
-                                    enhetsUtvalg=0, gr_var='SykehusNavn',  terskel = 5, inkl_konf = 1)
+nnrrFigGjsnPrePostGrVar_v2 <- function(
+    RegData, valgtVar, datoFra='2000-01-01',
+    datoTil='2050-01-01', reshID,
+    minald=0, maxald=120, erMann=99,
+    outfile='', sammenlign = 1,
+    enhetsUtvalg=0, gr_var='SykehusNavn',
+    terskel = 5, inkl_konf = 1,
+    width = 3 * 595,
+    height = 4 * 595)
 
 {
 
@@ -30,38 +36,48 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', 
   }
 
   # Definerer pre -og postvariabler, fjerner registreringer som mangler én eller begge
-  PrePostVar <- switch(valgtVar,
-                       ODI_PrePost = c('OdiScore', 'OdiScore_post', 'OdiScore_post2'),
-                       NDI_PrePost = c('NdiScore', 'NdiScore_post', 'NdiScore_post2'),
-                       EQ5D_PrePost = c('Eq5dScore', 'Eq5dScore_post', 'Eq5dScore_post'), # NB, finn ut av
-                       PainExperiencesNoActivity = c('PainExperiencesNoActivity',
-                                                     'PainExperiencesNoActivity_post',
-                                                     'PainExperiencesNoActivity_post2'),
-                       PainExperiencesActivity = c('PainExperiencesActivity',
-                                                   'PainExperiencesActivity_post',
-                                                   'PainExperiencesActivity_post2'))
+  PrePostVar <- switch(
+    valgtVar,
+    ODI_PrePost = c('OdiScore', 'OdiScore_post', 'OdiScore_post2'),
+    NDI_PrePost = c('NdiScore', 'NdiScore_post', 'NdiScore_post2'),
+    EQ5D_PrePost = c('Eq5dScore', 'Eq5dScore_post', 'Eq5dScore_post'), # NB, finn ut av
+    PainExperiencesNoActivity = c('PainExperiencesNoActivity',
+                                  'PainExperiencesNoActivity_post',
+                                  'PainExperiencesNoActivity_post2'),
+    PainExperiencesActivity = c('PainExperiencesActivity',
+                                'PainExperiencesActivity_post',
+                                'PainExperiencesActivity_post2'))
 
   RegData$VarPre <- RegData[ ,PrePostVar[1]]
   RegData$VarPost <- RegData[ ,PrePostVar[2]]
   RegData$VarPost2 <- RegData[ ,PrePostVar[3]]
-  if (sammenlign == 0) {RegData <- RegData[which(!is.na(RegData$VarPre)), ]}
-  if (sammenlign == 1) {RegData <- RegData[which(!is.na(RegData$VarPre) & !is.na(RegData$VarPost)), ]}
-  if (sammenlign == 2) {RegData <- RegData[which(!is.na(RegData$VarPre) &
-                                                   !is.na(RegData$VarPost) &
-                                                   !is.na(RegData$VarPost2)), ]}
+  if (sammenlign == 0) {
+    RegData <- RegData[which(!is.na(RegData$VarPre)), ]}
+  if (sammenlign == 1) {
+    RegData <- RegData[which(!is.na(RegData$VarPre) &
+                               !is.na(RegData$VarPost)), ]}
+  if (sammenlign == 2) {
+    RegData <- RegData[which(!is.na(RegData$VarPre) &
+                               !is.na(RegData$VarPost) &
+                               !is.na(RegData$VarPost2)), ]}
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
-  NNRRUtvalg <- nnrrUtvalg(RegData=RegData, datoFra=datoFra, datoTil=datoTil, minald=minald,
-                           maxald=maxald, erMann=erMann)
+  NNRRUtvalg <- nnrrUtvalg(
+    RegData=RegData, datoFra=datoFra,
+    datoTil=datoTil, minald=minald,
+    maxald=maxald, erMann=erMann)
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
 
-  PrePost <- aggregate(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]],
-                       by=list(RegData$Gr_var), mean, na.rm = TRUE)
-  PrePostSD <- aggregate(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]],
-                         by=list(RegData$Gr_var), sd, na.rm = TRUE)
+  PrePost <- aggregate(
+    RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]],
+    by=list(RegData$Gr_var), mean, na.rm = TRUE)
+  PrePostSD <- aggregate(
+    RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]],
+    by=list(RegData$Gr_var), sd, na.rm = TRUE)
   # Ngr <- tapply(RegData[, c('VarPre')], RegData$Gr_var, function(x){length(x[!is.na(x)])})
-  Ngr <- aggregate(RegData[, c('VarPre')], by=list(RegData$Gr_var), length)
+  Ngr <- aggregate(RegData[, c('VarPre')],
+                   by=list(RegData$Gr_var), length)
   kategorier <- as.character(Ngr$Group.1)
   Ngr <- as.matrix(t(Ngr[,-1]))
   PlotMatrise <- as.matrix(t(PrePost[,-1]))
@@ -72,7 +88,7 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', 
   } else {
     PlotMatrise <- cbind(PlotMatrise, colMeans(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]]))
     PrePostSD <- cbind(PrePostSD, apply(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]], 2, sd, na.rm = TRUE))
-    }
+  }
 
   # PrePostSD <- cbind(PrePostSD, apply(RegData[, c('VarPre', "VarPost", "VarPost2")[1:(sammenlign+1)]], 2, sd, na.rm = TRUE))
   #   Ngr <- table(as.character(RegData$Gr_var))  ######## Må forsikre at rekkefølgen av sykehus blir lik som i PlotMatrise
@@ -132,10 +148,14 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(RegData, valgtVar, datoFra='2000-01-01', 
     ymax <- length(PlotMatrise)*(sammenlign + 1)*1.3
   } else {
     ymax <- dim(PlotMatrise)[2]*(sammenlign + 2)*1.1
-    }
+  }
 
 
-  FigTypUt <- rapFigurer::figtype(outfile, fargepalett='BlaaOff')
+  FigTypUt <- rapFigurer::figtype(
+    outfile,
+    width = width,
+    height = height,
+    fargepalett='BlaaOff')
   farger <- FigTypUt$farger
   NutvTxt <- length(utvalgTxt)
   vmarg <- max(0, strwidth(grtxt, units='figure', cex=cexgr)*0.7)

@@ -1,6 +1,6 @@
 #' Provide global dataframe for NNRR
 #'
-#' Provides NNRR data from staging
+#' Provides NNRR data
 #'
 #' @inheritParams nnrrFigAndeler
 #'
@@ -12,45 +12,36 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   registryName <- "data"
   dbType <- "mysql"
 
-  if (rapbase::isRapContext()) {
-    legeskjema <- rapbase::loadRegData(
-      registryName,
-      "SELECT * FROM behandlerskjema_1")
-    pasientsvar_pre <- rapbase::loadRegData(
-      registryName,
-      "SELECT * FROM pasientskjema_for_behandling_2")
-    pasientsvar_post <- rapbase::loadRegData(
-      registryName,
-      "SELECT * FROM pasientskjema_6_maaneder_etter_behandling_3")
-    pasientsvar_post2 <- rapbase::loadRegData(
-      registryName,
-      "SELECT * FROM pasientskjema_12_maaneder_etter_behandling_8")
-  } else {
-    legeskjema <-
-      readr::read_csv2(
-        paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1505.csv"))
-    pasientsvar_pre <-
-      readr::read_csv2(
-        paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1512.csv"))
-    pasientsvar_post <-
-      readr::read_csv2(
-        paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1519.csv"))
-    pasientsvar_post2 <-
-      readr::read_csv2(
-        paste0("C:/Users/kth200/regdata/nnrr/datadump/data_2026-01-28_1521.csv"))
-  }
+  legeskjema <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM behandlerskjema_1")
+  pasientsvar_pre <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM pasientskjema_foer_behand_2")
+  pasientsvar_post <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM pasientskjema_6_maaneder__3")
+  pasientsvar_post2 <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM pasientskjema_12_maaneder_8")
 
-  flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[table(pasientsvar_pre$HovedskjemaGUID)>1]
+  flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[
+    table(pasientsvar_pre$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){
-    pasientsvar_pre <- pasientsvar_pre[!(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+    pasientsvar_pre <- pasientsvar_pre[
+      !(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
   }
-  flere_hovedskjemaGuid <- names(table(pasientsvar_post$HovedskjemaGUID))[table(pasientsvar_post$HovedskjemaGUID)>1]
+  flere_hovedskjemaGuid <- names(table(pasientsvar_post$HovedskjemaGUID))[
+    table(pasientsvar_post$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){
-    pasientsvar_post <- pasientsvar_post[!(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+    pasientsvar_post <- pasientsvar_post[
+      !(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
   }
-  flere_hovedskjemaGuid <- names(table(pasientsvar_post2$HovedskjemaGUID))[table(pasientsvar_post2$HovedskjemaGUID)>1]
+  flere_hovedskjemaGuid <- names(table(pasientsvar_post2$HovedskjemaGUID))[
+    table(pasientsvar_post2$HovedskjemaGUID)>1]
   if (!is.null(flere_hovedskjemaGuid)){
-    pasientsvar_post2 <- pasientsvar_post2[!(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
+    pasientsvar_post2 <- pasientsvar_post2[
+      !(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
   }
 
   # icd10 <- read.table('C:/GIT/data/nnrr/icd10.csv', sep=';',
@@ -60,9 +51,12 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   pasientsvar_post$regstatus <- 1
   pasientsvar_post2$regstatus <- 1
 
-  names(pasientsvar_pre)[names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
-  names(pasientsvar_post)[names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
-  names(pasientsvar_post2)[names(pasientsvar_post2)=='SkjemaGUID'] <- 'SkjemaGUID_post2'
+  names(pasientsvar_pre)[
+    names(pasientsvar_pre)=='SkjemaGUID'] <- 'SkjemaGUID_pre'
+  names(pasientsvar_post)[
+    names(pasientsvar_post)=='SkjemaGUID'] <- 'SkjemaGUID_post'
+  names(pasientsvar_post2)[
+    names(pasientsvar_post2)=='SkjemaGUID'] <- 'SkjemaGUID_post2'
 
   RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
                    by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'))

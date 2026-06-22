@@ -111,7 +111,7 @@ FigTypUt <- rapFigurer::figtype(outfile=outfile,
                                 pointsizePDF=11, fargepalett='BlaaOff')
 farger <- FigTypUt$farger
 
-xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[3],
+xpos <- barplot(as.vector(unlist(Tabell[,4])), col = farger[1],
                 border = F, ylim = c(0, 45), #ylim = c(0,1.25*max(Tabell[,-1])),
                 main = "Klinisk viktig endring i ODI",
                 ylab = "Andel %")
@@ -119,7 +119,7 @@ pktStr <- 1.5
 points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
 points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
 legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
-       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[1]),
        legend=names(Tabell[-1]), ncol = 3)
 
 mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
@@ -177,7 +177,7 @@ pktStr <- 1.5
 points(y=as.vector(unlist(Tabell[,2])), x=xpos,cex=pktStr) #'#4D4D4D'
 points(y=as.vector(unlist(Tabell[,3])), x=xpos,cex=pktStr,pch= 19)
 legend('top', cex=0.9*pktStr, bty='n', #bg='white', box.col='white',y=max(ypos),
-       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[3]),
+       lwd=c(NA,NA,NA), pch=c(1,19,15), pt.cex=c(1.2,1.2,1.8), col=c('black','black',farger[2]),
        legend=names(Tabell[-1]), ncol = 3)
 
 mtext(c(paste0("N=", N[1,4]), paste0("N=", N[2,4])), side = 1, line = -1, at = xpos)
@@ -893,7 +893,8 @@ readr::write_csv2(kobling, "C:/GIT/data/nnrr/nnrr_kobling_v2.csv")
 ########## Utlevering hianor 15.02.2023 #######################################
 kobling <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-16_0840.csv')
 kobling <- kobling[match(unique(kobling$PasientGUID), kobling$PasientGUID), ]
-pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
+# debugging rapporteket, fjern kommentar for gjenskapning
+# pasientsvar_pre <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
 # legeskjema <- read.table('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv',
 #                          sep=';', header=T, fileEncoding = 'UTF-8-BOM', stringsAsFactors = F)
 legeskjema <- readr::read_csv2('~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv')
@@ -927,9 +928,9 @@ readr::write_csv2(pasientsvar_post, "~/mydata/nnrr/skjema2_15022023.csv")
 readr::write_csv2(kobling, "~/mydata/nnrr/nnrr_kobling.csv")
 
 ######### Utlevering John Bjørneboe 14.02.2023  ########################################
-pasientsvar_pre <-
-  readr::read_csv2(
-    '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
+# pasientsvar_pre <- # debugging rapporteket, fjern kommentar for gjenskapning
+#   readr::read_csv2(
+#     '~/mydata/nnrr/DataDump_MRS-PROD_Pasientskjema+før+behandling_2023-02-02_0917.csv')
 legeskjema <-
   readr::read_csv2(
     '~/mydata/nnrr/DataDump_MRS-PROD_Behandlerskjema_2023-02-02_0917.csv')

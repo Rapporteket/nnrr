@@ -56,10 +56,15 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
           by = c("year", "SykehusNavn"), all.x = TRUE)
 
 
+  Andel_long2 <- Andel_long |>
+    tidyr::complete(SykehusNavn, year, fill = list(
+      andel = NA, Antall = NA, N = NA
+    ))
+
+
+
   aar <- sort(unique(Andel_long$year))
-  # library(ggplot2)
-  # library(plotly)
-  # library(dplyr)
+
   bakgrunn_gronn <- data.frame(
     xmin = 50,
     xmax = Inf,
@@ -84,6 +89,8 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
   alpha <- .8
 
   # x11()
+  library(ggplot2)
+  library(dplyr)
   p <- ggplot(Andel_long,
               aes(x = andel, y = SykehusNavn, shape = year, color = year,
                   text = paste("Sykehus:", SykehusNavn, "<br>Antall:",
@@ -124,7 +131,7 @@ ggPlotIndikator <- function(indikatordata, graaUt=NA, outfile = '',
       plot.title = element_text(vjust = 5, hjust = 0.5),
       plot.margin = unit(c(1, 0.5, 0.5, 0.5), "cm")
     )
-
+  p
 }
 
 

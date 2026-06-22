@@ -270,12 +270,12 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
         # if (rapbase::isRapContext()) {
           if (req(input$tab) == "fig") {
             mld_fordeling <- paste0(
-              "NoRGast: Figur - fordeling, variabel - ",
+              "NNRR: Figur - fordeling, variabel - ",
               input$valgtVar)
           }
           if (req(input$tab) == "tab") {
             mld_fordeling <- paste(
-              "NoRGast: tabell - fordeling. variabel - ",
+              "NNRR: tabell - fordeling. variabel - ",
               input$valgtVar)
           }
           rapbase::repLogger(
@@ -283,11 +283,11 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session){
             msg = mld_fordeling
           )
           mldLastNedFig <- paste(
-            "NoRGast: nedlasting figur - fordeling. variabel -",
+            "NNRR: nedlasting figur - fordeling. variabel -",
             input$valgtVar
           )
           mldLastNedTab <- paste(
-            "NoRGast: nedlasting tabell - fordeling. variabel -",
+            "NNRR: nedlasting tabell - fordeling. variabel -",
             input$valgtVar
           )
           shinyjs::onclick(

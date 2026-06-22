@@ -13,11 +13,11 @@ datoTil <- "2024-06-30"
 datoFra <- (as.Date(datoTil) - lubridate::years(2) + lubridate::days(1)) |>
   as.character()
 
-datasti <- "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/"
+datasti <- "C:/Users/kth200/regdata/nnrr/"
 
 legeskjema <-
   readr::read_csv2(
-    paste0(datasti, "data_2025-03-26_0912.csv"))
+    paste0(datasti, "data_2025-03-26_0912ø.csv"))
 pasientsvar_pre <-
   readr::read_csv2(
     paste0(datasti, "data_2025-03-26_0918.csv"))
@@ -28,7 +28,7 @@ pasientsvar_post2 <-
   readr::read_csv2(
     paste0(datasti, "data_2025-03-26_0928.csv"))
 
-filfolder <- "C:/Users/kth200/OneDrive - Helse Nord RHF/Dokumenter/regdata/nnrr/validering/"
+filfolder <- "C:/Users/kth200/regdata/nnrr/validering/"
 fil1 <- paste0(filfolder, "Variabelliste.xlsx")
 
 ### Trekk ut liste over pasienter:
@@ -109,12 +109,14 @@ data_pre <- merge(data_pre, pasientsvar_post6mnd,
   dplyr::mutate(Oppfolging = ifelse(is.na(DateOfCompletion), "Mangler_oppf", "Har_oppf"))
 
 data_analyse <- data_pre |>
-  mutate(alder_kat = cut(PatientAge, breaks = c(0, 30, 67, 140)),
-         Kjonn = factor(PatientGender, levels = 1:2, labels = c("Mann", "Kvinne")),
-         NationalCountry_lab = ifelse(NationalCountry==1, 1, 2),
-         NationalCountry_lab = factor(NationalCountry_lab, levels = 1:2,
-                                      labels = c("Norsk", "Ikke-norsk/ukjent")),
-         oppf = relevel(as.factor(Oppfolging), "Mangler_oppf")
+  mutate(
+    alder_kat = cut(PatientAge, breaks = c(0, 30, 67, 140)),
+    Kjonn = factor(PatientGender, levels = 1:2, 
+                   labels = c("Mann", "Kvinne")),
+    NationalCountry_lab = ifelse(NationalCountry==1, 1, 2),
+    NationalCountry_lab = factor(NationalCountry_lab, levels = 1:2,
+                                 labels = c("Norsk", "Ikke-norsk/ukjent")),
+    oppf = relevel(as.factor(Oppfolging), "Mangler_oppf")
   )
 
 var_kat <-c("S2_RetirementPension",
@@ -149,6 +151,8 @@ var_num <-c("PatientAge",
             "OwnChildren")
 
 ```
+
+# 6mnd-data
 
 ## Analyser katagoriske variabler: Aldersjustert
 
@@ -240,7 +244,7 @@ smnslaatt <- read.csv2(
   dplyr::rename(variabel_id = variable,
                 verdi = value,
                 verditekst = Slaa_sammen)
-  
+
 
 erstatt_koder_m_etiketter <- function(df, mapping) {
   df_label <- df %>%  
@@ -304,3 +308,229 @@ for (p in 1:length(var_kat)){
 }
 
 ```
+
+# 12mnd-data
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+
+data_forbehandl <- pasientsvar_pre[, forbehandl] %>%
+  mutate(Dato = as.Date(S1b_DateOfCompletion, format="%d.%m.%Y")) %>%
+  dplyr::filter(Dato >= "2021-01-01",
+                Dato <= "2022-12-31") %>%
+  dplyr::select(-c(S1b_DateOfCompletion))
+data_behandl <- legeskjema[, behandl] %>%
+  mutate(Dato = as.Date(S1b_DateOfCompletion, format="%d.%m.%Y")) %>%
+  dplyr::filter(Dato >= "2021-01-01",
+                Dato <= "2022-12-31") %>%
+  dplyr::select(-c(Dato, S1b_DateOfCompletion))
+
+data_pre <- merge(data_forbehandl, data_behandl, by.x = "HovedskjemaGUID",
+                  by.y = "SkjemaGUID", suffixes = c("_pas", "_beh"))
+
+pasientsvar_post12mnd <- pasientsvar_post2[, c("HovedskjemaGUID", "FormDate", "DateOfCompletion")]
+
+data_pre <- merge(data_pre, pasientsvar_post12mnd,
+                  by = "HovedskjemaGUID",
+                  all.x = TRUE) %>%
+  dplyr::mutate(Oppfolging = ifelse(is.na(DateOfCompletion), 
+                                    "Mangler_oppf", "Har_oppf"))
+
+data_analyse <- data_pre |>
+  mutate(
+    alder_kat = cut(PatientAge, breaks = c(0, 30, 67, 140)),
+    Kjonn = factor(PatientGender, levels = 1:2, 
+                   labels = c("Mann", "Kvinne")),
+    NationalCountry_lab = ifelse(NationalCountry==1, 1, 2),
+    NationalCountry_lab = factor(NationalCountry_lab, levels = 1:2,
+                                 labels = c("Norsk", "Ikke-norsk/ukjent")),
+    oppf = relevel(as.factor(Oppfolging), "Mangler_oppf")
+  )
+
+var_kat <-c("S2_RetirementPension",
+            "UhiQ31",
+            "NationalCountry",
+            "PainCausesSkeleton",
+            "ReadWriteDifficulties",
+            "UhiQ30",
+            "Treatment_FollowUpOperation",
+            "NationalInterpreter",
+            "FamilyStatus",
+            "Radiological_None",
+            "CourseYellowFlagComplicatingFactors",
+            "TreatmentEarlierOther",
+            "UhiQ32",
+            "S2_Student",
+            "TreatmentEvaluationByPsychologist",
+            "MedicationCFrequency",
+            "UhiQ6",
+            "Interpreter",
+            "PhysicalActivity",
+            "UhiQ24",
+            "UhiQ12",
+            "UhiQ3",
+            "S2_StayAtHome",
+            "UhiQ28")
+
+data_analyse[var_kat] <- lapply(data_analyse[var_kat], factor)
+var_num <-c("PatientAge",
+            "NofPainRegions",
+            "UHIIndex",
+            "OwnChildren")
+```
+
+
+## Analyser katagoriske variabler: Aldersjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + PatientAge")),
+    data = data_analyse |> dplyr::filter(!!sym(var_kat[p]) != -1), family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
+
+## Analyser katagoriske variabler: Kjønnsjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + Kjonn")),
+    data = data_analyse |> dplyr::filter(!!sym(var_kat[p]) != -1), family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
+
+## Analyser katagoriske variabler: Alders- og kjønnsjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + PatientAge + Kjonn")),
+    data = data_analyse |> dplyr::filter(!!sym(var_kat[p]) != -1), family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
+
+
+## Analyser numeriske variabler: Aldersjustert
+
+```{r}
+
+for (p in 1:length(var_num)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_num[p], " + PatientAge")),
+    data = data_analyse |> dplyr::filter(!is.na( !!sym(var_num[p]) )), family = "binomial")
+  print(paste0(var_num[p], ":"))
+  print(summary(model1))
+}
+```
+
+## Analyser numeriske variabler: Kjønnssjustert
+
+```{r}
+
+for (p in 1:length(var_num)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_num[p], " + Kjonn")),
+    data = data_analyse |> dplyr::filter(!is.na( !!sym(var_num[p]) )), family = "binomial")
+  print(paste0(var_num[p], ":"))
+  print(summary(model1))
+}
+```
+
+## Analyser numeriske variabler: Alders- og kjønnsjustert
+
+```{r}
+
+for (p in 1:length(var_num)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_num[p], " + PatientAge + Kjonn")),
+    data = data_analyse |> dplyr::filter(!is.na( !!sym(var_num[p]) )), family = "binomial")
+  print(paste0(var_num[p], ":"))
+  print(summary(model1))
+}
+```
+
+# Nye analyser: dikotomiserte variabler
+
+```{r}
+smnslaatt <- read.csv2(
+  paste0(filfolder, "oppsummering_kategoriske_redigert_paindurationnow.csv"),
+  fileEncoding = "Latin1") |>  
+  filter(variable != "",
+         Slaa_sammen != "") |> 
+  dplyr::rename(variabel_id = variable,
+                verdi = value,
+                verditekst = Slaa_sammen)
+
+
+erstatt_koder_m_etiketter <- function(df, mapping) {
+  df_label <- df %>%  
+    dplyr::mutate(
+      dplyr::across(
+        intersect(names(df), mapping$variabel_id), 
+        ~ factor(.x, 
+                 levels = dplyr::filter(mapping, 
+                                        variabel_id %in% 
+                                          dplyr::cur_column())$verdi,
+                 labels = dplyr::filter(mapping, 
+                                        variabel_id %in% 
+                                          dplyr::cur_column())$verditekst))
+    )
+}
+
+data_analyse_dikotom <- erstatt_koder_m_etiketter(data_analyse,smnslaatt)
+
+var_kat <- intersect(var_kat, smnslaatt$variabel_id)
+
+```
+
+## Analyser dikotomiserte variabler: Aldersjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + PatientAge")),
+    data = data_analyse_dikotom |> dplyr::filter(!is.na(!!sym(var_kat[p]))), 
+    family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
+
+## Analyser dikotomiserte variabler: Kjønnsjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + Kjonn")),
+    data = data_analyse_dikotom |> dplyr::filter(!is.na(!!sym(var_kat[p]))), 
+    family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
+
+## Analyser dikotomiserte variabler: Alders- og kjønnsjustert
+
+```{r}
+for (p in 1:length(var_kat)){
+  model1 <- glm(
+    as.formula(paste0("oppf ~ ", var_kat[p], " + PatientAge + Kjonn")),
+    data = data_analyse_dikotom |> dplyr::filter(!is.na(!!sym(var_kat[p]))), 
+    family = "binomial")
+  print(paste0(var_kat[p], ":"))
+  print(summary(model1))
+}
+
+```
+
