@@ -17,7 +17,7 @@ datasti <- "C:/Users/kth200/regdata/nnrr/"
 
 legeskjema <-
   readr::read_csv2(
-    paste0(datasti, "data_2025-03-26_0912ø.csv"))
+    paste0(datasti, "data_2025-03-26_0912.csv"))
 pasientsvar_pre <-
   readr::read_csv2(
     paste0(datasti, "data_2025-03-26_0918.csv"))

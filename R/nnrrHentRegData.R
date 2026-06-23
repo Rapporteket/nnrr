@@ -14,16 +14,24 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
 
   legeskjema <- rapbase::loadRegData(
     registryName,
-    "SELECT * FROM behandlerskjema_1")
+    "SELECT * FROM behandlerskjema_1") |>
+    dplyr::filter(S1b_DateOfCompletion >= datoFra,
+                  S1b_DateOfCompletion <= datoTil)
   pasientsvar_pre <- rapbase::loadRegData(
     registryName,
-    "SELECT * FROM pasientskjema_foer_behand_2")
+    "SELECT * FROM pasientskjema_foer_behand_2") |>
+    dplyr::filter(S1b_DateOfCompletion >= datoFra,
+                  S1b_DateOfCompletion <= datoTil)
   pasientsvar_post <- rapbase::loadRegData(
     registryName,
-    "SELECT * FROM pasientskjema_6_maaneder__3")
+    "SELECT * FROM pasientskjema_6_maaneder__3") |>
+    dplyr::filter(S1b_DateOfCompletion >= datoFra,
+                  S1b_DateOfCompletion <= datoTil)
   pasientsvar_post2 <- rapbase::loadRegData(
     registryName,
-    "SELECT * FROM pasientskjema_12_maaneder_8")
+    "SELECT * FROM pasientskjema_12_maaneder_8") |>
+    dplyr::filter(S1b_DateOfCompletion >= datoFra,
+                  S1b_DateOfCompletion <= datoTil)
 
   flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[
     table(pasientsvar_pre$HovedskjemaGUID)>1]
@@ -58,18 +66,22 @@ nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
   names(pasientsvar_post2)[
     names(pasientsvar_post2)=='SkjemaGUID'] <- 'SkjemaGUID_post2'
 
-  RegData <- merge(legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
-                   by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'))
-  RegData <- merge(RegData, pasientsvar_post, by.x = 'SkjemaGUID',
-                   by.y = 'HovedskjemaGUID', suffixes = c('', '_post'),
-                   all.x = TRUE)
-  RegData <- merge(RegData, pasientsvar_post2, by.x = 'SkjemaGUID',
-                   by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'),
-                   all.x = TRUE)
+  RegData <- merge(
+    legeskjema, pasientsvar_pre, by.x = 'SkjemaGUID',
+    by.y = 'HovedskjemaGUID', suffixes = c('', '_pre'))
+  RegData <- merge(
+    RegData, pasientsvar_post, by.x = 'SkjemaGUID',
+    by.y = 'HovedskjemaGUID', suffixes = c('', '_post'),
+    all.x = TRUE)
+  RegData <- merge(
+    RegData, pasientsvar_post2, by.x = 'SkjemaGUID',
+    by.y = 'HovedskjemaGUID', suffixes = c('', '_post2'),
+    all.x = TRUE)
 
   RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
   RegData <- nnrr::nnrrPreprosess(RegData = RegData)
-  rm(list = c('pasientsvar_pre', 'legeskjema', 'pasientsvar_post', 'pasientsvar_post2'))
+  rm(list = c('pasientsvar_pre', 'legeskjema',
+              'pasientsvar_post', 'pasientsvar_post2'))
 
   return(RegData)
 }

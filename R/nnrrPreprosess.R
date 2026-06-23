@@ -132,9 +132,11 @@ nnrrPreprosess <- function(RegData)
 
   RegData$PainDurationNow[RegData$PainDurationNow==0] <- 99
   RegData$SmerteNum <- RegData$PainDurationNow
-  RegData$PainDurationNow <- factor(RegData$PainDurationNow, levels = c(1:5,99),
-                                    labels = c('Ingen smerter', 'Mindre enn 3 måneder', '3 til 12 måneder',
-                                               '1-2 år', 'Mer enn 2', 'Ikke svart'))
+  RegData$PainDurationNow <- factor(
+    RegData$PainDurationNow, levels = c(1:5,99),
+    labels = c('Ingen smerter', 'Mindre enn 3 måneder',
+               '3 til 12 måneder',
+               '1-2 år', 'Mer enn 2', 'Ikke svart'))
   RegData$VentetidFraHenvisningTilTilbud_kat <-
     cut(RegData$VentetidFraHenvisningTilTilbud, breaks = c(0,30,60,90,180,365, 100000),
         labels = )
