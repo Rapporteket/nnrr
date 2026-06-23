@@ -7,53 +7,46 @@
 #' @return RegData data frame
 #' @export
 
-nnrrHentRegData <- function(datoFra = '2017-01-01', datoTil = '2099-01-01') {
+nnrrHentRegData <- function(datoFra = '2017-01-01',
+                            datoTil = '2099-01-01') {
 
   registryName <- "data"
   dbType <- "mysql"
 
   legeskjema <- rapbase::loadRegData(
     registryName,
-    "SELECT * FROM behandlerskjema_1") |>
-    dplyr::filter(S1b_DateOfCompletion >= datoFra,
-                  S1b_DateOfCompletion <= datoTil)
+    paste0(
+      "SELECT * FROM behandlerskjema_1 WHERE
+      S1b_DateOfCompletion >= \'",
+      datoFra, "\' AND S1b_DateOfCompletion <= \'",
+      datoTil, "\' ")) |>
+    dplyr::distinct(SkjemaGUID, .keep_all = TRUE)
+
   pasientsvar_pre <- rapbase::loadRegData(
     registryName,
-    "SELECT * FROM pasientskjema_foer_behand_2") |>
-    dplyr::filter(S1b_DateOfCompletion >= datoFra,
-                  S1b_DateOfCompletion <= datoTil)
+    paste0(
+      "SELECT * FROM pasientskjema_foer_behand_2 WHERE
+      S1b_DateOfCompletion >= \'",
+      datoFra, "\' AND S1b_DateOfCompletion <= \'",
+      datoTil, "\' ")) |>
+    dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE)
   pasientsvar_post <- rapbase::loadRegData(
     registryName,
-    "SELECT * FROM pasientskjema_6_maaneder__3") |>
-    dplyr::filter(S1b_DateOfCompletion >= datoFra,
-                  S1b_DateOfCompletion <= datoTil)
+    paste0(
+      "SELECT * FROM pasientskjema_6_maaneder__3 WHERE
+      S1b_DateOfCompletion >= \'",
+      datoFra, "\' AND S1b_DateOfCompletion <= \'",
+      datoTil, "\' ")) |>
+    dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE)
   pasientsvar_post2 <- rapbase::loadRegData(
     registryName,
-    "SELECT * FROM pasientskjema_12_maaneder_8") |>
-    dplyr::filter(S1b_DateOfCompletion >= datoFra,
-                  S1b_DateOfCompletion <= datoTil)
+    paste0(
+      "SELECT * FROM pasientskjema_12_maaneder_8 WHERE
+      S1b_DateOfCompletion >= \'",
+      datoFra, "\' AND S1b_DateOfCompletion <= \'",
+      datoTil, "\' ")) |>
+    dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE)
 
-  flere_hovedskjemaGuid <- names(table(pasientsvar_pre$HovedskjemaGUID))[
-    table(pasientsvar_pre$HovedskjemaGUID)>1]
-  if (!is.null(flere_hovedskjemaGuid)){
-    pasientsvar_pre <- pasientsvar_pre[
-      !(pasientsvar_pre$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
-  }
-  flere_hovedskjemaGuid <- names(table(pasientsvar_post$HovedskjemaGUID))[
-    table(pasientsvar_post$HovedskjemaGUID)>1]
-  if (!is.null(flere_hovedskjemaGuid)){
-    pasientsvar_post <- pasientsvar_post[
-      !(pasientsvar_post$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
-  }
-  flere_hovedskjemaGuid <- names(table(pasientsvar_post2$HovedskjemaGUID))[
-    table(pasientsvar_post2$HovedskjemaGUID)>1]
-  if (!is.null(flere_hovedskjemaGuid)){
-    pasientsvar_post2 <- pasientsvar_post2[
-      !(pasientsvar_post2$HovedskjemaGUID %in% flere_hovedskjemaGuid), ]
-  }
-
-  # icd10 <- read.table('C:/GIT/data/nnrr/icd10.csv', sep=';',
-  #                     header=T, stringsAsFactors = F, fileEncoding = 'UTF-8')
   legeskjema$regstatus <- 1
   pasientsvar_pre$regstatus <- 1
   pasientsvar_post$regstatus <- 1
