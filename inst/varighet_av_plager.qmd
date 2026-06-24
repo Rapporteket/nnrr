@@ -1,0 +1,53 @@
+---
+title: "Varighet av plager"
+author: "NNRR"
+format:
+  html:
+    self-contained: true
+---
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+library(nnrr)
+library(dplyr)
+library(tidyr)
+
+datoTil <- "2024-12-31"
+datoFra <- "2022-01-01"
+
+raadata <- nnrr::nnrrHentRegData(datoFra = datoFra, 
+                                 datoTil = datoTil)
+
+RegData <- raadata |>
+  dplyr::filter(S1b_DateOfCompletion >= datoFra,
+                S1b_DateOfCompletion <= datoTil,
+                regstatus == 1,
+                regstatus_pre == 1,
+                regstatus_post == 1,
+                regstatus_post2 == 1,
+                PainDurationNow != "Ikke svart") |>
+  dplyr::mutate(
+    smertevarighet =ifelse(PainDurationNow == "Mer enn 2", 
+                           "Smerter > 2 år", "Smerter <= 2 år"),
+    i_jobb_el_studier = S2_Working | S2_Student,
+    arbledig_el_hjem = S2_Unemployed | S2_StayAtHome,
+    aap_el_ufor = S2_NAV | S2_Pension)
+
+
+tab1 <- tableone::CreateTableOne(
+  c("PatientAge", "PatientGender", "EducationLevel", 
+    "FamilyStatus", "HSCL10Score", "FABQScore1", 
+    "OdiScore", "PainExperiencesActivity", "i_jobb_el_studier", 
+    "arbledig_el_hjem", "S2_SickLeave", "aap_el_ufor",
+    "S2_RetirementPension", "NofPainRegions",
+    "VentetidFraHenvisningTilBesok"),
+  strata = "smertevarighet", 
+  data = RegData,
+  factorVars = c("PatientGender", "EducationLevel", 
+                 "FamilyStatus", "i_jobb_el_studier",
+                 "arbledig_el_hjem", "S2_SickLeave", 
+                 "aap_el_ufor", "S2_RetirementPension"),
+  addOverall = TRUE)
+
+knitr::kable(print(tab1, printToggle = FALSE)[,-5])
+
+```
