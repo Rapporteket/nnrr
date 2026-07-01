@@ -4,8 +4,11 @@ author: "NNRR"
 format:
   html:
     self-contained: true
+output:
+  bookdown::html_document2
 ---
-## Deskriptiv analyse fra pasientskjema før behandling
+## Flytdiagram for inklusjon av pasienter i analysen
+
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 #| code-fold: true
 #| code-summary: "Click to see the code"
@@ -45,53 +48,9 @@ RegData <- raadata |>
     bedring_aktivitet2 = PainExperiencesActivity - PainExperiencesActivity_post2 >= 2,
     ingen_Behandling = Treatment_NoTreatment == 1
   )
-RegData |>
-  summarise(
-    N = n(),
-    Ingen_Beh = sum(Treatment_NoTreatment == 1),
-    Mottatt_Beh = sum(
-      Treatment_FollowUpMunicipality == 1 |
-        Treatment_FollowUpFysioterapeut == 1 |
-        Treatment_FollowUpKiropraktor == 1 |
-        Treatment_FollowUpPsykolog == 1
-    ),
-  )
-
-tab1 <- tableone::CreateTableOne(
-  c("PatientAge", "PatientGender", "EducationLevel", 
-    "FamilyStatus", "HSCL10Score", "FABQScore1", 
-    "OdiScore", "PainExperiencesActivity", "i_jobb_el_studier", 
-    "arbledig_el_hjem", "S2_SickLeave", "aap_el_ufor",
-    "S2_RetirementPension", "NofPainRegions",
-    "VentetidFraHenvisningTilBesok"),
-  strata = "smertevarighet", 
-  data = RegData,
-  factorVars = c("PatientGender", "EducationLevel", 
-                 "FamilyStatus", "i_jobb_el_studier",
-                 "arbledig_el_hjem", "S2_SickLeave", 
-                 "aap_el_ufor", "S2_RetirementPension"),
-  addOverall = TRUE)
-
-knitr::kable(print(tab1, printToggle = FALSE)[,-5])
-
-
-```
-
-## DAG
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
-#| code-fold: true
-#| code-summary: "Click to see the code"
-
-
 RegData_1 <- raadata
 
-RegData_2 <- RegData_1 |>
-  filter(regstatus == 1)
-
-RegData_3 <- RegData_2 |>
-  filter(regstatus_pre == 1)
-
-RegData_4 <- RegData_3 |>
+RegData_4 <- RegData_1 |>
   filter(regstatus_post == 1)
 
 RegData_5 <- RegData_4 |>
@@ -101,27 +60,21 @@ RegData_6 <- RegData_5 |>
   filter(PainDurationNow != "Ikke svart")
 
 filter_steps <- tibble(
-  id = c("raw", "reg", "pre", "post", "post2", "pain"),
+  id = c("raw", "post", "post2", "pain"),
   step = c(
-    "Rådata innenfor datoperiode",
-    "Har behandlingskjema",
-    "Har besvart pre-spørreskjema",
+    "Besvart pre-spørreskjema innenfor datoperiode",
     "Har besvart 6mnd post-spørreskjema",
     "Har besvart 12mnd post-spørreskjema",
     "Inkludert i analysen"
   ),
   excluded_label = c(
     NA,
-    "Mangler behandlingskjema",
-    "Ikke svart pre-spørreskjema",
     "Ikke svart 6mnd post-spørreskjema",
     "Ikke svart 12mnd post-spørreskjema",
     "Ikke oppgitt smertevarighet"
   ),
   n = c(
     nrow(RegData_1),
-    nrow(RegData_2),
-    nrow(RegData_3),
     nrow(RegData_4),
     nrow(RegData_5),
     nrow(RegData_6)
@@ -156,7 +109,7 @@ excluded_edges <- glue(
 )
 
 rank_pairs <- glue(
-  "{{ rank = same; {excluded_steps$to_id}; excl_{excluded_steps$id}; }}"
+  "{{ rank = same; {excluded_steps$from_id}; excl_{excluded_steps$id}; }}"
 )
 
 grViz(glue("
@@ -190,6 +143,35 @@ digraph filtering_dag {{
   {paste(rank_pairs, collapse = '\n')}
 }}
 "))
+
+
+
+```
+## Deskriptiv analyse fra pasientskjema før behandling
+
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+#| label: tbl-sammenligningstabell
+#| tbl-cap: "Sammenligningstabell etter smertevarighet"
+#| code-fold: true
+#| code-summary: "Click to see the code"
+
+tab1 <- tableone::CreateTableOne(
+  c("PatientAge", "PatientGender", "EducationLevel", 
+    "FamilyStatus", "HSCL10Score", "FABQScore1", 
+    "OdiScore", "PainExperiencesActivity", "i_jobb_el_studier", 
+    "arbledig_el_hjem", "S2_SickLeave", "aap_el_ufor",
+    "S2_RetirementPension", "NofPainRegions",
+    "VentetidFraHenvisningTilBesok"),
+  strata = "smertevarighet", 
+  data = RegData,
+  factorVars = c("PatientGender", "EducationLevel", 
+                 "FamilyStatus", "i_jobb_el_studier",
+                 "arbledig_el_hjem", "S2_SickLeave", 
+                 "aap_el_ufor", "S2_RetirementPension"),
+  addOverall = TRUE)
+
+knitr::kable(print(tab1, printToggle = FALSE)[,-5])
+
 ```
 ## Andel endring i ODI etter 6 mnd; pasienter med smertevarighet < og > 2 år ved baseline
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
@@ -236,6 +218,14 @@ ggplot(pie_data, aes(x = "", y = prosent, fill = kategori)) +
     aes(label = label),
     position = position_stack(vjust = 0.5),
     size = 3
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Forverring av plager" = "#C77CFF",
+      "Uendret plager" = "#00BFC4",
+      "Bedring under 10 poeng" = "#7CAE00",
+      "Klinisk bedring ≥10 poeng" = "#F8766D"
+    )
   ) +
   labs(
     title = "Endring i ODI etter 6 måneder",
@@ -445,7 +435,63 @@ knitr::kable(final_tabell_odi)
 
 ```
 ## Korrigert analyse med GEE-modell
+P-verdiene i @tbl-sammenligningstabell viser om pasientene med kort
+og lang smertevarighet skiller seg fra hverandre på baselinevariabler.
+Dette gir nyttig deskriptiv informasjon og kan bidra til å synliggjøre
+eventuell ubalanse mellom gruppene. Samtidig bør p-verdiene ikke alene
+være avgjørende for hvilke variabler som inkluderes som justeringsvariabler
+i GEE-modellen.
+
+Ved valg av justeringsvariabler er hovedmålet å redusere mulig bias,
+særlig knyttet til konfunderende faktorer. En variabel kan være statistisk
+signifikant forskjellig mellom gruppene uten nødvendigvis å være en viktig
+konfunderende faktor. Tilsvarende kan en klinisk relevant variabel,
+for eksempel alder eller kjønn, være ikke-signifikant i @tbl-sammenligningstabell,
+men likevel være relevant å justere for dersom den kan påvirke smerteforløp
+eller sannsynligheten for klinisk viktig bedring.
+
+Det er derfor ikke tilstrekkelig at en variabel er ulikt fordelt mellom gruppene.
+Variabelen bør også være klinisk eller metodisk relevant for utfallet, og
+plausibelt kunne påvirke både gruppetilhørighet og prognose. I store datasett
+kan dessuten små og klinisk lite viktige forskjeller bli statistisk
+signifikante. Dersom alle signifikante variabler inkluderes automatisk,
+kan modellen bli mer datadrevet enn faglig begrunnet.
+
+Samtidig bør man være varsom med å justere for variabler som kan ligge
+på årsakskjeden mellom smertevarighet og utfall. Slike mediatorer kan
+være en del av mekanismen man ønsker å undersøke, og justering for dem
+kan dermed svekke eller endre tolkningen av sammenhengen mellom
+smertevarighet og klinisk viktig bedring. Eksempelvis kan smertevarighet
+påvirke frykt for deltakelse i aktivitet, som igjen kan påvirke smerteforløpet.
+Justering for frykt for deltakelse kan dermed redusere den observerte sammenhengen mellom
+smertevarighet og klinisk viktig bedring, selv om frykt for deltakelse er en del av mekanismen.
+
+Målet med justeringen er derfor ikke å korrigere for alle observerte
+forskjeller mellom gruppene, men å gjøre sammenligningen mer rettferdig
+med hensyn til faktorer som kan gi skjevhet i estimatet. Valg av variabler
+bør derfor bygge på det vi mener er faktorer som er relevante
+prognostiske eller konfunderende
+variabler, uten å inkludere mulige mediatorer unødig.
+
+
+#### GEE kort forklart
+
+OR-tabellen viser sammenhengen mellom ulike faktorer og sannsynligheten
+for klinisk viktig bedring. Fordi samme pasient inngår med målinger
+ved både 6 og 12 måneder, bruker vi GEE i stedet for vanlig logistisk
+regresjon. GEE tar hensyn til at observasjoner fra samme pasient er korrelerte,
+og gir derfor mer korrekte standardfeil, konfidensintervall og p-verdier.
+Grunnen til at vi tar hensyn til korrelasjon er at en pasients bedring
+ved 6 måneder i stor grad kan være relatert til bedring ved 12 måneder. Hvis vi ignorerer
+denne korrelasjonen, kan vi undervurdere usikkerheten i estimatene og
+dermed få for smale konfidensintervall og feilaktige p-verdier.
+Odds ratioene kan ligne på dem vi ville fått fra vanlig logistisk regresjon,
+men GEE gir en riktigere vurdering av usikkerheten rundt estimatene.
+OR-ene tolkes som gjennomsnittlige sammenhenger på gruppenivå, ikke som
+individuelle pasientspesifikke effekter.
+
 ### Oddsratio for klinisk viktig bedring i smerte etter 6 mnd og 12 mnd mellom pasienter med smertevarighet < og > 2 år ved baseline
+
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 #| code-fold: true
 #| code-summary: "Click to see the code"
@@ -502,7 +548,14 @@ gee_data_activity <- RegData |>
       as.factor
     )
   )
-
+smerte_baseline_below_2 <- gee_data_activity |>
+  filter(smerte_baseline < 2) |>
+  distinct(PasientGUID, tidspunkt, .keep_all = TRUE)
+str <- glue("Antall pasienter med smerte_baseline < 2: {nrow(smerte_baseline_below_2)}.
+Disse ble eksludert fra analysen.")
+print(str)
+gee_data_activity <- gee_data_activity |>
+  filter(smerte_baseline >= 2)
 
 gee_data_activity <- gee_data_activity |>
   distinct(PasientGUID, tidspunkt, .keep_all = TRUE) |>
@@ -616,7 +669,15 @@ gee_data_odi <- RegData |>
       as.factor
     )
   )
-
+  ODI_baseline_below_10 <- gee_data_odi |>
+    filter(odi_baseline < 10) |>
+    distinct(PasientGUID, tidspunkt, .keep_all = TRUE)
+  str <- glue("Antall pasienter med ODI_baseline < 10: {nrow(ODI_baseline_below_10)}.
+  Disse ble eksludert fra analysen.")
+  print(str)
+  
+  gee_data_odi <- gee_data_odi |>
+    filter(odi_baseline >= 10)
   gee_data_odi <- gee_data_odi |>
     distinct(PasientGUID, tidspunkt, .keep_all = TRUE) |>
     mutate(across(where(is.factor), droplevels)) |>
