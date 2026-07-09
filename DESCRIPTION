@@ -21,6 +21,7 @@ Imports:
   janitor,
   DT,
   kableExtra,
+  magrittr,
   rapbase,
   rapFigurer,
   plotly
