@@ -15,6 +15,7 @@ output:
 library(nnrr)
 library(dplyr)
 library(tidyr)
+library(scales)
 library(ggplot2)
 library(geepack)
 library(emmeans)
@@ -45,9 +46,16 @@ RegData <- raadata |>
     kun_post = ifelse(regstatus_post == 1 & regstatus_post2 == 0, 1, 0),
     kun_post2 = ifelse(regstatus_post == 0 & regstatus_post2 == 1, 1, 0),
     bedring_aktivitet = PainExperiencesActivity - PainExperiencesActivity_post >= 2,
-    bedring_aktivitet2 = PainExperiencesActivity - PainExperiencesActivity_post2 >= 2,
-    ingen_Behandling = Treatment_NoTreatment == 1
-  )
+    bedring_aktivitet2 = PainExperiencesActivity - PainExperiencesActivity_post2 >= 2
+  ) |>
+  dplyr::group_by(PasientGUID) |>
+  dplyr::slice_max(
+    S1b_DateOfCompletion,
+    n = 1,
+    with_ties = FALSE
+  ) |>
+  dplyr::ungroup()
+
 RegData_1 <- raadata
 
 RegData_4 <- RegData_1 |>
@@ -58,26 +66,37 @@ RegData_5 <- RegData_4 |>
 
 RegData_6 <- RegData_5 |>
   filter(PainDurationNow != "Ikke svart")
+RegData_7 <- RegData_6 |>
+  dplyr::group_by(PasientGUID) |>
+  dplyr::slice_max(
+    S1b_DateOfCompletion,
+    n = 1,
+    with_ties = FALSE
+  ) |>
+  dplyr::ungroup()
 
 filter_steps <- tibble(
-  id = c("raw", "post", "post2", "pain"),
+  id = c("raw", "post", "post2", "pain", "dupl"),
   step = c(
     "Besvart pre-spørreskjema innenfor datoperiode",
     "Har besvart 6mnd post-spørreskjema",
     "Har besvart 12mnd post-spørreskjema",
+    "Inkludert før fjerning av duplikater",
     "Inkludert i analysen"
   ),
   excluded_label = c(
     NA,
     "Ikke svart 6mnd post-spørreskjema",
     "Ikke svart 12mnd post-spørreskjema",
-    "Ikke oppgitt smertevarighet"
+    "Ikke oppgitt smertevarighet",
+    "Duplikater"
   ),
   n = c(
     nrow(RegData_1),
     nrow(RegData_4),
     nrow(RegData_5),
-    nrow(RegData_6)
+    nrow(RegData_6),
+    nrow(RegData_7)
   )
 ) |>
   mutate(
@@ -149,29 +168,95 @@ digraph filtering_dag {{
 ```
 ## Deskriptiv analyse fra pasientskjema før behandling
 
+Det er brukt enveis ANOVA for å sammenligne kontinuerlige variabler.
+For kategoriske variabler er det brukt Pearsons kji-kvadrat test.
+
+Personer som ikke har svart på en variabel er ekskludert fra analysen for den aktuelle variabelen.
+
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 #| label: tbl-sammenligningstabell
 #| tbl-cap: "Sammenligningstabell etter smertevarighet"
 #| code-fold: true
 #| code-summary: "Click to see the code"
+RegData_tab1 <- RegData
+
+var_labels <- c(
+  PatientAge = "Alder",
+  PatientGender = "Kjønn",
+  EducationLevel = "Utdanning",
+  FamilyStatus = "Familiestatus",
+  HSCL10Score = "Psykisk symptomtrykk (HSCL-10 skår)",
+  FABQScore1 = "FABQ skår",
+  OdiScore = "ODI skår",
+  PainExperiencesActivity = "Smertepåvirkning på aktivitet",
+  i_jobb_el_studier = "I arbeid eller studier",
+  arbledig_el_hjem = "Arbeidsledig eller hjemme",
+  S2_SickLeave = "Sykemeldt",
+  aap_el_ufor = "På AAP eller ufør",
+  S2_RetirementPension = "Alderspensjon",
+  NofPainRegions = "Antall smerteregioner",
+  VentetidFraHenvisningTilBesok = "Ventetid (dager)",
+  PhysicalActivity = "Fysisk aktivitet"
+)
+
+names(RegData_tab1)[match(names(var_labels), names(RegData_tab1))] <- unname(var_labels)
+
+factor_vars <- c(
+  "Kjønn", "Utdanning", "Familiestatus",
+  "I arbeid eller studier", "Arbeidsledig eller hjemme",
+  "Sykemeldt", "På AAP eller ufør",
+  "Alderspensjon", "Fysisk aktivitet"
+)
+
+RegData_tab1 <- RegData_tab1 |>
+  mutate(
+    Kjønn = factor(
+      Kjønn,
+      levels = c(1, 2),
+      labels = c("Mann", "Kvinne")
+    )
+  ) |>
+  mutate(
+    across(
+      all_of(factor_vars),
+      ~ trimws(as.character(.x))
+    )
+  ) |>
+  mutate(
+    across(
+      all_of(factor_vars),
+      ~ ifelse(.x %in% c("Ikke svart", "Ikke besvart"), NA, .x)
+    )
+  ) |>
+  mutate(
+    `Fysisk aktivitet` = ifelse(`Fysisk aktivitet` == "0", NA, `Fysisk aktivitet`)
+  ) |>
+  mutate(
+    across(
+      all_of(factor_vars),
+      factor
+    )
+  )
 
 tab1 <- tableone::CreateTableOne(
-  c("PatientAge", "PatientGender", "EducationLevel", 
-    "FamilyStatus", "HSCL10Score", "FABQScore1", 
-    "OdiScore", "PainExperiencesActivity", "i_jobb_el_studier", 
-    "arbledig_el_hjem", "S2_SickLeave", "aap_el_ufor",
-    "S2_RetirementPension", "NofPainRegions",
-    "VentetidFraHenvisningTilBesok"),
+  vars = c(
+    "Alder", "Kjønn", "Utdanning", 
+    "Familiestatus", "Psykisk symptomtrykk (HSCL-10 skår)", "FABQ skår",
+    "ODI skår", "Smertepåvirkning på aktivitet", 
+    "I arbeid eller studier", "Arbeidsledig eller hjemme", 
+    "Sykemeldt", "På AAP eller ufør",
+    "Alderspensjon", "Antall smerteregioner",
+    "Ventetid (dager)", "Fysisk aktivitet"
+  ),
   strata = "smertevarighet", 
-  data = RegData,
-  factorVars = c("PatientGender", "EducationLevel", 
-                 "FamilyStatus", "i_jobb_el_studier",
-                 "arbledig_el_hjem", "S2_SickLeave", 
-                 "aap_el_ufor", "S2_RetirementPension"),
-  addOverall = TRUE)
+  data = RegData_tab1,
+  factorVars = factor_vars,
+  addOverall = TRUE
+)
 
-knitr::kable(print(tab1, printToggle = FALSE)[,-5])
+tab1_out <- print(tab1, printToggle = FALSE)
 
+knitr::kable(tab1_out[, -5])
 ```
 ## Andel endring i ODI etter 6 mnd; pasienter med smertevarighet < og > 2 år ved baseline
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
@@ -223,9 +308,10 @@ ggplot(pie_data, aes(x = "", y = prosent, fill = kategori)) +
     values = c(
       "Forverring av plager" = "#C77CFF",
       "Uendret plager" = "#00BFC4",
-      "Bedring under 10 poeng" = "#7CAE00",
-      "Klinisk bedring ≥10 poeng" = "#F8766D"
-    )
+      "Bedring under 10 poeng" = "#dc0574",
+      "Klinisk bedring ≥10 poeng" = "#fd1808"
+    ),
+    guide = guide_legend(reverse = TRUE)
   ) +
   labs(
     title = "Endring i ODI etter 6 måneder",
@@ -233,27 +319,6 @@ ggplot(pie_data, aes(x = "", y = prosent, fill = kategori)) +
     fill = "Kategori"
   ) +
   theme_void()
-
-ggplot(pie_data, aes(x = kategori, y = prosent, fill = kategori)) +
-  geom_col(width = 0.7, color = "white") +
-  facet_wrap(~ smertevarighet) +
-  geom_text(
-    aes(label = label),
-    vjust = -0.5,
-    size = 3
-  ) +
-  labs(
-    title = "Endring i ODI etter 6 måneder",
-    subtitle = "Fordelt på varighet av plager ved baseline",
-    fill = "Kategori",
-    x = "",
-    y = "Prosent (%)"
-  ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    panel.spacing = unit(1, "cm")
-  )
 
 kontroll_tabell <- pie_data |>
   mutate(prosent = paste0(round(prosent, 1), "%")) |>
@@ -269,24 +334,76 @@ knitr::kable(kontroll_tabell)
 ```
 ## Andeler ved baseline
 
-### Andel med klinisk viktig bedring i smerte i aktivitet etter 6 mnd og 12 mnd; pasienter med smertevarighet < og > 2 år ved baseline
+#### Antall pasienter som ikke har besvart smerte eller ODI på oppfølgingsskjema ved baseline, 6 og 12 måneder
+Disse pasientene 
 ```{r, echo=TRUE, warning=FALSE, message=FALSE}
 #| code-fold: true
 #| code-summary: "Click to see the code"
+not_answered <- RegData |>
+  summarise(
+    `ikke besvart NSR baseline` = sum(is.na(PainExperiencesActivity)),
+    `ikke besvart NSR 6 mnd` = sum(is.na(PainExperiencesActivity_post)),
+    `ikke besvart NSR 12 mnd` = sum(is.na(PainExperiencesActivity_post2)),
+    `ikke besvart ODI baseline` = sum(is.na(OdiScore)),
+    `ikke besvart ODI 6 mnd` = sum(is.na(OdiScore_post)),
+    `ikke besvart ODI 12 mnd` = sum(is.na(OdiScore_post2))
+  )
+knitr::kable(not_answered)
+```
+### Andel med klinisk viktig bedring i smerte i aktivitet etter 6 mnd og 12 mnd; pasienter med smertevarighet < og > 2 år ved baseline
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| results: asis
+#| code-fold: true
+#| code-summary: "Click to see the code"
+
 prop_ci <- function(x, n) {
+  if (is.na(n) || n == 0) {
+    return(c(NA_real_, NA_real_))
+  }
+
   prop.test(x, n)$conf.int
 }
 
 safe_p <- function(gruppe, utfall) {
-  tab <- table(gruppe, utfall)
-  chisq.test(tab)$p.value
+  dat <- data.frame(
+    gruppe = gruppe,
+    utfall = utfall
+  ) |>
+    filter(
+      !is.na(gruppe),
+      !is.na(utfall)
+    ) |>
+    mutate(
+      gruppe = droplevels(as.factor(gruppe)),
+      utfall = factor(utfall, levels = c(0, 1))
+    )
+
+  tab <- table(dat$gruppe, dat$utfall)
+
+  if (nrow(tab) < 2 || ncol(tab) < 2) {
+    return(NA_real_)
+  }
+
+  suppressWarnings(chisq.test(tab)$p.value)
+}
+
+format_p <- function(p) {
+  ifelse(
+    is.na(p),
+    "",
+    format.pval(p, digits = 3, eps = 0.001)
+  )
 }
 
 andel_data <- RegData |>
   mutate(
     smertevarighet = factor(
       smertevarighet,
-      levels = c("Smerter > 2 år", "Smerter <= 2 år")
+      levels = c("Smerter <= 2 år", "Smerter > 2 år")
     ),
     smerte_baseline = PainExperiencesActivity,
     ODI_baseline = OdiScore
@@ -299,7 +416,6 @@ andel_data <- RegData |>
     `12 måneder aktivitet` = PainExperiencesActivity_post2,
     `6 måneder ODI` = OdiScore_post,
     `12 måneder ODI` = OdiScore_post2
-    
   )
 
 andel_data_activity <- andel_data |>
@@ -309,6 +425,15 @@ andel_data_activity <- andel_data |>
     values_to = "smerte_oppfolging"
   ) |>
   mutate(
+    tidspunkt = case_when(
+      tidspunkt == "6 måneder aktivitet" ~ "6 måneder",
+      tidspunkt == "12 måneder aktivitet" ~ "12 måneder",
+      TRUE ~ tidspunkt
+    ),
+    tidspunkt = factor(
+      tidspunkt,
+      levels = c("6 måneder", "12 måneder")
+    ),
     smertereduksjon = smerte_baseline - smerte_oppfolging,
     klinisk_viktig_bedring = case_when(
       is.na(smertereduksjon) ~ NA_integer_,
@@ -316,6 +441,7 @@ andel_data_activity <- andel_data |>
       TRUE ~ 0L
     )
   )
+
 andel_data_odi <- andel_data |>
   pivot_longer(
     cols = c(`6 måneder ODI`, `12 måneder ODI`),
@@ -323,6 +449,15 @@ andel_data_odi <- andel_data |>
     values_to = "odi_oppfolging"
   ) |>
   mutate(
+    tidspunkt = case_when(
+      tidspunkt == "6 måneder ODI" ~ "6 måneder",
+      tidspunkt == "12 måneder ODI" ~ "12 måneder",
+      TRUE ~ tidspunkt
+    ),
+    tidspunkt = factor(
+      tidspunkt,
+      levels = c("6 måneder", "12 måneder")
+    ),
     odi_endring = ODI_baseline - odi_oppfolging,
     klinisk_viktig_bedring = case_when(
       is.na(odi_endring) ~ NA_integer_,
@@ -336,18 +471,19 @@ andel_tabell_activity <- andel_data_activity |>
   summarise(
     N = sum(!is.na(klinisk_viktig_bedring)),
     n_bedring = sum(klinisk_viktig_bedring == 1, na.rm = TRUE),
-    n_uten_bedring = sum(klinisk_viktig_bedring == 0, na.rm = TRUE),
     ci_lower = prop_ci(n_bedring, N)[1],
     ci_upper = prop_ci(n_bedring, N)[2],
     .groups = "drop"
   ) |>
   mutate(
-    `Andel med klinisk viktig bedring` =
-      sprintf("%s/%s (%.1f%%)", n_bedring, N, 100 * n_bedring / N),
-    `Andel uten klinisk viktig bedring` =
-      sprintf("%s/%s (%.1f%%)", n_uten_bedring, N, 100 * n_uten_bedring / N),
-    `Konfidensintervall` =
-      sprintf("%.1f–%.1f%%", 100 * ci_lower, 100 * ci_upper)
+    verdi = sprintf(
+      "%s/%s (%.1f%%)<br>(%.1f–%.1f%%)",
+      n_bedring,
+      N,
+      100 * n_bedring / N,
+      100 * ci_lower,
+      100 * ci_upper
+    )
   )
 
 p_values_activity <- andel_data_activity |>
@@ -359,48 +495,81 @@ p_values_activity <- andel_data_activity |>
   )
 
 final_tabell_activity <- andel_tabell_activity |>
-  left_join(p_values_activity, by = "tidspunkt") |>
-  group_by(tidspunkt) |>
-  mutate(
-    `P-verdi` = ifelse(
-      row_number() == 1,
-      format.pval(p_value, digits = 3, eps = 0.001),
-      ""
-    )
-  ) |>
-  ungroup() |>
   select(
     tidspunkt,
-    Gruppe = smertevarighet,
-    `Andel med klinisk viktig bedring`,
-    `Andel uten klinisk viktig bedring`,
-    `Konfidensintervall`,
+    smertevarighet,
+    verdi
+  ) |>
+  pivot_wider(
+    names_from = smertevarighet,
+    values_from = verdi
+  ) |>
+  left_join(p_values_activity, by = "tidspunkt") |>
+  mutate(
+    Rad = "Andel med<br>klinisk viktig<br>bedring",
+    `P-verdi` = format_p(p_value)
+  ) |>
+  select(
+    tidspunkt,
+    Rad,
+    `Smerter <= 2 år`,
+    `Smerter > 2 år`,
     `P-verdi`
-  )
+  ) |>
+  arrange(tidspunkt)
 
-knitr::kable(final_tabell_activity)
+final_tabell_activity |>
+  knitr::kable(
+    format = "html",
+    escape = FALSE,
+    col.names = c(
+      "",
+      "",
+      "Smerter < 2 år (%)<br>(KI)",
+      "Smerter > 2 år (%)<br>(KI)",
+      "P-verdi"
+    ),
+    align = c("l", "l", "c", "c", "c")
+  ) |>
+  kableExtra::kable_styling(
+    full_width = FALSE,
+    bootstrap_options = c("condensed")
+  ) |>
+  kableExtra::column_spec(1, width = "7em") |>
+  kableExtra::column_spec(2, width = "12em") |>
+  kableExtra::column_spec(3, width = "13em") |>
+  kableExtra::column_spec(4, width = "13em") |>
+  kableExtra::column_spec(5, width = "6em")
 ```
+
 ### Andel med klinisk viktig bedring i ODI etter 6 mnd og 12 mnd; pasienter med smertevarighet < og > 2 år ved baseline
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+
+```{r}
+#| echo: true
+#| warning: false
+#| message: false
+#| results: asis
 #| code-fold: true
 #| code-summary: "Click to see the code"
+
 andel_tabell_odi <- andel_data_odi |>
   group_by(tidspunkt, smertevarighet) |>
   summarise(
     N = sum(!is.na(klinisk_viktig_bedring)),
     n_bedring = sum(klinisk_viktig_bedring == 1, na.rm = TRUE),
-    n_uten_bedring = sum(klinisk_viktig_bedring == 0, na.rm = TRUE),
     ci_lower = prop_ci(n_bedring, N)[1],
     ci_upper = prop_ci(n_bedring, N)[2],
     .groups = "drop"
   ) |>
   mutate(
-    `Andel med klinisk viktig bedring` =
-      sprintf("%s/%s (%.1f%%)", n_bedring, N, 100 * n_bedring / N),
-    `Andel uten klinisk viktig bedring` =
-      sprintf("%s/%s (%.1f%%)", n_uten_bedring, N, 100 * n_uten_bedring / N),
-    `Konfidensintervall` =
-      sprintf("%.1f–%.1f%%", 100 * ci_lower, 100 * ci_upper)
+    verdi = sprintf(
+      "%s/%s (%.1f%%)<br>(%.1f–%.1f%%)",
+      n_bedring,
+      N,
+      100 * n_bedring / N,
+      100 * ci_lower,
+      100 * ci_upper
+    )
   )
 
 p_values_odi <- andel_data_odi |>
@@ -412,27 +581,51 @@ p_values_odi <- andel_data_odi |>
   )
 
 final_tabell_odi <- andel_tabell_odi |>
-  left_join(p_values_odi, by = "tidspunkt") |>
-  group_by(tidspunkt) |>
-  mutate(
-    `P-verdi` = ifelse(
-      row_number() == 1,
-      format.pval(p_value, digits = 3, eps = 0.001),
-      ""
-    )
-  ) |>
-  ungroup() |>
   select(
     tidspunkt,
-    Gruppe = smertevarighet,
-    `Andel med klinisk viktig bedring`,
-    `Andel uten klinisk viktig bedring`,
-    `Konfidensintervall`,
+    smertevarighet,
+    verdi
+  ) |>
+  pivot_wider(
+    names_from = smertevarighet,
+    values_from = verdi
+  ) |>
+  left_join(p_values_odi, by = "tidspunkt") |>
+  mutate(
+    Rad = "Andel med<br>klinisk viktig<br>bedring",
+    `P-verdi` = format_p(p_value)
+  ) |>
+  select(
+    tidspunkt,
+    Rad,
+    `Smerter <= 2 år`,
+    `Smerter > 2 år`,
     `P-verdi`
-  )
+  ) |>
+  arrange(tidspunkt)
 
-knitr::kable(final_tabell_odi)
-
+final_tabell_odi |>
+  knitr::kable(
+    format = "html",
+    escape = FALSE,
+    col.names = c(
+      "",
+      "",
+      "Smerter < 2 år (%)<br>(KI)",
+      "Smerter > 2 år (%)<br>(KI)",
+      "P-verdi"
+    ),
+    align = c("l", "l", "c", "c", "c")
+  ) |>
+  kableExtra::kable_styling(
+    full_width = FALSE,
+    bootstrap_options = c("condensed")
+  ) |>
+  kableExtra::column_spec(1, width = "7em") |>
+  kableExtra::column_spec(2, width = "12em") |>
+  kableExtra::column_spec(3, width = "13em") |>
+  kableExtra::column_spec(4, width = "13em") |>
+  kableExtra::column_spec(5, width = "6em")
 ```
 ## Korrigert analyse med GEE-modell
 P-verdiene i @tbl-sammenligningstabell viser om pasientene med kort
@@ -549,8 +742,7 @@ gee_data_activity <- RegData |>
     )
   )
 smerte_baseline_below_2 <- gee_data_activity |>
-  filter(smerte_baseline < 2) |>
-  distinct(PasientGUID, tidspunkt, .keep_all = TRUE)
+  filter(smerte_baseline < 2)
 str <- glue("Antall pasienter med smerte_baseline < 2: {nrow(smerte_baseline_below_2)}.
 Disse ble eksludert fra analysen.")
 print(str)
@@ -558,7 +750,6 @@ gee_data_activity <- gee_data_activity |>
   filter(smerte_baseline >= 2)
 
 gee_data_activity <- gee_data_activity |>
-  distinct(PasientGUID, tidspunkt, .keep_all = TRUE) |>
   mutate(across(where(is.factor), droplevels)) |>
   arrange(PasientGUID, tidspunkt)  |>
   mutate(
@@ -670,8 +861,7 @@ gee_data_odi <- RegData |>
     )
   )
   ODI_baseline_below_10 <- gee_data_odi |>
-    filter(odi_baseline < 10) |>
-    distinct(PasientGUID, tidspunkt, .keep_all = TRUE)
+    filter(odi_baseline < 10)
   str <- glue("Antall pasienter med ODI_baseline < 10: {nrow(ODI_baseline_below_10)}.
   Disse ble eksludert fra analysen.")
   print(str)
@@ -679,7 +869,6 @@ gee_data_odi <- RegData |>
   gee_data_odi <- gee_data_odi |>
     filter(odi_baseline >= 10)
   gee_data_odi <- gee_data_odi |>
-    distinct(PasientGUID, tidspunkt, .keep_all = TRUE) |>
     mutate(across(where(is.factor), droplevels)) |>
     arrange(PasientGUID, tidspunkt)  |>
     mutate(
@@ -728,4 +917,91 @@ gee_data_odi <- RegData |>
     ) |>
     knitr::kable()
 or_tabell_odi
+
+
+```
+
+### Oddsratio for klinisk viktig bedring i smerte ved aktivitet og ODI etter 6 mnd og 12 mnd mellom pasienter med smertevarighet < og > 2 år ved baseline
+```{r, echo=TRUE, warning=FALSE, message=FALSE}
+#| code-fold: true
+#| code-summary: "Click to see the code"
+or_plot_odi <- summary(
+  or_odi$contrasts,
+  infer = TRUE,
+  type = "response"
+) |>
+  as.data.frame() |>
+  mutate(
+    utfall = "ODI",
+    tidspunkt = factor(tidspunkt, levels = c("12 måneder", "6 måneder")),
+    label = sprintf("OR %.2f", odds.ratio)
+  )
+
+or_plot_activity <- summary(
+  or_activity$contrasts,
+  infer = TRUE,
+  type = "response"
+) |>
+  as.data.frame() |>
+  mutate(
+    utfall = "Smerte ved aktivitet",
+    tidspunkt = factor(tidspunkt, levels = c("12 måneder", "6 måneder")),
+    label = sprintf("OR %.2f", odds.ratio)
+  )
+
+or_plot_stacked <- bind_rows(
+  or_plot_activity,
+  or_plot_odi
+) |>
+  mutate(
+    utfall = factor(
+      utfall,
+      levels = c("Smerte ved aktivitet", "ODI")
+    )
+  )
+
+ggplot(
+  or_plot_stacked,
+  aes(
+    y = tidspunkt,
+    x = odds.ratio,
+    xmin = lower.CL,
+    xmax = upper.CL
+  )
+) +
+  geom_vline(
+    xintercept = 1,
+    linetype = "dashed"
+  ) +
+  geom_errorbarh(
+    height = 0.18,
+    linewidth = 0.9
+  ) +
+  geom_point(
+    size = 3
+  ) +
+  geom_label(
+    aes(label = label),
+    vjust = -0.8,
+    size = 3.5,
+    label.size = 0.2
+  ) +
+  scale_x_log10(
+    breaks = c(0.25, 0.5, 1, 2, 4, 8),
+    labels = label_number(accuracy = 0.01)
+  ) +
+  facet_grid(
+    utfall ~ .,
+    switch = "y"
+  ) +
+  labs(
+    x = "Odds ratio med 95 % KI",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    strip.placement = "outside",
+    strip.text.y.left = element_text(angle = 0),
+    panel.spacing.y = unit(1, "lines")
+  )
 ```
