@@ -718,7 +718,8 @@ gee_data_activity <- RegData |>
       is.na(smertereduksjon) ~ NA_integer_,
       smertereduksjon >= 2 ~ 1L,
       TRUE ~ 0L
-    )
+    ),
+    EducationLevel = ifelse(EducationLevel == "Ikke svart", NA, EducationLevel)
   ) |>
   filter(
     !is.na(PasientGUID),
@@ -742,7 +743,8 @@ gee_data_activity <- RegData |>
     )
   )
 smerte_baseline_below_2 <- gee_data_activity |>
-  filter(smerte_baseline < 2)
+  filter(smerte_baseline < 2) |>
+    distinct(PasientGUID)
 str <- glue("Antall pasienter med smerte_baseline < 2: {nrow(smerte_baseline_below_2)}.
 Disse ble eksludert fra analysen.")
 print(str)
@@ -756,6 +758,12 @@ gee_data_activity <- gee_data_activity |>
     cluster_id = as.integer(factor(PasientGUID))
   )
 
+str2 <- glue(
+    "geeglm() er en complete-case analyse.
+    Antall pasienter med komplette rader for denne analysen er:
+    {n_distinct(gee_data_activity$PasientGUID)}."
+  )
+print(str2)
 gee_activity <- geeglm(
   klinisk_viktig_bedring ~
     smertevarighet * tidspunkt +
@@ -837,7 +845,8 @@ gee_data_odi <- RegData |>
       is.na(odi_endring) ~ NA_integer_,
       odi_endring >= 10 ~ 1L,
       TRUE ~ 0L
-    )
+    ),
+    EducationLevel = ifelse(EducationLevel == "Ikke svart", NA, EducationLevel)
   ) |>
   filter(
     !is.na(PasientGUID),
@@ -861,7 +870,8 @@ gee_data_odi <- RegData |>
     )
   )
   ODI_baseline_below_10 <- gee_data_odi |>
-    filter(odi_baseline < 10)
+    filter(odi_baseline < 10) |>
+    distinct(PasientGUID)
   str <- glue("Antall pasienter med ODI_baseline < 10: {nrow(ODI_baseline_below_10)}.
   Disse ble eksludert fra analysen.")
   print(str)
@@ -874,7 +884,12 @@ gee_data_odi <- RegData |>
     mutate(
       cluster_id = as.integer(factor(PasientGUID))
     )
-  
+  str2 <- glue(
+    "geeglm() er en complete-case analyse.
+    Antall pasienter med komplette rader for denne analysen er:
+    {n_distinct(gee_data_odi$PasientGUID)}."
+  )
+  print(str2)
   gee_odi <- geeglm(
     klinisk_viktig_bedring ~
       smertevarighet * tidspunkt +
