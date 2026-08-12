@@ -59,7 +59,10 @@ datadump_Server <- function(id, RegData, userRole, hvd_session, reshID){
             if (input$dumptype == "nnrr_utflatet") {
               tmpData <- RegData
             } else {
-              tmpData <- nnrrHentTabell(input$dumptype)
+              tmpData <- nnrrHentTabell(
+                tabellnavn = input$dumptype,
+                datoFra = input$datovalg[1],
+                datoTil = input$datovalg[2])
             }
           } else {
             tmpData <- switch (

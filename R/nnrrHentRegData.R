@@ -25,7 +25,7 @@ nnrrHentRegData <- function(datoFra = '2017-01-01',
   pasientsvar_pre <- rapbase::loadRegData(
     registryName,
     paste0(
-      "SELECT * FROM pasientskjema_foer_behand_2 WHERE
+      "SELECT * FROM pasientskjema_foer_behandling_2 WHERE
       S1b_DateOfCompletion >= \'",
       datoFra, "\' AND S1b_DateOfCompletion <= \'",
       datoTil, "\' ")) |>
@@ -33,7 +33,7 @@ nnrrHentRegData <- function(datoFra = '2017-01-01',
   pasientsvar_post <- rapbase::loadRegData(
     registryName,
     paste0(
-      "SELECT * FROM pasientskjema_6_maaneder__3 WHERE
+      "SELECT * FROM pasientskjema_6_maaneder_etter_behandling_3 WHERE
       S1b_DateOfCompletion >= \'",
       datoFra, "\' AND S1b_DateOfCompletion <= \'",
       datoTil, "\' ")) |>
@@ -41,7 +41,7 @@ nnrrHentRegData <- function(datoFra = '2017-01-01',
   pasientsvar_post2 <- rapbase::loadRegData(
     registryName,
     paste0(
-      "SELECT * FROM pasientskjema_12_maaneder_8 WHERE
+      "SELECT * FROM pasientskjema_12_maaneder_etter_behandling_8 WHERE
       S1b_DateOfCompletion >= \'",
       datoFra, "\' AND S1b_DateOfCompletion <= \'",
       datoTil, "\' ")) |>
@@ -77,4 +77,37 @@ nnrrHentRegData <- function(datoFra = '2017-01-01',
               'pasientsvar_post', 'pasientsvar_post2'))
 
   return(RegData)
+}
+
+
+#' Fetch relevant table for NNRR
+#'
+#' Provides NNRR data
+#'
+#' @inheritParams nnrrFigAndeler
+#'
+#' @return Data frame with relevant table
+#' @export
+
+nnrrHentTabell <- function(tabellnavn, datoFra, datoTil) {
+
+  registryName <- "data"
+  dbType <- "mysql"
+
+  maptabnavn <- data.frame(
+    tab = c("pasientsvar_pre", "legeskjema",
+            "pasientsvar_post", "pasientsvar_post2"),
+    tabnavn = c("pasientskjema_foer_behandling_2", "behandlerskjema_1",
+                "pasientskjema_6_maaneder_etter_behandling_3",
+                "pasientskjema_12_maaneder_etter_behandling_8"))
+  tabellnavn <- maptabnavn$tabnavn[match(tabellnavn, maptabnavn$tab)]
+
+  regdata <- rapbase::loadRegData(
+    registryName,
+    paste0("SELECT * FROM ", tabellnavn, " WHERE S1b_DateOfCompletion >= \'",
+           datoFra, "\' AND S1b_DateOfCompletion <= \'",
+           datoTil, "\' ")
+    )
+
+  return(regdata)
 }
