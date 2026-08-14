@@ -27,22 +27,28 @@ appServer <- function(input, output, session) {
   )
 
   fordelingsfigServer("fordelingsfig_id", reshID = user$org,
-                      RegData = RegData, userRole = user$role, hvd_session = session)
+                      RegData = RegData, userRole = user$role,
+                      hvd_session = session)
 
   sykehusvisningServer("sykehusvisning_id",
-                      RegData = RegData, userRole = user$role, hvd_session = session)
+                       RegData = RegData, userRole = user$role,
+                       hvd_session = session)
 
   tidsvisningServer("tidsvisning_id", reshID = user$org,
-                    RegData = RegData, userRole = user$role, hvd_session = session)
+                    RegData = RegData, userRole = user$role,
+                    hvd_session = session)
 
   indikatorfigServer("indikatorfig_id",
-                     RegData = RegData, userRole = user$role, hvd_session = session)
+                     RegData = RegData, userRole = user$role,
+                     hvd_session = session)
 
   datadump_Server("datadump_id", reshID = user$org,
-                  RegData = RegData, userRole = user$role, hvd_session = session)
+                  RegData = RegData, userRole = user$role,
+                  hvd_session = session)
 
   samledok_server("samledok", reshID = user$org,
-                  RegData = RegData, userRole = user$role, hvd_session = session)
+                  RegData = RegData, userRole = user$role,
+                  hvd_session = session)
 
   # Administrative tabeller
   # nnrr::admtab_server("admtabell", SkjemaOversikt)
@@ -145,7 +151,12 @@ appServer <- function(input, output, session) {
   ##############################################################################
   # Eksport  ###################################################################
   # brukerkontroller
-  rapbase::exportUCServer("nnrrExport", "nnrr")
+  observe(
+    rapbase::exportUCServer(id = "nnrrExport",
+                            dbName = "data",
+                            teamName = "nnrr",
+                            eligible = (user$role() == "SC"))
+  )
 
   ## veileding
   rapbase::exportGuideServer("nnrrExportGuide", "nnrr")

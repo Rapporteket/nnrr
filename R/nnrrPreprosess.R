@@ -11,25 +11,33 @@
 
 nnrrPreprosess <- function(RegData)
 {
-  boolske_var1b <- as.character(nnrr::varnavn_1b$Variabelnavn)[which(as.character(nnrr::varnavn_1b$Felttype) == 'Avkrysning')]
-  boolske_var1a <- as.character(nnrr::varnavn_1a$Variabelnavn)[which(as.character(nnrr::varnavn_1a$Felttype) == 'Avkrysning')]
-  boolske_var2 <- as.character(nnrr::varnavn_2$Variabelnavn)[which(as.character(nnrr::varnavn_2$Felttype) == 'Avkrysning')]
-  boolske_var2 <- c(boolske_var2,
-                    paste0(as.character(nnrr::varnavn_2$Variabelnavn)[which(as.character(nnrr::varnavn_2$Felttype) == 'Avkrysning')],
-                           "_post"))
-  boolske_var <- intersect(c(boolske_var1b, boolske_var1a, boolske_var2), names(RegData))
+  boolske_var1b <- as.character(nnrr::varnavn_1b$Variabelnavn)[
+    which(as.character(nnrr::varnavn_1b$Felttype) == 'Avkrysning')]
+  boolske_var1a <- as.character(nnrr::varnavn_1a$Variabelnavn)[
+    which(as.character(nnrr::varnavn_1a$Felttype) == 'Avkrysning')]
+  boolske_var2 <- as.character(nnrr::varnavn_2$Variabelnavn)[
+    which(as.character(nnrr::varnavn_2$Felttype) == 'Avkrysning')]
+  boolske_var2 <- c(
+    boolske_var2,
+    paste0(as.character(nnrr::varnavn_2$Variabelnavn)[
+      which(as.character(nnrr::varnavn_2$Felttype) == 'Avkrysning')],
+      "_post"))
+  boolske_var <- intersect(c(boolske_var1b, boolske_var1a, boolske_var2),
+                           names(RegData))
   RegData[, boolske_var] <-
     apply(RegData[, boolske_var], 2, as.logical)
   # RegData$TreatmentOperation <- as.logical(RegData$TreatmentOperation)
 
-  RegData[, c("FormDate", "FormDate_pre", "FormDate_post", "S1b_DateOfCompletion",
+  RegData[, c("FormDate", "FormDate_pre", "FormDate_post",
+              "S1b_DateOfCompletion",
               "S1b_DateOfCompletion_pre", "S1b_DateOfCompletion_post",
               "DateOfCompletion", "DateOfCompletion_post2")] <-
-    dplyr::mutate_all(RegData[, c("FormDate", "FormDate_pre", "FormDate_post",
-                                  "S1b_DateOfCompletion", "S1b_DateOfCompletion_pre",
-                                  "S1b_DateOfCompletion_post", "DateOfCompletion",
-                                  "DateOfCompletion_post2")],
-                      list(~ as.Date(., format="%d.%m.%Y")))
+    dplyr::mutate_all(
+      RegData[, c("FormDate", "FormDate_pre", "FormDate_post",
+                  "S1b_DateOfCompletion", "S1b_DateOfCompletion_pre",
+                  "S1b_DateOfCompletion_post", "DateOfCompletion",
+                  "DateOfCompletion_post2")],
+      list(~ as.Date(., format="%d.%m.%Y")))
   RegData$Besoksdato <- RegData$S1b_DateOfCompletion
 
   RegData <- RegData[order(RegData$DateOfCompletion, decreasing = T, na.last = T), ] # Hvis flere pasientskjema, bruk nyeste
