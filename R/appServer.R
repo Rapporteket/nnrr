@@ -239,12 +239,10 @@ appServer <- function(input, output, session) {
   })
 
   ## Stats
-  # observe(
-    rapbase::statsServer("nnrrStats",
-                         registryName = "nnrr",
-                         app_id = Sys.getenv("FALK_APP_ID"))#,
-                         # eligible = (user$role() == "SC"))
-  # )
+
+  rapbase::statsServer("nnrrStats",
+                       registryName = "nnrr",
+                       app_id = Sys.getenv("FALK_APP_ID"))
   rapbase::statsGuideServer("nnrrStatsGuide", registryName = "nnrr")
 
 
