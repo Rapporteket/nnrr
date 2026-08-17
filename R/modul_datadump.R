@@ -100,7 +100,8 @@ datadump_Server <- function(id, RegData, userRole, hvd_session, reshID){
             "lastNed_dump",
             rapbase::repLogger(
               session = hvd_session,
-              msg = paste0("NNRR: nedlasting datadump: ", input$dumptype)
+              msg = paste0("NNRR: nedlasting datadump: ",
+                           input$dumptype)
             )
           )
         }

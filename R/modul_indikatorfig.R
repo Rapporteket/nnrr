@@ -39,27 +39,30 @@ indikatorfig_UI <- function(id){
       #             choices = BrValg$sykehus, multiple = TRUE),
       # sliderInput(ns("skriftStr"), "Skriftstørrelse sykehusnavn", min = 0.5, max = 1.8,
       #             value = 1.3, step = 0.05, ticks = F),
-      selectInput(inputId = ns("bildeformat"), label = "Velg bildeformat",
-                  choices = c('pdf', 'png', 'jpg', 'bmp', 'tif', 'svg')),
+      selectInput(inputId = ns("bildeformat"),
+                  label = "Velg bildeformat",
+                  choices = c('pdf', 'png', 'jpg', 'bmp',
+                              'tif', 'svg')),
       tags$hr(),
       actionButton(ns("reset_input"), "Nullstill valg")
     ),
     mainPanel(
-      tabsetPanel(id = ns("tab"),
-                  tabPanel("Figur", value = "fig",
-                           plotOutput(ns("Figur1"), height="auto"),
-                           downloadButton(ns("lastNedBilde"), "Last ned figur")),
-                  # tabPanel("Figur plotly", value = "fig2",
-                  #          plotly::plotlyOutput(ns("plotlyfig"), height = "600px"),
-                  #          downloadButton(ns("lastNedBilde2"), "Last ned figur")),
-                  # tabPanel("Figur ggplot", value = "fig",
-                  #          plotOutput(ns("ggplotfig"), height="auto"),
-                  #          downloadButton(ns("lastNedBilde3"), "Last ned figur")),
-                  tabPanel("Tabell", value = "tab",
-                           # uiOutput(ns("utvalg")),
-                           # br(),
-                           DT::DTOutput(ns("tabell"))
-                  )
+      tabsetPanel(
+        id = ns("tab"),
+        tabPanel("Figur", value = "fig",
+                 plotOutput(ns("Figur1"), height="auto"),
+                 downloadButton(ns("lastNedBilde"), "Last ned figur")),
+        # tabPanel("Figur plotly", value = "fig2",
+        #          plotly::plotlyOutput(ns("plotlyfig"), height = "600px"),
+        #          downloadButton(ns("lastNedBilde2"), "Last ned figur")),
+        # tabPanel("Figur ggplot", value = "fig",
+        #          plotOutput(ns("ggplotfig"), height="auto"),
+        #          downloadButton(ns("lastNedBilde3"), "Last ned figur")),
+        tabPanel("Tabell", value = "tab",
+                 # uiOutput(ns("utvalg")),
+                 # br(),
+                 DT::DTOutput(ns("tabell"))
+        )
       )
     )
   )

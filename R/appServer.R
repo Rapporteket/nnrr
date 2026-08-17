@@ -9,7 +9,8 @@
 
 appServer <- function(input, output, session) {
 
-  rapbase::appLogger(session = session, msg = "Starting nnrr application")
+  rapbase::appLogger(session = session,
+                     msg = "Starting nnrr application")
 
   # Last data
   RegData <- nnrr::nnrrHentRegData()
@@ -25,6 +26,105 @@ appServer <- function(input, output, session) {
     caller = "nnrr",
     map_orgname = shiny::req(map_avdeling)
   )
+
+  # Legg til SC-spesifikke faner, og fjern dem for andre roller
+  tabs_added <- shiny::reactiveVal(FALSE)
+
+  shiny::observeEvent(
+    shiny::req(user$role()), {
+      if (user$role() == "SC") {
+        if (!tabs_added()) {
+          shiny::insertTab(
+            "nnrr_app_id",
+            tab = shiny::tabPanel(
+              "Sykehusvisning",
+              nnrr::sykehusvisning_UI("sykehusvisning_id"),
+              value = "sykehusvisning_id"),
+            target = "Fordelinger", position = "after"
+          )
+          shiny::insertTab(
+            "nnrr_app_id",
+            tab = shiny::tabPanel(
+              "Indikatorer",
+              nnrr::indikatorfig_UI("indikatorfig_id"),
+              value = "indikatorfig_id"),
+            target = "Andeler over tid", position = "after"
+          )
+          tabs_added(TRUE)
+        }
+      } else {
+        if (tabs_added()) {
+          shiny::removeTab("nnrr_app_id", target = "sykehusvisning_id")
+          shiny::removeTab("nnrr_app_id", target = "indikator_id")
+          tabs_added(FALSE)
+        }
+      }
+    }
+  )
+
+  # Legg til verktøy-fanen for SC-brukere, og fjern den for andre roller
+  tool_tabs_added <- shiny::reactiveVal(FALSE)
+
+  shiny::observeEvent(shiny::req(user$role()), {
+    if (user$role() == "SC") {
+      if (!tool_tabs_added()) {
+        shiny::appendTab(
+          inputId = "nnrr_app_id",
+          tab = shiny::navbarMenu(
+            "Verktøy",
+            shiny::tabPanel(
+              "Utsending",
+              shiny::sidebarLayout(
+                shiny::sidebarPanel(
+                  rapbase::autoReportOrgInput("nnrrDispatch"),
+                  rapbase::autoReportInput("nnrrDispatch")
+                ),
+                shiny::mainPanel(
+                  rapbase::autoReportUI("nnrrDispatch")
+                )
+              )
+            ),
+            shiny::tabPanel(
+              "Metadata",
+              shiny::sidebarLayout(
+                shiny::sidebarPanel(shiny::uiOutput("metaControl")),
+                shiny::mainPanel(shiny::htmlOutput("metaData"))
+              )
+            ),
+            shiny::tabPanel(
+              "Eksport",
+              shiny::sidebarLayout(
+                shiny::sidebarPanel(
+                  rapbase::exportUCInput("nnrrExport")
+                ),
+                shiny::mainPanel(
+                  rapbase::exportGuideUI("nnrrExportGuide")
+                )
+              )
+            ),
+            shiny::tabPanel(
+              "Bruksstatistikk",
+              shiny::sidebarLayout(
+                shiny::sidebarPanel(rapbase::statsInput("nnrrStats")),
+                shiny::mainPanel(
+                  rapbase::statsUI("nnrrStats"),
+                  rapbase::statsGuideUI("nnrrStatsGuide")
+                )
+              )
+            )
+          )
+        )
+        tool_tabs_added(TRUE)
+      }
+    } else {
+      if (tool_tabs_added()) {
+        shiny::removeTab("nnrr_app_id", target = "Verktøy")
+        tool_tabs_added(FALSE)
+      }
+    }
+  })
+
+
 
   fordelingsfigServer("fordelingsfig_id", reshID = user$org,
                       RegData = RegData, userRole = user$role,
@@ -139,24 +239,21 @@ appServer <- function(input, output, session) {
   })
 
   ## Stats
-  observe(
+  # observe(
     rapbase::statsServer("nnrrStats",
                          registryName = "nnrr",
-                         app_id = Sys.getenv("FALK_APP_ID"),
-                         eligible = (user$role() == "SC"))
-  )
+                         app_id = Sys.getenv("FALK_APP_ID"))#,
+                         # eligible = (user$role() == "SC"))
+  # )
   rapbase::statsGuideServer("nnrrStatsGuide", registryName = "nnrr")
 
 
   ##############################################################################
   # Eksport  ###################################################################
   # brukerkontroller
-  observe(
-    rapbase::exportUCServer(id = "nnrrExport",
-                            dbName = "data",
-                            teamName = "nnrr",
-                            eligible = (user$role() == "SC"))
-  )
+  rapbase::exportUCServer(id = "nnrrExport",
+                          dbName = "data",
+                          teamName = "nnrr")
 
   ## veileding
   rapbase::exportGuideServer("nnrrExportGuide", "nnrr")
