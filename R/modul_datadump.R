@@ -44,6 +44,12 @@ datadump_UI <- function(id){
   )
 }
 
+#' Modul for serverdel av datadump i NNRR sin shiny-app på Rapporteket
+#'
+#' Kun til bruk i Shiny
+#'
+#' @export
+#'
 datadump_Server <- function(id, RegData, userRole, hvd_session, reshID){
   moduleServer(
     id,

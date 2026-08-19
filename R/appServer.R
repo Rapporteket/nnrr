@@ -62,7 +62,8 @@ appServer <- function(input, output, session) {
     }
   )
 
-  # Legg til verktøy-fanen for SC-brukere, og fjern den for andre roller
+  # Legg til verktøy-fanen for SC-brukere, og fjern den
+  # for andre roller
   tool_tabs_added <- shiny::reactiveVal(FALSE)
 
   shiny::observeEvent(shiny::req(user$role()), {
@@ -126,33 +127,34 @@ appServer <- function(input, output, session) {
 
 
 
-  fordelingsfigServer("fordelingsfig_id", reshID = user$org,
+  nnrr::fordelingsfigServer("fordelingsfig_id", reshID = user$org,
                       RegData = RegData, userRole = user$role,
                       hvd_session = session)
 
-  sykehusvisningServer("sykehusvisning_id",
+  nnrr::sykehusvisningServer("sykehusvisning_id",
                        RegData = RegData, userRole = user$role,
                        hvd_session = session)
 
-  tidsvisningServer("tidsvisning_id", reshID = user$org,
+  nnrr::tidsvisningServer("tidsvisning_id", reshID = user$org,
                     RegData = RegData, userRole = user$role,
                     hvd_session = session)
 
-  indikatorfigServer("indikatorfig_id",
+  nnrr::indikatorfigServer("indikatorfig_id",
                      RegData = RegData, userRole = user$role,
                      hvd_session = session)
 
-  datadump_Server("datadump_id", reshID = user$org,
+  nnrr::datadump_Server("datadump_id", reshID = user$org,
                   RegData = RegData, userRole = user$role,
                   hvd_session = session)
 
-  samledok_server("samledok", reshID = user$org,
+  nnrr::samledok_server("samledok", reshID = user$org,
                   RegData = RegData, userRole = user$role,
                   hvd_session = session)
 
-  # Administrative tabeller
-  # nnrr::admtab_server("admtabell", SkjemaOversikt)
-  #
+  nnrr::admtab_server("admtabell", RegData = RegData,
+                      userRole = user$role,
+                      hvd_session = session)
+
 
   ##############################################################################
   ################ Subscription, Dispatchment and Stats ########################
