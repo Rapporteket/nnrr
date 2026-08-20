@@ -8,17 +8,21 @@
 #' @export
 
 appServer <- function(input, output, session) {
-
-  rapbase::appLogger(session = session,
-                     msg = "Starting nnrr application")
+  rapbase::appLogger(
+    session = session,
+    msg = "Starting nnrr application"
+  )
 
   # Last data
   RegData <- nnrr::nnrrHentRegData()
 
   map_avdeling <- data.frame(
     UnitId = unique(RegData$UnitId),
-    orgname = RegData$SykehusNavn[match(unique(RegData$UnitId),
-                                        RegData$UnitId)])
+    orgname = RegData$SykehusNavn[match(
+      unique(RegData$UnitId),
+      RegData$UnitId
+    )]
+  )
 
   user <- rapbase::navbarWidgetServer2(
     "navbar-widget",
@@ -31,7 +35,8 @@ appServer <- function(input, output, session) {
   tabs_added <- shiny::reactiveVal(FALSE)
 
   shiny::observeEvent(
-    shiny::req(user$role()), {
+    shiny::req(user$role()),
+    {
       if (user$role() == "SC") {
         if (!tabs_added()) {
           shiny::insertTab(
@@ -39,7 +44,8 @@ appServer <- function(input, output, session) {
             tab = shiny::tabPanel(
               "Sykehusvisning",
               nnrr::sykehusvisning_UI("sykehusvisning_id"),
-              value = "sykehusvisning_id"),
+              value = "sykehusvisning_id"
+            ),
             target = "Fordelinger", position = "after"
           )
           shiny::insertTab(
@@ -47,7 +53,8 @@ appServer <- function(input, output, session) {
             tab = shiny::tabPanel(
               "Indikatorer",
               nnrr::indikatorfig_UI("indikatorfig_id"),
-              value = "indikatorfig_id"),
+              value = "indikatorfig_id"
+            ),
             target = "Andeler over tid", position = "after"
           )
           tabs_added(TRUE)
@@ -126,34 +133,45 @@ appServer <- function(input, output, session) {
   })
 
 
-
-  nnrr::fordelingsfigServer("fordelingsfig_id", reshID = user$org,
-                      RegData = RegData, userRole = user$role,
-                      hvd_session = session)
+  nnrr::fordelingsfigServer("fordelingsfig_id",
+    reshID = user$org,
+    RegData = RegData, userRole = user$role,
+    hvd_session = session
+  )
 
   nnrr::sykehusvisningServer("sykehusvisning_id",
-                       RegData = RegData, userRole = user$role,
-                       hvd_session = session)
+    RegData = RegData, userRole = user$role,
+    hvd_session = session
+  )
 
-  nnrr::tidsvisningServer("tidsvisning_id", reshID = user$org,
-                    RegData = RegData, userRole = user$role,
-                    hvd_session = session)
+  nnrr::tidsvisningServer("tidsvisning_id",
+    reshID = user$org,
+    RegData = RegData, userRole = user$role,
+    hvd_session = session
+  )
 
   nnrr::indikatorfigServer("indikatorfig_id",
-                     RegData = RegData, userRole = user$role,
-                     hvd_session = session)
+    RegData = RegData, userRole = user$role,
+    hvd_session = session
+  )
 
-  nnrr::datadump_Server("datadump_id", reshID = user$org,
-                  RegData = RegData, userRole = user$role,
-                  hvd_session = session)
+  nnrr::datadump_Server("datadump_id",
+    reshID = user$org,
+    RegData = RegData, userRole = user$role,
+    hvd_session = session
+  )
 
-  nnrr::samledok_server("samledok", reshID = user$org,
-                  RegData = RegData, userRole = user$role,
-                  hvd_session = session)
+  nnrr::samledok_server("samledok",
+    reshID = user$org,
+    RegData = RegData, userRole = user$role,
+    hvd_session = session
+  )
 
-  nnrr::admtab_server("admtabell", RegData = RegData,
-                      userRole = user$role,
-                      hvd_session = session)
+  nnrr::admtab_server("admtabell",
+    RegData = RegData,
+    userRole = user$role,
+    hvd_session = session
+  )
 
 
   ##############################################################################
@@ -232,8 +250,9 @@ appServer <- function(input, output, session) {
 
 
   output$metaDataTable <- DT::renderDataTable(
-    meta()[[input$metaTab]], rownames = FALSE,
-    options = list(lengthMenu=c(25, 50, 100, 200, 400))
+    meta()[[input$metaTab]],
+    rownames = FALSE,
+    options = list(lengthMenu = c(25, 50, 100, 200, 400))
   )
 
   output$metaData <- shiny::renderUI({
@@ -243,21 +262,23 @@ appServer <- function(input, output, session) {
   ## Stats
 
   rapbase::statsServer("nnrrStats",
-                       registryName = "nnrr",
-                       app_id = Sys.getenv("FALK_APP_ID"))
+    registryName = "nnrr",
+    app_id = Sys.getenv("FALK_APP_ID")
+  )
   rapbase::statsGuideServer("nnrrStatsGuide", registryName = "nnrr")
 
 
   ##############################################################################
   # Eksport  ###################################################################
   # brukerkontroller
-  rapbase::exportUCServer(id = "nnrrExport",
-                          dbName = "data",
-                          teamName = "nnrr")
+  rapbase::exportUCServer(
+    id = "nnrrExport",
+    dbName = "data",
+    teamName = "nnrr"
+  )
 
   ## veileding
   rapbase::exportGuideServer("nnrrExportGuide", "nnrr")
 
   ##############################################################################
-
 }

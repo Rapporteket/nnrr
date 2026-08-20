@@ -4,7 +4,7 @@
 #'
 #' @export
 #'
-indikatorfig_UI <- function(id){
+indikatorfig_UI <- function(id) {
   ns <- shiny::NS(id)
 
   shiny::sidebarLayout(
@@ -14,7 +14,8 @@ indikatorfig_UI <- function(id){
       selectInput(
         inputId = ns("valgtVar"), label = "Velg indikator",
         choices =
-          c("Andel tverrfaglig behandlet" =
+          c(
+            "Andel tverrfaglig behandlet" =
               "nnrr_tverrfaglig_behandling",
             "Klinisk viktig endring i ODI" =
               "nnrr_bedret_funksjon",
@@ -34,39 +35,45 @@ indikatorfig_UI <- function(id){
               "nnrr_misfornoeyd"
           )
       ),
-      uiOutput(outputId = ns('tilAar_ui')),
+      uiOutput(outputId = ns("tilAar_ui")),
       # selectInput(inputId = ns("valgtShus"), label = "Fjern sykehus pga. lav dekningsgrad",
       #             choices = BrValg$sykehus, multiple = TRUE),
       # sliderInput(ns("skriftStr"), "Skriftstørrelse sykehusnavn", min = 0.5, max = 1.8,
       #             value = 1.3, step = 0.05, ticks = F),
-      selectInput(inputId = ns("bildeformat"),
-                  label = "Velg bildeformat",
-                  choices = c('pdf', 'png', 'jpg', 'bmp',
-                              'tif', 'svg')),
+      selectInput(
+        inputId = ns("bildeformat"),
+        label = "Velg bildeformat",
+        choices = c(
+          "pdf", "png", "jpg", "bmp",
+          "tif", "svg"
+        )
+      ),
       tags$hr(),
       actionButton(ns("reset_input"), "Nullstill valg")
     ),
     mainPanel(
       tabsetPanel(
         id = ns("tab"),
-        tabPanel("Figur", value = "fig",
-                 plotOutput(ns("Figur1"), height="auto"),
-                 downloadButton(ns("lastNedBilde"), "Last ned figur")),
+        tabPanel("Figur",
+          value = "fig",
+          plotOutput(ns("Figur1"), height = "auto"),
+          downloadButton(ns("lastNedBilde"), "Last ned figur")
+        ),
         # tabPanel("Figur plotly", value = "fig2",
         #          plotly::plotlyOutput(ns("plotlyfig"), height = "600px"),
         #          downloadButton(ns("lastNedBilde2"), "Last ned figur")),
         # tabPanel("Figur ggplot", value = "fig",
         #          plotOutput(ns("ggplotfig"), height="auto"),
         #          downloadButton(ns("lastNedBilde3"), "Last ned figur")),
-        tabPanel("Tabell", value = "tab",
-                 # uiOutput(ns("utvalg")),
-                 # br(),
-                 DT::DTOutput(ns("tabell"))
+        tabPanel("Tabell",
+          value = "tab",
+          # uiOutput(ns("utvalg")),
+          # br(),
+          DT::DTOutput(ns("tabell"))
         )
       )
     )
   )
-
 }
 
 #' Server-modul for indikatorfigurer i NNRR sin shiny-app på Rapporteket
@@ -75,12 +82,10 @@ indikatorfig_UI <- function(id){
 #'
 #' @export
 #'
-indikatorfigServer <- function(id, RegData, userRole, hvd_session){
+indikatorfigServer <- function(id, RegData, userRole, hvd_session) {
   moduleServer(
     id,
-
     function(input, output, session) {
-
       observeEvent(input$reset_input, {
         shinyjs::reset("id_indikator_panel")
       })
@@ -93,25 +98,35 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
 
       output$tilAar_ui <- renderUI({
         ns <- session$ns
-        selectInput(inputId = ns("tilAar"), label = "T.o.m. år",
-                    choices = rev((min(RegData$Aar)+2):max(RegData$Aar)))
+        selectInput(
+          inputId = ns("tilAar"), label = "T.o.m. år",
+          choices = rev((min(RegData$Aar) + 2):max(RegData$Aar))
+        )
       })
 
 
       tabellReager <- reactive({
-        indikatordata <- nnrr::nnrrBeregnIndikator(RegData = RegData,
-                                                   ind_id = input$valgtVar)
+        indikatordata <- nnrr::nnrrBeregnIndikator(
+          RegData = RegData,
+          ind_id = input$valgtVar
+        )
         TabellData <- indikatordata$indikator
         TabellData <- TabellData[which(TabellData$year <= as.numeric(req(input$tilAar))), ]
         indikatordata$indikator <- TabellData
         indikatordata
       })
 
-      output$Figur1 <- renderPlot({
-        nnrr::nnrrPlotIndikator(indikatordata = tabellReager(),
-                                graaUt=NA, outfile = '',
-                                lavDG=NA, inkl_konf=F)
-      }, width = 700, height = 700)
+      output$Figur1 <- renderPlot(
+        {
+          nnrr::nnrrPlotIndikator(
+            indikatordata = tabellReager(),
+            graaUt = NA, outfile = "",
+            lavDG = NA, inkl_konf = F
+          )
+        },
+        width = 700,
+        height = 700
+      )
 
 
       # output$plotlyfig <- plotly::renderPlotly({
@@ -141,18 +156,20 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
       #
       # })
 
-      output$tabell  <- DT::renderDataTable(
+      output$tabell <- DT::renderDataTable(
         server = FALSE,
         DT::datatable(
-          {tabellReager()$indikator %>%
+          {
+            tabellReager()$indikator %>%
               dplyr::group_by(SykehusNavn, year) %>%
-              dplyr::summarise(Antall = sum(var),
-                               N = sum(denominator),
-                               Andel = Antall/N*100)},
-
-          extensions = 'Buttons',
+              dplyr::summarise(
+                Antall = sum(var),
+                N = sum(denominator),
+                Andel = Antall / N * 100
+              )
+          },
+          extensions = "Buttons",
           rownames = FALSE,
-
           options = list(
             paging = TRUE,
             pageLength = 40,
@@ -160,29 +177,25 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session){
             fixedColumns = TRUE,
             autoWidth = TRUE,
             ordering = TRUE,
-            dom = 'tB',
-            buttons = c('copy', 'csv', 'excel')
+            dom = "tB",
+            buttons = c("copy", "csv", "excel")
           ),
-
           class = "display"
         ) %>% DT::formatRound(columns = "Andel", digits = 1)
       )
 
       output$lastNedBilde <- downloadHandler(
-        filename = function(){
-          fs::path_sanitize(paste0("indikator_", input$valgtVar, Sys.time(), '.', input$bildeformat))
+        filename = function() {
+          fs::path_sanitize(paste0("indikator_", input$valgtVar, Sys.time(), ".", input$bildeformat))
         },
-
-        content = function(file){
-          nnrr::nnrrPlotIndikator(indikatordata = tabellReager(),
-                                  graaUt=NA, outfile = file,
-                                  lavDG=NA, inkl_konf=F)
+        content = function(file) {
+          nnrr::nnrrPlotIndikator(
+            indikatordata = tabellReager(),
+            graaUt = NA, outfile = file,
+            lavDG = NA, inkl_konf = F
+          )
         }
       )
-
-
     }
   )
 }
-
-
