@@ -11,7 +11,7 @@ startside_UI <- function(id) {
         class = "panel panel-default",
         div(
           class = "panel-heading", style = "background-color : #E0E0E0 ",
-          h2("Velkommen til Rapporteket for Norsk nakke- og ryggregister - debug", align = "center")
+          h2("Velkommen til Rapporteket for Norsk nakke- og ryggregister", align = "center")
         ),
         div(
           class = "panel-body", style = "background-color:#F0F0F0",
