@@ -8,10 +8,6 @@
 #' @export
 
 appServer <- function(input, output, session) {
-  # rapbase::appLogger(
-  #   session = session,
-  #   msg = "Starting nnrr application"
-  # )
 
   # Last data
   RegData <- nnrr::nnrrHentRegData()
@@ -214,7 +210,7 @@ appServer <- function(input, output, session) {
     orgs = orgs,
     freq = "quarter",
     user = user,
-    runAutoReportButton = TRUE
+    runAutoReportButton = FALSE
   )
 
   ## Dispatchment
@@ -246,7 +242,7 @@ appServer <- function(input, output, session) {
     eligible = vis_rapp,
     freq = "quarter",
     user = user,
-    runAutoReportButton = TRUE
+    runAutoReportButton = FALSE
   )
 
   ## Metadata
