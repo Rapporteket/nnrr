@@ -34,40 +34,46 @@ nnrrBeregnAndeler <- function(RegData,
                               tolk = 99,
                               valgtShus = "",
                               reshID) {
-  if (valgtShus[1] != "") {
-    valgtShus <- as.numeric(valgtShus)
-    if (length(valgtShus)==1) {reshID<-valgtShus[1]}
-  }
-
-  # Sykehustekst avhengig av bruker og brukervalg
-  if (enhetsUtvalg == 0) {
-    shtxt <- "Hele landet"
-  } else {
-    shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
-  }
-
-  if (enhetsUtvalg!=0 & length(valgtShus)>1) {
-    RegData$UnitId[RegData$UnitId %in% valgtShus] <- 99
-    shtxt <- 'Ditt utvalg'
-    reshID <- 99
-  }
-
-  # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
-  if (enhetsUtvalg == 2) {
-    RegData <- RegData[which(RegData$UnitId == reshID), ]
-  }
+  # if (valgtShus[1] != "") {
+  #   valgtShus <- as.numeric(valgtShus)
+  #   if (length(valgtShus)==1) {reshID<-valgtShus[1]}
+  # }
+  #
+  # # Sykehustekst avhengig av bruker og brukervalg
+  # if (enhetsUtvalg == 0) {
+  #   shtxt <- "Hele landet"
+  # } else {
+  #   shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
+  # }
+  #
+  # if (enhetsUtvalg!=0 & length(valgtShus)>1) {
+  #   RegData$UnitId[RegData$UnitId %in% valgtShus] <- 99
+  #   shtxt <- 'Ditt utvalg'
+  #   reshID <- 99
+  # }
+  #
+  # # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
+  # if (enhetsUtvalg == 2) {
+  #   RegData <- RegData[which(RegData$UnitId == reshID), ]
+  # }
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra,
+    RegData = RegData,
+    reshID = reshID,
+    enhetsUtvalg = enhetsUtvalg,
+    datoFra = datoFra,
     datoTil = datoTil, valgtShus = valgtShus,
     minald = minald, maxald = maxald, erMann = erMann,
     tverrfaglig = tverrfaglig, minHSCL = minHSCL,
     maxHSCL = maxHSCL, medikamenter = medikamenter,
     smerte = smerte, tolk = tolk
   )
+  # if (enhetsUtvalg!=0 & length(valgtShus)>1) {reshID <- 99}
+  reshID <- NNRRUtvalg$reshID
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
+  shtxt <- NNRRUtvalg$shtxt
 
   # Initialiserer nødvendige størrelser
   Andeler <- list(Hoved = 0, Rest = 0)

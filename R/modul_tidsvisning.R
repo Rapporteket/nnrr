@@ -213,6 +213,8 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
         TabellData <- nnrr::nnrrBeregnAndelTid(
           RegData = RegData,
           valgtVar = input$valgtVar,
+          valgtShus = if (!is.null(input$valgtShus) &
+                          userRole() == "SC") {input$valgtShus} else {""},
           datovar = datovar(),
           datoFra = input$datovalg[1],
           datoTil = input$datovalg[2],
@@ -227,7 +229,8 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
           medikamenter = input$medikamenter,
           smerte = as.numeric(input$smerte),
           tolk = as.numeric(input$tolk),
-          enhetsUtvalg = input$enhetsUtvalg
+          enhetsUtvalg = input$enhetsUtvalg,
+
         )
       })
 
