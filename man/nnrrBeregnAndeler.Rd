@@ -19,6 +19,7 @@ nnrrBeregnAndeler(
   medikamenter = NULL,
   smerte = NULL,
   tolk = 99,
+  valgtShus = "",
   reshID
 )
 }
