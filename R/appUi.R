@@ -28,10 +28,6 @@ appUi <- function() {
         nnrr::tidsvisning_UI(id = "tidsvisning_id")
       ),
       shiny::tabPanel(
-        "Datadump",
-        nnrr::datadump_UI(id = "datadump_id")
-      ),
-      shiny::tabPanel(
         "Administrative tabeller",
         nnrr::admtab_ui(id = "admtabell")
       ),

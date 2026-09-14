@@ -19,6 +19,7 @@ nnrrUtvalg(
   smerte = NA,
   tolk = 99,
   iArbeid = 99,
+  valgtShus = "",
   fargepalett = "BlaaRapp"
 )
 }

@@ -32,10 +32,11 @@ nnrrBeregnAndeler <- function(RegData,
                               medikamenter = NULL,
                               smerte = NULL,
                               tolk = 99,
+                              valgtShus = "",
                               reshID) {
-  # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
-  if (enhetsUtvalg == 2) {
-    RegData <- RegData[which(RegData$UnitId == reshID), ]
+  if (valgtShus[1] != "") {
+    valgtShus <- as.numeric(valgtShus)
+    if (length(valgtShus)==1) {reshID<-valgtShus[1]}
   }
 
   # Sykehustekst avhengig av bruker og brukervalg
@@ -45,11 +46,22 @@ nnrrBeregnAndeler <- function(RegData,
     shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
   }
 
+  if (enhetsUtvalg!=0 & length(valgtShus)>1) {
+    RegData$UnitId[RegData$UnitId %in% valgtShus] <- 99
+    shtxt <- 'Ditt utvalg'
+    reshID <- 99
+  }
+
+  # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
+  if (enhetsUtvalg == 2) {
+    RegData <- RegData[which(RegData$UnitId == reshID), ]
+  }
+
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
     RegData = RegData, datoFra = datoFra,
-    datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann,
+    datoTil = datoTil, valgtShus = valgtShus,
+    minald = minald, maxald = maxald, erMann = erMann,
     tverrfaglig = tverrfaglig, minHSCL = minHSCL,
     maxHSCL = maxHSCL, medikamenter = medikamenter,
     smerte = smerte, tolk = tolk

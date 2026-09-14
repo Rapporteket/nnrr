@@ -22,15 +22,16 @@ nnrrUtvalg <- function(RegData,
                        smerte = NA,
                        tolk = 99,
                        iArbeid = 99,
+                       valgtShus = "",
                        fargepalett = "BlaaRapp") {
   # Definerer intersect-operator
   "%i%" <- intersect
 
   RegData$Dato <- RegData[, datovar]
   datotxt <- switch(datovar,
-    "Besoksdato" = "Besoksdato: ",
-    "dato_oppfolg" = "6mnd-oppfølgingsdato: ",
-    "dato_oppfolg2" = "12mnd-oppfølgingsdato: "
+                    "Besoksdato" = "Besoksdato: ",
+                    "dato_oppfolg" = "6mnd-oppfølgingsdato: ",
+                    "dato_oppfolg2" = "12mnd-oppfølgingsdato: "
   )
 
   Ninn <- dim(RegData)[1]
@@ -137,10 +138,15 @@ nnrrUtvalg <- function(RegData,
         "Har arbeidsforhold: ",
         c("Nei", "Ja")[iArbeid + 1]
       )
+    },
+    if (length(valgtShus)>1) {
+      paste0('Valgte RESH: ', paste(as.character(valgtShus),
+                                    collapse=', '))
     }
   )
 
 
-  UtData <- list(RegData = RegData, utvalgTxt = utvalgTxt, fargepalett = fargepalett)
+  UtData <- list(RegData = RegData, utvalgTxt = utvalgTxt,
+                 fargepalett = fargepalett)
   return(invisible(UtData))
 }

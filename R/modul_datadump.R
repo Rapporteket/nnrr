@@ -56,7 +56,8 @@ datadump_UI <- function(id) {
 #'
 #' @export
 #'
-datadump_Server <- function(id, RegData, userRole, hvd_session, reshID) {
+datadump_Server <- function(id, RegData,
+                            hvd_session, user) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -99,20 +100,34 @@ datadump_Server <- function(id, RegData, userRole, hvd_session, reshID) {
           }
           dumpdata <- tmpData[which(as.Date(tmpData$S1b_DateOfCompletion, format = "%d.%m.%Y") >= input$datovalg[1] &
             as.Date(tmpData$S1b_DateOfCompletion, format = "%d.%m.%Y") <= input$datovalg[2]), ]
-          if (userRole() != "SC") {
-            dumpdata <- dumpdata[dumpdata$UnitId %in% reshID(), ]
+          if (user$role() != "SC") {
+            dumpdata <- dumpdata[dumpdata$UnitId %in% user$org(), ]
           }
           # write.csv2(dumpdata, file, row.names = F, na = '', fileEncoding = 'Latin1')
           readr::write_excel_csv2(dumpdata, file)
         }
       )
 
+      # shiny::observe({
+      #   if (rapbase::isRapContext()) {
+      #     shinyjs::onclick(
+      #       "lastNed_dump",
+      #       rapbase::repLogger(
+      #         session = hvd_session,
+      #         msg = paste0(
+      #           "NNRR: nedlasting datadump: ",
+      #           input$dumptype
+      #         )
+      #       )
+      #     )
+      #   }
+      # })
       shiny::observe({
         if (rapbase::isRapContext()) {
           shinyjs::onclick(
             "lastNed_dump",
-            rapbase::repLogger(
-              session = hvd_session,
+            rapbase::repLogger2(
+              user = user,
               msg = paste0(
                 "NNRR: nedlasting datadump: ",
                 input$dumptype
@@ -121,6 +136,8 @@ datadump_Server <- function(id, RegData, userRole, hvd_session, reshID) {
           )
         }
       })
+
+
     }
   )
 }

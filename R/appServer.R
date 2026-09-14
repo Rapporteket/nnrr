@@ -8,10 +8,10 @@
 #' @export
 
 appServer <- function(input, output, session) {
-  rapbase::appLogger(
-    session = session,
-    msg = "Starting nnrr application"
-  )
+  # rapbase::appLogger(
+  #   session = session,
+  #   msg = "Starting nnrr application"
+  # )
 
   # Last data
   RegData <- nnrr::nnrrHentRegData()
@@ -37,7 +37,7 @@ appServer <- function(input, output, session) {
   shiny::observeEvent(
     shiny::req(user$role()),
     {
-      if (user$role() == "SC") {
+      if (user$role() %in% c("LC", "SC")) {
         if (!tabs_added()) {
           shiny::insertTab(
             "nnrr_app_id",
@@ -57,12 +57,22 @@ appServer <- function(input, output, session) {
             ),
             target = "Andeler over tid", position = "after"
           )
+          shiny::insertTab(
+            "nnrr_app_id",
+            shiny::tabPanel(
+              "Datadump",
+              nnrr::datadump_UI(id = "datadump_id"),
+              value = "datadump_id"
+            ),
+            target = "Administrative tabeller", position = "before"
+          )
           tabs_added(TRUE)
         }
       } else {
         if (tabs_added()) {
           shiny::removeTab("nnrr_app_id", target = "sykehusvisning_id")
-          shiny::removeTab("nnrr_app_id", target = "indikator_id")
+          shiny::removeTab("nnrr_app_id", target = "indikatorfig_id")
+          shiny::removeTab("nnrr_app_id", target = "datadump_id")
           tabs_added(FALSE)
         }
       }
@@ -134,43 +144,44 @@ appServer <- function(input, output, session) {
 
 
   nnrr::fordelingsfigServer("fordelingsfig_id",
-    reshID = user$org,
-    RegData = RegData, userRole = user$role,
-    hvd_session = session
+                            reshID = user$org,
+                            RegData = RegData, userRole = user$role,
+                            hvd_session = session
   )
 
   nnrr::sykehusvisningServer("sykehusvisning_id",
-    RegData = RegData, userRole = user$role,
-    hvd_session = session
+                             RegData = RegData, userRole = user$role,
+                             hvd_session = session
   )
 
   nnrr::tidsvisningServer("tidsvisning_id",
-    reshID = user$org,
-    RegData = RegData, userRole = user$role,
-    hvd_session = session
+                          reshID = user$org,
+                          RegData = RegData, userRole = user$role,
+                          hvd_session = session
   )
 
   nnrr::indikatorfigServer("indikatorfig_id",
-    RegData = RegData, userRole = user$role,
-    hvd_session = session
+                           RegData = RegData, userRole = user$role,
+                           hvd_session = session
   )
 
   nnrr::datadump_Server("datadump_id",
-    reshID = user$org,
-    RegData = RegData, userRole = user$role,
-    hvd_session = session
+                        #reshID = user$org,
+                        user = user,
+                        RegData = RegData, #userRole = user$role,
+                        hvd_session = session
   )
 
   nnrr::samledok_server("samledok",
-    reshID = user$org,
-    RegData = RegData, userRole = user$role,
-    hvd_session = session
+                        reshID = user$org,
+                        RegData = RegData, userRole = user$role,
+                        hvd_session = session
   )
 
   nnrr::admtab_server("admtabell",
-    RegData = RegData,
-    userRole = user$role,
-    hvd_session = session
+                      RegData = RegData,
+                      userRole = user$role,
+                      hvd_session = session
   )
 
 
@@ -262,8 +273,8 @@ appServer <- function(input, output, session) {
   ## Stats
 
   rapbase::statsServer("nnrrStats",
-    registryName = "nnrr",
-    app_id = Sys.getenv("FALK_APP_ID")
+                       registryName = "nnrr",
+                       app_id = Sys.getenv("FALK_APP_ID")
   )
   rapbase::statsGuideServer("nnrrStatsGuide", registryName = "nnrr")
 

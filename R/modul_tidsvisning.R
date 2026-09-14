@@ -10,6 +10,16 @@ tidsvisning_UI <- function(id) {
   shiny::sidebarLayout(
     sidebarPanel(
       id = ns("id_panel"),
+      dateRangeInput(
+        inputId = ns("datovalg"),
+        label = "Dato fra og til",
+        min = "2014-01-01",
+        language = "nb",
+        max = Sys.Date(),
+        start = lubridate::floor_date(lubridate::today() -
+                                        lubridate::years(1), unit = "year"),
+        end = Sys.Date(), separator = " til "
+      ),
       selectInput(
         inputId = ns("valgtVar"),
         label = "Velg variabel",
@@ -32,16 +42,6 @@ tidsvisning_UI <- function(id) {
           "Hopkins symptom checklist" = "HSCL10.Score",
           "Smertevarighet > 2 år" = "smerter_2aar"
         )
-      ),
-      dateRangeInput(
-        inputId = ns("datovalg"),
-        label = "Dato fra og til",
-        min = "2014-01-01",
-        language = "nb",
-        max = Sys.Date(),
-        start = lubridate::floor_date(lubridate::today() -
-          lubridate::years(1), unit = "year"),
-        end = Sys.Date(), separator = " til "
       ),
       selectInput(
         inputId = ns("tidsenhet"),

@@ -10,6 +10,16 @@ fordelingsfig_UI <- function(id) {
   shiny::sidebarLayout(
     sidebarPanel(
       id = ns("id_fordeling_panel"),
+      dateRangeInput(
+        inputId = ns("datovalg"),
+        label = "Dato fra og til",
+        min = "2014-01-01",
+        max = Sys.Date(),
+        start = Sys.Date() %m-% months(12) + 1,
+        end = Sys.Date(),
+        language = "nb",
+        separator = " til "
+      ),
       selectInput(
         inputId = ns("valgtVar"),
         label = "Velg variabel",
@@ -38,16 +48,6 @@ fordelingsfig_UI <- function(id) {
           "Hopkins symptom checklist" = "HSCL10.Score",
           "Smertevarighet > 2 år" = "smerter_2aar"
         )
-      ),
-      dateRangeInput(
-        inputId = ns("datovalg"),
-        label = "Dato fra og til",
-        min = "2014-01-01",
-        max = Sys.Date(),
-        start = Sys.Date() %m-% months(12) + 1,
-        end = Sys.Date(),
-        language = "nb",
-        separator = " til "
       ),
       selectInput(
         inputId = ns("enhetsUtvalg"),
@@ -172,51 +172,20 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session) {
 
       output$sykehus_ui <- shiny::renderUI({
         ns <- session$ns
+        if (userRole() == 'SC') {
         selectInput(
           inputId = ns("valgtShus"), label = "Velg sykehus",
           choices = sykehus, multiple = T
         )
-      })
-
-      # output$slider <- renderUI({
-      #
-      #   # args       <- list(inputId="foo", label="slider :", ticks=c(90,95,99,99.9), value=c(2,3))
-      #   args       <- list(inputId="foo", label="slider :", ticks=c(1, 1.5, 1.85, 2, 2.5, 3, 3.5, 4),
-      #                      value=c(1,4), step=0.1)
-      #
-      #   args$min   <- 1
-      #   args$max   <- 4
-      #
-      #   if (sessionInfo()$otherPkgs$shiny$Version>="0.11") {
-      #     # this part works with shiny 1.5.0
-      #     ticks <- paste0(args$ticks, collapse=',')
-      #     args$ticks <- T
-      #     html  <- do.call('sliderInput', args)
-      #
-      #     html$children[[2]]$attribs[['data-values']] <- ticks;
-      #     # html$children[[2]]$attribs[['data-values']] <- paste0(seq(from = 1, to = 4, by = 0.1), collapse=',');
-      #
-      #   } else {
-      #     html  <- do.call('sliderInput', args)
-      #   }
-      #
-      #   html
-      # })
-
-      observe(
-        if (userRole() != "SC") {
-          shinyjs::hide(id = "valgtShus")
         }
-      )
-
-      # observe(
-      #   print(paste0(input$tolk))
-      # )
+      })
 
       tabellReager <- reactive({
         TabellData <- nnrr::nnrrBeregnAndeler(
           RegData = RegData,
           valgtVar = input$valgtVar,
+          valgtShus = if (!is.null(input$valgtShus) &
+                          userRole() == "SC") {input$valgtShus} else {""},
           datoFra = input$datovalg[1],
           datoTil = input$datovalg[2],
           minald = as.numeric(input$alder[1]),
@@ -323,48 +292,48 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session) {
         }
       )
 
-      shiny::observe({
-        # if (rapbase::isRapContext()) {
-        if (req(input$tab) == "fig") {
-          mld_fordeling <- paste0(
-            "NNRR: Figur - fordeling, variabel - ",
-            input$valgtVar
-          )
-        }
-        if (req(input$tab) == "tab") {
-          mld_fordeling <- paste(
-            "NNRR: tabell - fordeling. variabel - ",
-            input$valgtVar
-          )
-        }
-        rapbase::repLogger(
-          session = hvd_session,
-          msg = mld_fordeling
-        )
-        mldLastNedFig <- paste(
-          "NNRR: nedlasting figur - fordeling. variabel -",
-          input$valgtVar
-        )
-        mldLastNedTab <- paste(
-          "NNRR: nedlasting tabell - fordeling. variabel -",
-          input$valgtVar
-        )
-        shinyjs::onclick(
-          "lastNedBilde",
-          rapbase::repLogger(
-            session = hvd_session,
-            msg = mldLastNedFig
-          )
-        )
-        shinyjs::onclick(
-          "lastNed",
-          rapbase::repLogger(
-            session = hvd_session,
-            msg = mldLastNedTab
-          )
-        )
-        # }
-      })
+      # shiny::observe({
+      #   # if (rapbase::isRapContext()) {
+      #   if (req(input$tab) == "fig") {
+      #     mld_fordeling <- paste0(
+      #       "NNRR: Figur - fordeling, variabel - ",
+      #       input$valgtVar
+      #     )
+      #   }
+      #   if (req(input$tab) == "tab") {
+      #     mld_fordeling <- paste(
+      #       "NNRR: tabell - fordeling. variabel - ",
+      #       input$valgtVar
+      #     )
+      #   }
+      #   rapbase::repLogger(
+      #     session = hvd_session,
+      #     msg = mld_fordeling
+      #   )
+      #   mldLastNedFig <- paste(
+      #     "NNRR: nedlasting figur - fordeling. variabel -",
+      #     input$valgtVar
+      #   )
+      #   mldLastNedTab <- paste(
+      #     "NNRR: nedlasting tabell - fordeling. variabel -",
+      #     input$valgtVar
+      #   )
+      #   shinyjs::onclick(
+      #     "lastNedBilde",
+      #     rapbase::repLogger(
+      #       session = hvd_session,
+      #       msg = mldLastNedFig
+      #     )
+      #   )
+      #   shinyjs::onclick(
+      #     "lastNed",
+      #     rapbase::repLogger(
+      #       session = hvd_session,
+      #       msg = mldLastNedTab
+      #     )
+      #   )
+      #   # }
+      # })
     }
   )
 }

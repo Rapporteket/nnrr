@@ -10,6 +10,16 @@ sykehusvisning_UI <- function(id) {
   shiny::sidebarLayout(
     sidebarPanel(
       id = ns("id_sykehusvisning_panel"),
+      dateRangeInput(
+        inputId = ns("datovalg"),
+        label = "Dato fra og til",
+        min = "2014-01-01",
+        max = Sys.Date(),
+        start = Sys.Date() %m-% months(12) + 1,
+        end = Sys.Date(),
+        language = "nb",
+        separator = " til "
+      ),
       selectInput(
         inputId = ns("valgtVar"),
         label = "Velg variabel",
@@ -29,16 +39,6 @@ sykehusvisning_UI <- function(id) {
           "Ved utredning og etter 6mnd." = 1,
           "Ved utredning og etter 6 og 12 mnd." = 2
         )
-      ),
-      dateRangeInput(
-        inputId = ns("datovalg"),
-        label = "Dato fra og til",
-        min = "2014-01-01",
-        max = Sys.Date(),
-        start = Sys.Date() %m-% months(12) + 1,
-        end = Sys.Date(),
-        language = "nb",
-        separator = " til "
       ),
       sliderInput(
         inputId = ns("alder"),
