@@ -131,25 +131,25 @@ tidsvisning_UI <- function(id) {
       tabsetPanel(
         id = ns("tab"),
         tabPanel("Figur",
-          value = "fig",
-          verbatimTextOutput(ns("value")),
-          plotOutput(ns("Figur1"),
-            height = "auto"
-          ),
-          downloadButton(
-            ns("lastNedBilde"),
-            "Last ned figur"
-          )
+                 value = "fig",
+                 verbatimTextOutput(ns("value")),
+                 plotOutput(ns("Figur1"),
+                            height = "auto"
+                 ),
+                 downloadButton(
+                   ns("lastNedBilde"),
+                   "Last ned figur"
+                 )
         ),
         tabPanel("Tabell",
-          value = "tab",
-          uiOutput(ns("utvalg")),
-          br(),
-          tableOutput(ns("Tabell1")),
-          downloadButton(
-            ns("lastNed"),
-            "Last ned tabell"
-          )
+                 value = "tab",
+                 uiOutput(ns("utvalg")),
+                 br(),
+                 tableOutput(ns("Tabell1")),
+                 downloadButton(
+                   ns("lastNed"),
+                   "Last ned tabell"
+                 )
         )
       )
     )
@@ -176,38 +176,33 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
       output$sykehus_ui <- shiny::renderUI({
         ns <- session$ns
         if (userRole() == 'SC') {
-        selectInput(
-          inputId = ns("valgtShus"), label = "Velg sykehus",
-          choices = sykehus, multiple = T
-        )
+          selectInput(
+            inputId = ns("valgtShus"), label = "Velg sykehus",
+            choices = sykehus, multiple = T
+          )
         }
       })
 
-      # observe(
-      #   if (userRole() != "SC") {
-      #     shinyjs::hide(id = "valgtShus")
-      #   }
-      # )
 
       datovar <- shiny::reactive({
         switch(input$valgtVar,
-          tverrfaglig_behandlet = "Besoksdato",
-          individuell_oppfolging = "Besoksdato",
-          fabq11 = "Besoksdato",
-          Oppfolging_utfylt_6mnd = "dato_oppfolg",
-          Oppfolging_utfylt_12mnd = "dato_oppfolg2",
-          opplevd_nytte_beh_6mnd = "dato_oppfolg",
-          opplevd_nytte_beh_12mnd = "dato_oppfolg2",
-          odi_klinisk_viktig_6mnd = "dato_oppfolg",
-          odi_klinisk_viktig_12mnd = "dato_oppfolg2",
-          bedring_smerte_hvile_6mnd = "dato_oppfolg",
-          bedring_smerte_hvile_12mnd = "dato_oppfolg2",
-          bedring_smerte_aktiv_6mnd = "dato_oppfolg",
-          bedring_smerte_aktiv_12mnd = "dato_oppfolg2",
-          fornoyd_6mnd = "dato_oppfolg",
-          fornoyd_12mnd = "dato_oppfolg2",
-          HSCL10.Score = "Besoksdato",
-          smerter_2aar = "Besoksdato"
+               tverrfaglig_behandlet = "Besoksdato",
+               individuell_oppfolging = "Besoksdato",
+               fabq11 = "Besoksdato",
+               Oppfolging_utfylt_6mnd = "dato_oppfolg",
+               Oppfolging_utfylt_12mnd = "dato_oppfolg2",
+               opplevd_nytte_beh_6mnd = "dato_oppfolg",
+               opplevd_nytte_beh_12mnd = "dato_oppfolg2",
+               odi_klinisk_viktig_6mnd = "dato_oppfolg",
+               odi_klinisk_viktig_12mnd = "dato_oppfolg2",
+               bedring_smerte_hvile_6mnd = "dato_oppfolg",
+               bedring_smerte_hvile_12mnd = "dato_oppfolg2",
+               bedring_smerte_aktiv_6mnd = "dato_oppfolg",
+               bedring_smerte_aktiv_12mnd = "dato_oppfolg2",
+               fornoyd_6mnd = "dato_oppfolg",
+               fornoyd_12mnd = "dato_oppfolg2",
+               HSCL10.Score = "Besoksdato",
+               smerter_2aar = "Besoksdato"
         )
       })
 

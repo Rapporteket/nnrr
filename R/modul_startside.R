@@ -90,7 +90,7 @@ startside <- function(id, userRole) {
 
         )
 
-        if (userRole() == "SC") {
+        if (userRole() %in% c("SC", "LC")) {
 
           innhold <- c(
             innhold,
@@ -118,7 +118,7 @@ startside <- function(id, userRole) {
           )
         )
 
-        if (userRole() == "SC") {
+        if (userRole() %in% c("SC", "LC")) {
 
           innhold <- c(
             innhold,
@@ -169,7 +169,8 @@ startside <- function(id, userRole) {
               h4(
                 tags$b("Verktøy "),
                 "gir SC-bruker tilgang til en del nyttige administrative
-                verktøy."
+                verktøy, blant annet muligheten for å sette opp utsendelse av
+                rapporter til ønskede e-postadresser."
               )
             )
           )
