@@ -57,6 +57,7 @@ indikatorfig_UI <- function(id) {
         tabPanel("Figur",
           value = "fig",
           plotOutput(ns("Figur1"), height = "auto"),
+          textOutput(ns("caption")),
           downloadButton(ns("lastNedBilde"), "Last ned figur")
         ),
         # tabPanel("Figur plotly", value = "fig2",
@@ -90,18 +91,47 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session) {
         shinyjs::reset("id_indikator_panel")
       })
 
-      # observe(
-      #   if (userRole() != 'SC') {
-      #     shinyjs::hide(id = 'valgtShus')
-      #   })
-
-
       output$tilAar_ui <- renderUI({
         ns <- session$ns
         selectInput(
           inputId = ns("tilAar"), label = "T.o.m. år",
           choices = rev((min(RegData$Aar) + 2):max(RegData$Aar))
         )
+      })
+
+      captions <- list(
+        nnrr_tverrfaglig_behandling =
+          "Andel pasienter som har mottatt tverrfaglig behandling
+        som del av behandlingstilbudet i spesialisthelsetjenesten.",
+        nnrr_bedret_funksjon  =
+          "Andel med klinisk viktig bedring av funksjon fra konsultasjon
+        til etter 6 måneder.",
+        nnrr_funksjons_nedsettelse  =
+          "Andel med minimal funksjonsnedsettelse 6 måneder etter
+        konsultasjon.",
+        nnrr_bedring_smerte_hvile  =
+          "Andel pasienter med klinisk viktig bedring av smerte fra
+        konsultasjon til etter 6 måneder.",
+        nnrr_bedring_smerte_aktiv  =
+          "Andel pasienter med klinisk viktig bedring av smerte fra
+        konsultasjon til etter 6 måneder.",
+        nnrr_jobb_ny_v1  =
+          "Andel pasienter som var helt eller delvis ute av jobb ved
+        konsultasjon og som er tilbake for fullt etter 6 måneder.",
+        nnrr_jobb_ny_v2  =
+          "Andel pasienter som var helt eller delvis ute av jobb ved
+        konsultasjon og som er tilbake for fullt eller har økt
+        stillingsandel etter 6 måneder.",
+        nnrr_bedring_av_behandling  =
+          "Andel pasienter som rapporterer 6 måneder etter konsultasjonen
+        at de er blitt bedre av behandlingen/ vurderingen.",
+        nnrr_misfornoeyd  =
+          "Andel pasienter som er fornøyd eller nøytral til kontakten
+        de har fått på sykehuset."
+      )
+
+      output$caption <- renderText({
+        captions[[input$valgtVar]]
       })
 
 

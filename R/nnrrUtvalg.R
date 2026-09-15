@@ -9,6 +9,8 @@
 #' @export
 #'
 nnrrUtvalg <- function(RegData,
+                       reshID = NA,
+                       enhetsUtvalg = NA,
                        datoFra = "2000-01-01",
                        datoTil = "2100-01-01",
                        minald = 0,
@@ -26,6 +28,35 @@ nnrrUtvalg <- function(RegData,
                        fargepalett = "BlaaRapp") {
   # Definerer intersect-operator
   "%i%" <- intersect
+
+  shtxt <- "Ingen valg"
+
+  if (!is.na(enhetsUtvalg)) {
+
+    if (valgtShus[1] != "") {
+      valgtShus <- as.numeric(valgtShus)
+      if (length(valgtShus)==1) {reshID<-valgtShus[1]}
+    }
+
+    # Sykehustekst avhengig av bruker og brukervalg
+    if (enhetsUtvalg == 0) {
+      shtxt <- "Hele landet"
+    } else {
+      shtxt <- as.character(RegData$SykehusNavn[
+        match(reshID, RegData$UnitId)])
+    }
+
+    if (enhetsUtvalg!=0 & length(valgtShus)>1) {
+      RegData$UnitId[RegData$UnitId %in% valgtShus] <- 99
+      shtxt <- 'Ditt utvalg'
+      reshID <- 99
+    }
+
+    # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
+    if (enhetsUtvalg == 2) {
+      RegData <- RegData[which(RegData$UnitId == reshID), ]
+    }
+  }
 
   RegData$Dato <- RegData[, datovar]
   datotxt <- switch(datovar,
@@ -147,6 +178,7 @@ nnrrUtvalg <- function(RegData,
 
 
   UtData <- list(RegData = RegData, utvalgTxt = utvalgTxt,
-                 fargepalett = fargepalett)
+                 fargepalett = fargepalett,
+                 shtxt = shtxt, reshID = reshID)
   return(invisible(UtData))
 }

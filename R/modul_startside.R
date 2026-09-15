@@ -28,20 +28,10 @@ startside_UI <- function(id) {
                        tabeller kan lastes ned."),
             br(),
             h4(tags$b(tags$u("Innhold i de ulike fanene:"))),
+
             div(
-              class = "container", style = "margin-right:(@gutter / 10)",
-              h4(tags$b("Fordelinger "), "viser fordelinger (figur/tabell) av ulike variabler.
-                Man kan velge hvilken variabel man vil se på, og man kan gjøre ulike filtreringer."),
-              h4(id = ns("SC1"), tags$b("Sykehusvisning "), "viser resultater per sykehus.
-                           Man kan velge hvilken variabel man vil se på og om man vil se gjennomsnitt, andeler eller stablede andeler."),
-              # h4(tags$b('Tidsvisning '), 'viser tidsutviklingen for valgt variabel for ditt sykehus'),
-              # h4(tags$b('Overlevelse '), 'viser Kaplan-Meier overlevelseskurver for to distinkte utvalg.'),
-              # h4(tags$b('Samledokumenter '), 'genererer ulike dokumenter som består av utvalgte figurer og tabeller.'),
-              h4(tags$b("Datadump "), "gir mulighet til å laste ned din egen avdelings registreringer. Man kan velge hvilke
-                           variabler man vil inkludere og for hvilket tidsrom og hvilke reseksjonsgrupper."),
-              h4(tags$b("Administrative tabeller "), "er en samling oversikter over antall registreringer.")
-              # h4(tags$b('Abonnement '), 'lar brukeren bestille rapporter til sin registrerte e-post. SC-bruker kan også bestille
-              # rapporter på vegne av andre avdelinger og kan velge hvilke e-postadresser som skal motta rapport.')
+              class = "container",
+              uiOutput(ns("fanebeskrivelse"))
             ),
             br(),
             br(),
@@ -61,11 +51,11 @@ startside_UI <- function(id) {
                 column(
                   width = 4, offset = 2,
                   h4("Mer informasjon om registeret finnes på NNRR sin hjemmeside: ",
-                    align = "center",
-                    a("NNRR hjemmeside",
-                      href = "https://unn.no/fag-og-forskning/medisinske-kvalitetsregistre/norsk-nakke-og-ryggregister",
-                      target = "_blank"
-                    )
+                     align = "center",
+                     a("NNRR hjemmeside",
+                       href = "https://unn.no/fag-og-forskning/medisinske-kvalitetsregistre/norsk-nakke-og-ryggregister",
+                       target = "_blank"
+                     )
                   )
                 )
               )
@@ -81,10 +71,116 @@ startside_UI <- function(id) {
 #'
 #' @export
 #'
-startside <- function(input, output, session, usrRole) {
-  observe(
-    if (usrRole() != "SC") {
-      shinyjs::hide("SC1")
+startside <- function(id, userRole) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+
+
+
+      output$fanebeskrivelse <- renderUI({
+
+        innhold <- list(
+
+          h4(
+            tags$b("Fordelinger "),
+            "viser fordelinger (figur/tabell) av ulike variabler.
+        Man kan velge hvilken variabel man vil se på, og man kan gjøre ulike filtreringer."
+          )
+
+        )
+
+        if (userRole() %in% c("SC", "LC")) {
+
+          innhold <- c(
+            innhold,
+            list(
+              h4(
+                tags$b("Sykehusvisning "),
+                "viser resultater per sykehus.
+            Man kan velge hvilken variabel man vil se på og om man vil se gjennomsnitt,
+            andeler eller stablede andeler."
+              )
+            )
+          )
+
+        }
+
+        innhold <- c(
+          innhold,
+          list(
+
+            h4(
+              tags$b("Andeler over tid "),
+              "viser tidsutviklingen for valgt variabel for ønsket
+              datointervall og tidsenhet."
+            )
+          )
+        )
+
+        if (userRole() %in% c("SC", "LC")) {
+
+          innhold <- c(
+            innhold,
+            list(
+              h4(
+                tags$b("Indikatorer "),
+                "viser registerets kvalitetsindikatorer."
+              ),
+
+              h4(
+                tags$b("Datadump "),
+                "gir mulighet til å laste ned din egen avdelings registreringer.
+          Man kan velge hvilke variabler man vil inkludere og for hvilket tidsrom
+          og hvilke reseksjonsgrupper."
+              ),
+
+              h4(
+                tags$b("Administrative tabeller "),
+                "er en samling oversikter over antall registreringer."
+              )
+            )
+          )
+
+        }
+
+        innhold <- c(
+          innhold,
+          list(
+            h4(
+              tags$b("Kvartalsrapport "),
+              "lar deg laste ned kvartalsrapport for ønsket kvartal"
+            ),
+
+            h4(
+              tags$b("Abonnement "),
+              "lar brukeren bestille regelmessig utsendelse av
+              rapporter til sin registrerte e-post."
+            )
+
+          )
+        )
+
+        if (userRole() == "SC") {
+
+          innhold <- c(
+            innhold,
+            list(
+              h4(
+                tags$b("Verktøy "),
+                "gir SC-bruker tilgang til en del nyttige administrative
+                verktøy, blant annet muligheten for å sette opp utsendelse av
+                rapporter til ønskede e-postadresser."
+              )
+            )
+          )
+
+        }
+
+        tagList(innhold)
+
+      })
     }
   )
 }
+

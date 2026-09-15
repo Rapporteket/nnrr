@@ -15,7 +15,7 @@ samledok_UI <- function(id) {
       shiny::selectInput(
         inputId = ns("valgtAar"), label = "Frem til år",
         choices = if (Sys.Date() %>% as.character() %>% substr(6, 7) %>%
-          as.numeric() >= 4) {
+                      as.numeric() >= 4) {
           rev(2014:as.numeric(format(Sys.Date(), "%Y")))
         } else {
           rev(2014:(as.numeric(format(Sys.Date(), "%Y")) - 1))
@@ -30,11 +30,11 @@ samledok_UI <- function(id) {
       tabsetPanel(
         id = ns("tabs"),
         tabPanel("Kvartalsrapport for din avdeling",
-          value = "kvartalsrapport",
-          downloadButton(
-            ns("lastNed_kvartal"),
-            "Last ned kvartalsrapport"
-          )
+                 value = "kvartalsrapport",
+                 downloadButton(
+                   ns("lastNed_kvartal"),
+                   "Last ned kvartalsrapport"
+                 )
         )
       )
     )
@@ -65,18 +65,14 @@ samledok_server <- function(id, reshID, RegData, userRole, hvd_session) {
         shinyjs::reset("id_samledok_panel")
       })
 
-      observe(
-        if (userRole() != "SC") {
-          shinyjs::hide(id = "valgtShus_ui")
-        }
-      )
-
       output$valgtShus_ui <- renderUI({
         ns <- session$ns
-        selectInput(
-          inputId = ns("valgtShus"), label = "Velg sykehus",
-          choices = sykehus, multiple = TRUE
-        )
+        if (userRole() == 'SC') {
+          selectInput(
+            inputId = ns("valgtShus"), label = "Velg sykehus",
+            choices = sykehus, multiple = FALSE
+          )
+        }
       })
 
       output$kvartal_ui <- renderUI({

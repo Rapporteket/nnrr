@@ -35,7 +35,8 @@ nnrrBeregnAndelTid <- function(RegData,
                                medikamenter = NULL,
                                smerte = NULL,
                                tolk = 99,
-                               iArbeid = 99) {
+                               iArbeid = 99,
+                               valgtShus = "") {
   datotxt <- switch(datovar,
     Besoksdato = "intervensjon",
     dato_oppfolg = "6-mnd oppfølging",
@@ -54,12 +55,12 @@ nnrrBeregnAndelTid <- function(RegData,
     Halvaar = "År og halvår for oppfølging"
   )
 
-  # Sykehustekst avhengig av bruker og brukervalg
-  if (enhetsUtvalg == 0) {
-    shtxt <- "Hele landet"
-  } else {
-    shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
-  }
+  # # Sykehustekst avhengig av bruker og brukervalg
+  # if (enhetsUtvalg == 0) {
+  #   shtxt <- "Hele landet"
+  # } else {
+  #   shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
+  # }
 
   ## Preparer variabler for fremstilling i figur
   PlotParams <- nnrrPrepVar(RegData = RegData, valgtVar = valgtVar)
@@ -68,15 +69,21 @@ nnrrBeregnAndelTid <- function(RegData,
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra,
+    RegData = RegData,
+    reshID = reshID,
+    enhetsUtvalg = enhetsUtvalg,
+    valgtShus = valgtShus,
+    datoFra = datoFra,
     datoTil = datoTil, minald = minald,
     maxald = maxald, erMann = erMann, datovar = datovar,
     tverrfaglig = tverrfaglig, minHSCL = minHSCL,
     maxHSCL = maxHSCL, medikamenter = medikamenter,
     smerte = smerte, tolk = tolk, iArbeid = iArbeid
   )
+  reshID <- NNRRUtvalg$reshID
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
+  shtxt <- NNRRUtvalg$shtxt
 
   RegData$Dato <- RegData[, datovar]
   RegData$Aar <- as.numeric(format(RegData$Dato, "%Y"))

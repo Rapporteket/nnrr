@@ -48,8 +48,13 @@ nnrrFigAndelTid <- function(RegData,
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra, datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann, datovar = datovar
+    RegData = RegData,
+    datoFra = datoFra,
+    datoTil = datoTil,
+    minald = minald,
+    maxald = maxald,
+    erMann = erMann,
+    datovar = datovar
   )
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
