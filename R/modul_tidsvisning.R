@@ -175,17 +175,19 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
 
       output$sykehus_ui <- shiny::renderUI({
         ns <- session$ns
+        if (userRole() == 'SC') {
         selectInput(
           inputId = ns("valgtShus"), label = "Velg sykehus",
           choices = sykehus, multiple = T
         )
+        }
       })
 
-      observe(
-        if (userRole() != "SC") {
-          shinyjs::hide(id = "valgtShus")
-        }
-      )
+      # observe(
+      #   if (userRole() != "SC") {
+      #     shinyjs::hide(id = "valgtShus")
+      #   }
+      # )
 
       datovar <- shiny::reactive({
         switch(input$valgtVar,

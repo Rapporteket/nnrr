@@ -69,7 +69,6 @@ nnrrBeregnAndeler <- function(RegData,
     maxHSCL = maxHSCL, medikamenter = medikamenter,
     smerte = smerte, tolk = tolk
   )
-  # if (enhetsUtvalg!=0 & length(valgtShus)>1) {reshID <- 99}
   reshID <- NNRRUtvalg$reshID
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt

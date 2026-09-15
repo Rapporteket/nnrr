@@ -60,8 +60,18 @@ appServer <- function(input, output, session) {
               nnrr::datadump_UI(id = "datadump_id"),
               value = "datadump_id"
             ),
-            target = "Administrative tabeller", position = "before"
+            target = "Kvartalsrapport", position = "before"
           )
+          shiny::insertTab(
+            "nnrr_app_id",
+            shiny::tabPanel(
+              "Administrative tabeller",
+              nnrr::admtab_ui(id = "admtabell"),
+              value = "admtabell"
+            ),
+            target = "Kvartalsrapport", position = "before"
+          )
+
           tabs_added(TRUE)
         }
       } else {
@@ -69,6 +79,7 @@ appServer <- function(input, output, session) {
           shiny::removeTab("nnrr_app_id", target = "sykehusvisning_id")
           shiny::removeTab("nnrr_app_id", target = "indikatorfig_id")
           shiny::removeTab("nnrr_app_id", target = "datadump_id")
+          shiny::removeTab("nnrr_app_id", target = "admtabell")
           tabs_added(FALSE)
         }
       }
@@ -138,6 +149,8 @@ appServer <- function(input, output, session) {
     }
   })
 
+  nnrr::startside("startside",
+                  userRole = user$role)
 
   nnrr::fordelingsfigServer("fordelingsfig_id",
                             reshID = user$org,

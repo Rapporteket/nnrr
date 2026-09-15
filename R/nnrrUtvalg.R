@@ -9,8 +9,8 @@
 #' @export
 #'
 nnrrUtvalg <- function(RegData,
-                       reshID,
-                       enhetsUtvalg = 1,
+                       reshID = NA,
+                       enhetsUtvalg = NA,
                        datoFra = "2000-01-01",
                        datoTil = "2100-01-01",
                        minald = 0,
@@ -29,28 +29,33 @@ nnrrUtvalg <- function(RegData,
   # Definerer intersect-operator
   "%i%" <- intersect
 
-  if (valgtShus[1] != "") {
-    valgtShus <- as.numeric(valgtShus)
-    if (length(valgtShus)==1) {reshID<-valgtShus[1]}
-  }
+  shtxt <- "Ingen valg"
 
-  # Sykehustekst avhengig av bruker og brukervalg
-  if (enhetsUtvalg == 0) {
-    shtxt <- "Hele landet"
-  } else {
-    shtxt <- as.character(RegData$SykehusNavn[match(reshID,
-                                                    RegData$UnitId)])
-  }
+  if (!is.na(enhetsUtvalg)) {
 
-  if (enhetsUtvalg!=0 & length(valgtShus)>1) {
-    RegData$UnitId[RegData$UnitId %in% valgtShus] <- 99
-    shtxt <- 'Ditt utvalg'
-    reshID <- 99
-  }
+    if (valgtShus[1] != "") {
+      valgtShus <- as.numeric(valgtShus)
+      if (length(valgtShus)==1) {reshID<-valgtShus[1]}
+    }
 
-  # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
-  if (enhetsUtvalg == 2) {
-    RegData <- RegData[which(RegData$UnitId == reshID), ]
+    # Sykehustekst avhengig av bruker og brukervalg
+    if (enhetsUtvalg == 0) {
+      shtxt <- "Hele landet"
+    } else {
+      shtxt <- as.character(RegData$SykehusNavn[
+        match(reshID, RegData$UnitId)])
+    }
+
+    if (enhetsUtvalg!=0 & length(valgtShus)>1) {
+      RegData$UnitId[RegData$UnitId %in% valgtShus] <- 99
+      shtxt <- 'Ditt utvalg'
+      reshID <- 99
+    }
+
+    # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
+    if (enhetsUtvalg == 2) {
+      RegData <- RegData[which(RegData$UnitId == reshID), ]
+    }
   }
 
   RegData$Dato <- RegData[, datovar]
