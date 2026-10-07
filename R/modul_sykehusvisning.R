@@ -20,17 +20,18 @@ sykehusvisning_UI <- function(id) {
         language = "nb",
         separator = " til "
       ),
-      selectInput(
-        inputId = ns("valgtVar"),
-        label = "Velg variabel",
-        choices = c(
-          "ODI_PrePost",
-          "NDI_PrePost",
-          "EQ5D_PrePost",
-          "PainExperiencesNoActivity",
-          "PainExperiencesActivity"
-        )
-      ),
+      # selectInput(
+      #   inputId = ns("valgtVar"),
+      #   label = "Velg variabel",
+      #   choices = c(
+      #     "Ryggfunksjon (ODI)" = "ODI_PrePost",
+      #     "Nakkefunksjon (NDI)" = "NDI_PrePost",
+      #     "Helserelatert livskvalitet (EQ-5D-5L)" = "EQ5D_PrePost",
+      #     "Smerte i hvile (NRS)" = "PainExperiencesNoActivity",
+      #     "Smerte i aktivitet (NRS)" = "PainExperiencesActivity"
+      #   )
+      # ),
+      uiOutput(ns("valgtVar_ui")),
       selectInput(
         inputId = ns("sammenlign"),
         label = "Vis verdi:",
@@ -67,24 +68,24 @@ sykehusvisning_UI <- function(id) {
       tabsetPanel(
         id = ns("tab"),
         tabPanel("Figur",
-          value = "fig",
-          plotOutput(ns("Figur1"),
-            height = "auto"
-          ),
-          downloadButton(
-            ns("lastNedBilde"),
-            "Last ned figur"
-          )
+                 value = "fig",
+                 plotOutput(ns("Figur1"),
+                            height = "auto"
+                 ),
+                 downloadButton(
+                   ns("lastNedBilde"),
+                   "Last ned figur"
+                 )
         ),
         tabPanel("Tabell",
-          value = "tab",
-          uiOutput(ns("utvalg")),
-          br(),
-          tableOutput(ns("Tabell1")),
-          downloadButton(
-            ns("lastNed"),
-            "Last ned tabell"
-          )
+                 value = "tab",
+                 uiOutput(ns("utvalg")),
+                 br(),
+                 tableOutput(ns("Tabell1")),
+                 downloadButton(
+                   ns("lastNed"),
+                   "Last ned tabell"
+                 )
         )
       )
     )
@@ -105,6 +106,55 @@ sykehusvisningServer <- function(id, RegData, userRole, hvd_session) {
       observeEvent(input$reset_input, {
         shinyjs::reset("id_sykehusvisning_panel")
       })
+
+
+      # output$valgtVar_ui <- renderUI({
+      #   ns <- session$ns
+      #   if (shiny::req(input$sammenlign) != 0) {
+      #     selectInput(
+      #       inputId = ns("valgtVar"),
+      #       label = "Velg variabel",
+      #       choices = c(
+      #         "Ryggfunksjon (ODI)" = "ODI_PrePost",
+      #         "Nakkefunksjon (NDI)" = "NDI_PrePost",
+      #         "Helserelatert livskvalitet (EQ-5D-5L)" = "EQ5D_PrePost",
+      #         "Smerte i hvile (NRS)" = "PainExperiencesNoActivity",
+      #         "Smerte i aktivitet (NRS)" = "PainExperiencesActivity"
+      #       )
+      #     )
+      #   } else {
+      #     selectInput(
+      #       inputId = ns("valgtVar"),
+      #       label = "Velg variabel",
+      #       choices = c(
+      #         "Ryggfunksjon (ODI)" = "ODI_PrePost",
+      #         "Nakkefunksjon (NDI)" = "NDI_PrePost",
+      #         "Helserelatert livskvalitet (EQ-5D-5L)" = "EQ5D_PrePost",
+      #         "Smerte i hvile (NRS)" = "PainExperiencesNoActivity",
+      #         "Smerte i aktivitet (NRS)" = "PainExperiencesActivity",
+      #         "Psykisk symptomtrykk (HSCL-10)" = "HSCL10Score"
+      #       )
+      #     )
+      #   }
+      # })
+      output$valgtVar_ui <- renderUI({
+        ns <- session$ns
+
+        selectInput(
+          inputId = ns("valgtVar"),
+          label = "Velg variabel",
+          choices = c(
+            "Ryggfunksjon (ODI)" = "ODI_PrePost",
+            "Nakkefunksjon (NDI)" = "NDI_PrePost",
+            "Helserelatert livskvalitet (EQ-5D-5L)" = "EQ5D_PrePost",
+            "Smerte i hvile (NRS)" = "PainExperiencesNoActivity",
+            "Smerte i aktivitet (NRS)" = "PainExperiencesActivity",
+            if (input$sammenlign == 0)
+              c("Psykisk symptomtrykk (HSCL-10)" = "HSCL10Score")
+          )
+        )
+      })
+
 
       tabellReager <- reactive({
         TabellData <- nnrr::nnrrBeregnGjsnPrePostGrVar(
@@ -196,8 +246,8 @@ sykehusvisningServer <- function(id, RegData, userRole, hvd_session) {
                 knitr::kable("html", digits = c(0, 1, 0, 1, 0, 1, 0, 0)) %>%
                 kableExtra::kable_styling("hover", full_width = F) %>%
                 kableExtra::add_header_above(c(" ",
-                  "Før intervensjon" = 2,
-                  "6 mnd." = 2, "12 mnd." = 2, " "
+                                               "Før intervensjon" = 2,
+                                               "6 mnd." = 2, "12 mnd." = 2, " "
                 ))
             }
           }

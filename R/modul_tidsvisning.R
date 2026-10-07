@@ -16,31 +16,48 @@ tidsvisning_UI <- function(id) {
         min = "2014-01-01",
         language = "nb",
         max = Sys.Date(),
-        start = lubridate::floor_date(lubridate::today() -
-                                        lubridate::years(1), unit = "year"),
+        start = lubridate::floor_date(
+          lubridate::today() -
+            lubridate::years(1), unit = "year"),
         end = Sys.Date(), separator = " til "
       ),
       selectInput(
         inputId = ns("valgtVar"),
         label = "Velg variabel",
         choices = c(
+          "Behandlet i spesialisthelsetjenesten" =
+            "Treatment_TreatmentInSpecialistServices",
           "Tverrfaglig behandlet" = "tverrfaglig_behandlet",
           "Individuell oppfølging" = "individuell_oppfolging",
-          "FABQ11" = "fabq11",
-          "Utfylt oppfølging 6 mnd" = "Oppfolging_utfylt_6mnd",
-          "Utfylt oppfølging 12 mnd" = "Oppfolging_utfylt_12mnd",
+          "Behandling i gruppe" =
+            "Treatment_GroupInterdisciplinary2018_dikotom",
+          "Klinisk viktig funksjonsbedring 6mnd (ODI)" =
+            "odi_klinisk_viktig_6mnd",
+          "Klinisk viktig funksjonsbedring 12mnd (ODI)" =
+            "odi_klinisk_viktig_12mnd",
+          "Klinisk bedring av smerte i hvile 6 mnd" =
+            "bedring_smerte_hvile_6mnd",
+          "Klinisk bedring av smerte i hvile 12 mnd" =
+            "bedring_smerte_hvile_12mnd",
+          "Klinisk bedring av smerte i aktivitet 6 mnd" =
+            "bedring_smerte_aktiv_6mnd",
+          "Klinisk bedring av smerte i aktivitet 12 mnd" =
+            "bedring_smerte_aktiv_12mnd",
+          # "Forhøyet psykisk symptomtrykk (HSCL-10)" = "HSCL10.Score",
+          "Smertevarighet > 2 år" = "smerter_2aar",
+          "Lav tro på RTW (FABQ11)" = "fabq11",
+          "Mestringsoritentert samtale" =
+            "mestringsorientert_samtale",
+          "Kartlagt funksjonsevne relatert til arbeid og utdannelse" =
+            "kartlagt_funksjon",
+          "Individuell rådgivning vedrørende livstil og/eller medikamenter" =
+            "ind_raad_livsstil",
           "Opplevd nytte av behandling 6 mnd" = "opplevd_nytte_beh_6mnd",
           "Opplevd nytte av behandling 12 mnd" = "opplevd_nytte_beh_12mnd",
-          "Funksjonsbedring 6 mnd" = "odi_klinisk_viktig_6mnd",
-          "Funksjonsbedring 12 mnd" = "odi_klinisk_viktig_12mnd",
-          "Klinisk bedring av smerte i hvile 6 mnd" = "bedring_smerte_hvile_6mnd",
-          "Klinisk bedring av smerte i hvile 12 mnd" = "bedring_smerte_hvile_12mnd",
-          "Klinisk bedring av smerte i aktivitet 6 mnd" = "bedring_smerte_aktiv_6mnd",
-          "Klinisk bedring av smerte i aktivitet 12 mnd" = "bedring_smerte_aktiv_12mnd",
           "Fornøyd med behandling 6 mnd" = "fornoyd_6mnd",
           "Fornøyd med behandling 12 mnd" = "fornoyd_12mnd",
-          "Hopkins symptom checklist" = "HSCL10.Score",
-          "Smertevarighet > 2 år" = "smerter_2aar"
+          "Utfylt oppfølging 6 mnd" = "Oppfolging_utfylt_6mnd",
+          "Utfylt oppfølging 12 mnd" = "Oppfolging_utfylt_12mnd"
         )
       ),
       selectInput(
@@ -77,10 +94,28 @@ tidsvisning_UI <- function(id) {
         choices = c("Begge" = 99, "Kvinne" = 0, "Mann" = 1)
       ),
       selectInput(
-        inputId = ns("tverrfaglig"),
-        label = "Tverrfaglig behandlet",
-        choices = c("--" = 99, "Nei" = 0, "Ja" = 1)
+        inputId = ns("Treatment_GroupInterdisciplinary2018"),
+        label = "Tverrfaglig behandling i gruppe",
+        choices = c("Nei" = 0, "1-3 ganger" = 1,
+                    "4-6 ganger" = 2, "7-10 ganger" = 3,
+                    ">10 ganger" = 4),
+        multiple = TRUE
       ),
+      selectInput(
+        inputId = ns("Treatment_IndividualMonoDiciplinary"),
+        label = "Individuell monofaglig behandling",
+        choices = c("Nei" = 0, "1-3 ganger" = 1,
+                    "4-10 ganger" = 2, ">10 ganger" = 3),
+        multiple = TRUE
+      ),
+      selectInput(
+        inputId = ns("Treatment_InvidualInterdisciplinary"),
+        label = "Individuell tverrfaglig behandling",
+        choices = c("Nei" = 0, "1-3 ganger" = 1,
+                    "4-10 ganger" = 2, ">10 ganger" = 3),
+        multiple = TRUE
+      ),
+
       sliderInput(
         inputId = ns("HSCL"),
         label = "HSCL score",
@@ -170,7 +205,8 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
         shinyjs::reset("id_panel")
       })
 
-      sykehus <- RegData$UnitId[match(sort(unique(RegData$SykehusNavn)), RegData$SykehusNavn)]
+      sykehus <- RegData$UnitId[match(sort(unique(RegData$SykehusNavn)),
+                                      RegData$SykehusNavn)]
       names(sykehus) <- sort(unique(RegData$SykehusNavn))
 
       output$sykehus_ui <- shiny::renderUI({
@@ -186,9 +222,14 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
 
       datovar <- shiny::reactive({
         switch(input$valgtVar,
+               Treatment_TreatmentInSpecialistServices = "Besoksdato",
                tverrfaglig_behandlet = "Besoksdato",
                individuell_oppfolging = "Besoksdato",
+               Treatment_GroupInterdisciplinary2018_dikotom = "Besoksdato",
                fabq11 = "Besoksdato",
+               mestringsorientert_samtale = "Besoksdato",
+               kartlagt_funksjon = "Besoksdato",
+               ind_raad_livsstil = "Besoksdato",
                Oppfolging_utfylt_6mnd = "dato_oppfolg",
                Oppfolging_utfylt_12mnd = "dato_oppfolg2",
                opplevd_nytte_beh_6mnd = "dato_oppfolg",
@@ -201,7 +242,7 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
                bedring_smerte_aktiv_12mnd = "dato_oppfolg2",
                fornoyd_6mnd = "dato_oppfolg",
                fornoyd_12mnd = "dato_oppfolg2",
-               HSCL10.Score = "Besoksdato",
+               # HSCL10.Score = "Besoksdato",
                smerter_2aar = "Besoksdato"
         )
       })
@@ -220,14 +261,25 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
           erMann = as.numeric(input$erMann),
           reshID = reshID(),
           tidsenhet = input$tidsenhet,
-          tverrfaglig = as.numeric(input$tverrfaglig),
+          # tverrfaglig = as.numeric(input$tverrfaglig),
           minHSCL = input$HSCL[1],
           maxHSCL = input$HSCL[2],
           medikamenter = input$medikamenter,
           smerte = as.numeric(input$smerte),
           tolk = as.numeric(input$tolk),
           enhetsUtvalg = input$enhetsUtvalg,
-
+          Treatment_IndividualMonoDiciplinary =
+            if (!is.null(input$Treatment_IndividualMonoDiciplinary)) {
+              as.numeric(input$Treatment_IndividualMonoDiciplinary)
+            } else {""},
+          Treatment_InvidualInterdisciplinary =
+            if (!is.null(input$Treatment_InvidualInterdisciplinary)) {
+              as.numeric(input$Treatment_InvidualInterdisciplinary)
+              } else {""},
+          Treatment_GroupInterdisciplinary2018 =
+            if (!is.null(input$Treatment_GroupInterdisciplinary2018)) {
+              as.numeric(input$Treatment_GroupInterdisciplinary2018)
+            } else {""}
         )
       })
 

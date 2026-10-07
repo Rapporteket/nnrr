@@ -141,7 +141,8 @@ indikatorfigServer <- function(id, RegData, userRole, hvd_session) {
           ind_id = input$valgtVar
         )
         TabellData <- indikatordata$indikator
-        TabellData <- TabellData[which(TabellData$year <= as.numeric(req(input$tilAar))), ]
+        TabellData <- TabellData[which(TabellData$year <=
+                                         as.numeric(req(input$tilAar))), ]
         indikatordata$indikator <- TabellData
         indikatordata
       })

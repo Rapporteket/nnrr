@@ -25,7 +25,9 @@ nnrrBeregnAndelTid(
   medikamenter = NULL,
   smerte = NULL,
   tolk = 99,
-  iArbeid = 99
+  iArbeid = 99,
+  valgtShus = "",
+  ...
 )
 }
 \arguments{

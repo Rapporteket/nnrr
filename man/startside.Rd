@@ -4,7 +4,7 @@
 \alias{startside}
 \title{Serverdel av startside for NNRR app på Rapporteket}
 \usage{
-startside(input, output, session, usrRole)
+startside(id, userRole)
 }
 \description{
 Serverdel av startside for NNRR app på Rapporteket

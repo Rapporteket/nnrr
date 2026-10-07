@@ -22,7 +22,24 @@ nnrrPrepVar <- function(RegData, valgtVar) {
   subtxt <- ""
   incl_N <- F
 
-  # endre
+
+  if (valgtVar == "Treatment_GroupInterdisciplinary2018_dikotom") {
+    tittel <- "-	Behandling i gruppe"
+    RegData$Variabel <- ifelse(
+      RegData$Treatment_GroupInterdisciplinary2018 == 0, 0, 1)
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel,
+                                 levels = 0:1, labels = grtxt)
+  }
+  if (valgtVar == "Treatment_TreatmentInSpecialistServices") {
+    tittel <- "Behandlet i spesialisthelsetjenesten"
+    RegData$Variabel <- RegData[, valgtVar]
+    # RegData$Variabel <- RegData$Treatment_TreatmentInSpecialistServices
+    grtxt <- c("Nei", "Ja")
+    RegData$VariabelGr <- factor(RegData$Variabel,
+                                 levels = 0:1, labels = grtxt)
+  }
+
   if (valgtVar == "FamilyStatus") {
     tittel <- "Sivilstatus"
     RegData <- RegData[RegData$regstatus == 1, ]
@@ -125,13 +142,26 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
 
+  # if (valgtVar == "individuell_oppfolging") {
+  #   tittel <- "Individuell oppfølging"
+  #   RegData <- RegData[RegData$regstatus == 1, ]
+  #   RegData$Variabel <- 0
+  #   RegData$Variabel[RegData$Treatment_IndividualFollowUp1to2Times |
+  #                      RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
+  #   grtxt <- c("Nei", "Ja")
+  #   RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  # }
+
   if (valgtVar == "individuell_oppfolging") {
     tittel <- "Individuell oppfølging"
-    RegData <- RegData[RegData$regstatus == 1, ]
-    RegData$Variabel <- 0
-    RegData$Variabel[RegData$Treatment_IndividualFollowUp1to2Times | RegData$Treatment_InvidualInterdisciplinary != 0] <- 1
     grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+    RegData <- RegData |>
+      dplyr::mutate(
+        Variabel = ifelse(
+          Treatment_IndividualMonoDiciplinary != 0 |
+            Treatment_InvidualInterdisciplinary != 0, 1, 0),
+        VariabelGr = factor(Variabel, levels = 0:1, labels = grtxt)
+        )
   }
 
   if (valgtVar == "fabq11") {
@@ -688,12 +718,17 @@ nnrrPrepVar <- function(RegData, valgtVar) {
 
     AntVar <- apply(
       RegData[, c(
-        "Treatment_TreatmentInSpecialistServices", "Treatment_FollowUpOperation",
+        "Treatment_TreatmentInSpecialistServices",
+        "Treatment_FollowUpOperation",
         "Treatment_TreatmentOtherRehabCentre",
-        "Treatment_ControlAfterReviewOrTreatment", "Treatment_IndividualFollowUp1to2Times",
-        "Treatment_InvidualInterdisciplinary1", "Treatment_InvidualInterdisciplinary2",
-        "Treatment_InvidualInterdisciplinary3", "Treatment_GroupInterdisciplinary1",
-        "Treatment_GroupInterdisciplinary2", "Treatment_GroupInterdisciplinary3"
+        "Treatment_ControlAfterReviewOrTreatment",
+        "Treatment_IndividualFollowUp1to2Times",
+        "Treatment_InvidualInterdisciplinary1",
+        "Treatment_InvidualInterdisciplinary2",
+        "Treatment_InvidualInterdisciplinary3",
+        "Treatment_GroupInterdisciplinary1",
+        "Treatment_GroupInterdisciplinary2",
+        "Treatment_GroupInterdisciplinary3"
       )],
       2, function(x) {
         sum(as.numeric(x), na.rm = T)
@@ -701,12 +736,17 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     )
     NVar <- apply(
       RegData[, c(
-        "Treatment_TreatmentInSpecialistServices", "Treatment_FollowUpOperation",
+        "Treatment_TreatmentInSpecialistServices",
+        "Treatment_FollowUpOperation",
         "Treatment_TreatmentOtherRehabCentre",
-        "Treatment_ControlAfterReviewOrTreatment", "Treatment_IndividualFollowUp1to2Times",
-        "Treatment_InvidualInterdisciplinary1", "Treatment_InvidualInterdisciplinary2",
-        "Treatment_InvidualInterdisciplinary3", "Treatment_GroupInterdisciplinary1",
-        "Treatment_GroupInterdisciplinary2", "Treatment_GroupInterdisciplinary3"
+        "Treatment_ControlAfterReviewOrTreatment",
+        "Treatment_IndividualFollowUp1to2Times",
+        "Treatment_InvidualInterdisciplinary1",
+        "Treatment_InvidualInterdisciplinary2",
+        "Treatment_InvidualInterdisciplinary3",
+        "Treatment_GroupInterdisciplinary1",
+        "Treatment_GroupInterdisciplinary2",
+        "Treatment_GroupInterdisciplinary3"
       )],
       2, function(x) {
         length(which(!is.na(x)))

@@ -25,6 +25,9 @@ nnrrUtvalg <- function(RegData,
                        tolk = 99,
                        iArbeid = 99,
                        valgtShus = "",
+                       Treatment_IndividualMonoDiciplinary = "",
+                       Treatment_InvidualInterdisciplinary = "",
+                       Treatment_GroupInterdisciplinary2018 = "",
                        fargepalett = "BlaaRapp") {
   # Definerer intersect-operator
   "%i%" <- intersect
@@ -84,6 +87,27 @@ nnrrUtvalg <- function(RegData,
   } else {
     indAlle
   }
+  ind_mono_individ <- if (Treatment_IndividualMonoDiciplinary[1] != "") {
+    which(RegData$Treatment_IndividualMonoDiciplinary %in%
+            Treatment_IndividualMonoDiciplinary)
+  } else {
+    indAlle
+  }
+
+  ind_tverrfaglig_individ <- if (Treatment_InvidualInterdisciplinary[1] != "") {
+    which(RegData$Treatment_InvidualInterdisciplinary %in%
+            Treatment_InvidualInterdisciplinary)
+  } else {
+    indAlle
+  }
+
+  ind_tverrfaglig_gruppe <- if (Treatment_GroupInterdisciplinary2018[1] != "") {
+    which(RegData$Treatment_GroupInterdisciplinary2018 %in%
+            Treatment_GroupInterdisciplinary2018)
+  } else {
+    indAlle
+  }
+
   indHSCL <- if (minHSCL > 1 | maxHSCL < 4) {
     which(RegData$HSCL10.Score >= minHSCL & RegData$HSCL10.Score <= maxHSCL)
   } else {
@@ -117,7 +141,8 @@ nnrrUtvalg <- function(RegData,
 
 
   indMed <- indAld %i% indDato %i% indKj %i% indTverr %i% indHSCL %i%
-    indMedikament %i% indSmerte %i% indTolk %i% indEmployed
+    indMedikament %i% indSmerte %i% indTolk %i% indEmployed %i%
+    ind_mono_individ %i% ind_tverrfaglig_individ %i% ind_tverrfaglig_gruppe
   RegData <- RegData[indMed, ]
 
   utvalgTxt <- c(
@@ -170,10 +195,33 @@ nnrrUtvalg <- function(RegData,
         c("Nei", "Ja")[iArbeid + 1]
       )
     },
+    if (Treatment_GroupInterdisciplinary2018[1] != "") {
+      paste0("Tverrfaglig behandling i gruppe: ",
+             paste(c("Nei", "1-3 ganger",
+                     "4-6 ganger", "7-10 ganger",
+                     ">10 ganger")[
+                       sort(Treatment_GroupInterdisciplinary2018 + 1)],
+                   collapse = ", "))
+    },
+    if (Treatment_IndividualMonoDiciplinary[1] != "") {
+      paste0("Individuell monofaglig behandling: ",
+             paste(c("Nei", "1-3 ganger",
+                     "4-10 ganger", ">10 ganger")[
+                       sort(Treatment_IndividualMonoDiciplinary + 1)],
+                   collapse = ", "))
+    },
+    if (Treatment_InvidualInterdisciplinary[1] != "") {
+      paste0("Individuell tverrfaglig behandling: ",
+             paste(c("Nei", "1-3 ganger",
+                     "4-10 ganger", ">10 ganger")[
+                       sort(Treatment_InvidualInterdisciplinary + 1)],
+                   collapse = ", "))
+    },
     if (length(valgtShus)>1) {
       paste0('Valgte RESH: ', paste(as.character(valgtShus),
                                     collapse=', '))
     }
+
   )
 
 

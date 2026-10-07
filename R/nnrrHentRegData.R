@@ -6,9 +6,129 @@
 #'
 #' @return RegData data frame
 #' @export
-
+#'
 nnrrHentRegData <- function(datoFra = "2017-01-01",
                             datoTil = "2099-01-01") {
+  shiny::withProgress(message = "Loading data", value = 0, {
+
+    dbList <- rapbase::rapOpenDbConnection("data", "mysql")
+
+    shiny::incProgress(0.1, detail = "Laster behandlerskjema")
+    legeskjema <- DBI::dbGetQuery(
+      conn = dbList$con,
+      statement = paste0(
+        "SELECT * FROM behandlerskjema_1 WHERE
+      S1b_DateOfCompletion >= \'",
+        datoFra, "\' AND S1b_DateOfCompletion <= \'",
+        datoTil, "\' "
+      )
+    )|>
+      dplyr::distinct(SkjemaGUID, .keep_all = TRUE)
+
+    shiny::incProgress(0.1, detail = "Laster pasientskjema før behandling")
+    pasientsvar_pre <- DBI::dbGetQuery(
+      conn = dbList$con,
+      statement = paste0(
+        "SELECT * FROM pasientskjema_foer_behandling_2 WHERE
+      S1b_DateOfCompletion >= \'",
+        datoFra, "\' AND S1b_DateOfCompletion <= \'",
+        datoTil, "\' "
+      )
+    )|>
+      dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE)
+
+    shiny::incProgress(0.1, detail = "Laster pasientskjema 6 mnd etter behandling")
+    pasientsvar_post <- DBI::dbGetQuery(
+      conn = dbList$con,
+      statement = paste0(
+        "SELECT * FROM pasientskjema_6_maaneder_etter_behandling_3 WHERE
+      S1b_DateOfCompletion >= \'",
+        datoFra, "\' AND S1b_DateOfCompletion <= \'",
+        datoTil, "\' "
+      )
+    )|>
+      dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE)
+
+    shiny::incProgress(0.1, detail = "Laster pasientskjema 12 mnd etter behandling")
+    pasientsvar_post2 <- DBI::dbGetQuery(
+      conn = dbList$con,
+      statement = paste0(
+        "SELECT * FROM pasientskjema_12_maaneder_etter_behandling_8 WHERE
+      S1b_DateOfCompletion >= \'",
+        datoFra, "\' AND S1b_DateOfCompletion <= \'",
+        datoTil, "\' "
+      )
+    )|>
+      dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE)
+
+    shiny::incProgress(0.1, detail = "Laster enheter")
+    accessunits <- DBI::dbGetQuery(
+      conn = dbList$con,
+      statement = "SELECT * FROM accessunits"
+    )
+
+    rapbase::rapCloseDbConnection(dbList$con)
+    dbList <- NULL
+
+    shiny::incProgress(0.5, detail = "Behandler data")
+
+    legeskjema$regstatus <- 1
+    pasientsvar_pre$regstatus <- 1
+    pasientsvar_post$regstatus <- 1
+    pasientsvar_post2$regstatus <- 1
+
+    names(pasientsvar_pre)[
+      names(pasientsvar_pre) == "SkjemaGUID"
+    ] <- "SkjemaGUID_pre"
+    names(pasientsvar_post)[
+      names(pasientsvar_post) == "SkjemaGUID"
+    ] <- "SkjemaGUID_post"
+    names(pasientsvar_post2)[
+      names(pasientsvar_post2) == "SkjemaGUID"
+    ] <- "SkjemaGUID_post2"
+
+    RegData <- merge(
+      legeskjema, pasientsvar_pre,
+      by.x = "SkjemaGUID",
+      by.y = "HovedskjemaGUID", suffixes = c("", "_pre")
+    )
+    RegData <- merge(
+      RegData, pasientsvar_post,
+      by.x = "SkjemaGUID",
+      by.y = "HovedskjemaGUID", suffixes = c("", "_post"),
+      all.x = TRUE
+    )
+    RegData <- merge(
+      RegData, pasientsvar_post2,
+      by.x = "SkjemaGUID",
+      by.y = "HovedskjemaGUID", suffixes = c("", "_post2"),
+      all.x = TRUE
+    ) |>
+      merge(accessunits |> dplyr::select(UnitId, ExtraData),
+            by = "UnitId")
+
+    RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
+    RegData <- nnrr::nnrrPreprosess(RegData = RegData)
+    rm(list = c(
+      "pasientsvar_pre", "legeskjema",
+      "pasientsvar_post", "pasientsvar_post2"
+    ))
+  })
+  return(RegData)
+}
+
+
+#' Provide global dataframe for NNRR
+#'
+#' Provides NNRR data
+#'
+#' @inheritParams nnrrFigAndeler
+#'
+#' @return RegData data frame
+#' @export
+#'
+nnrrHentRegDataLokal <- function(datoFra = "2017-01-01",
+                                 datoTil = "2099-01-01") {
   registryName <- "data"
   dbType <- "mysql"
 
@@ -54,6 +174,11 @@ nnrrHentRegData <- function(datoFra = "2017-01-01",
   ) |>
     dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE)
 
+  accessunits <- rapbase::loadRegData(
+    registryName,
+    "SELECT * FROM accessunits"
+  )
+
   legeskjema$regstatus <- 1
   pasientsvar_pre$regstatus <- 1
   pasientsvar_post$regstatus <- 1
@@ -85,7 +210,9 @@ nnrrHentRegData <- function(datoFra = "2017-01-01",
     by.x = "SkjemaGUID",
     by.y = "HovedskjemaGUID", suffixes = c("", "_post2"),
     all.x = TRUE
-  )
+  ) |>
+    merge(accessunits |> dplyr::select(UnitId, ExtraData),
+          by = "UnitId")
 
   RegData$DiagnosticNumber1 <- trimws(RegData$DiagnosticNumber1)
   RegData <- nnrr::nnrrPreprosess(RegData = RegData)
