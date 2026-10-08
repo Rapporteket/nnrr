@@ -13,7 +13,7 @@ sykehusvisning_UI <- function(id) {
       dateRangeInput(
         inputId = ns("datovalg"),
         label = "Dato fra og til",
-        min = "2014-01-01",
+        min = "2020-01-01",
         max = Sys.Date(),
         start = Sys.Date() %m-% months(12) + 1,
         end = Sys.Date(),

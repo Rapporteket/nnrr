@@ -13,7 +13,7 @@ tidsvisning_UI <- function(id) {
       dateRangeInput(
         inputId = ns("datovalg"),
         label = "Dato fra og til",
-        min = "2014-01-01",
+        min = "2020-01-01",
         language = "nb",
         max = Sys.Date(),
         start = lubridate::floor_date(

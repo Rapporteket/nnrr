@@ -16,9 +16,9 @@ samledok_UI <- function(id) {
         inputId = ns("valgtAar"), label = "Frem til år",
         choices = if (Sys.Date() %>% as.character() %>% substr(6, 7) %>%
                       as.numeric() >= 4) {
-          rev(2014:as.numeric(format(Sys.Date(), "%Y")))
+          rev(2020:as.numeric(format(Sys.Date(), "%Y")))
         } else {
-          rev(2014:(as.numeric(format(Sys.Date(), "%Y")) - 1))
+          rev(2020:(as.numeric(format(Sys.Date(), "%Y")) - 1))
         }
       ),
       uiOutput(outputId = ns("kvartal_ui")),

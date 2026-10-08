@@ -23,7 +23,7 @@ admtab_ui <- function(id) {
           dateRangeInput(
             inputId = ns("datovalg_adm"),
             label = "Dato fra og til",
-            min = "2014-01-01", language = "nb",
+            min = "2020-01-01", language = "nb",
             max = Sys.Date(),
             start = lubridate::floor_date(
               lubridate::today() -
@@ -158,7 +158,7 @@ admtab_server <- function(id, RegData, userRole,
             shinyWidgets::airDatepickerInput(
               inputId = ns("datovalg_adm_tid_mnd"),
               label = "Vis til og med måned:",
-              minDate = "2014-01-01",
+              minDate = "2020-01-01",
               maxDate = Sys.Date(),
               value = Sys.Date(),
               view = "months",
@@ -179,7 +179,7 @@ admtab_server <- function(id, RegData, userRole,
             shinyWidgets::airDatepickerInput(
               inputId = ns("datovalg_adm_tid_aar"),
               label = "Vis til og med år:",
-              minDate = "2014-01-01",
+              minDate = "2020-01-01",
               maxDate = Sys.Date(),
               value = Sys.Date(),
               view = "years",

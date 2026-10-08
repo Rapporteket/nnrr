@@ -10,7 +10,7 @@
 appServer <- function(input, output, session) {
 
   # Last data
-  RegData <- nnrr::nnrrHentRegData()
+  RegData <- nnrr::nnrrHentRegData(datoFra = "2020-01-01")
 
   map_avdeling <- data.frame(
     UnitId = unique(RegData$UnitId),

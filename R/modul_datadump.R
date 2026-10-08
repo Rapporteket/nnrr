@@ -15,7 +15,7 @@ datadump_UI <- function(id) {
         label = "Dato fra og til",
         language = "nb",
         max = Sys.Date(),
-        start = "2014-01-01",
+        start = "2020-01-01",
         end = Sys.Date(),
         separator = " til "
       ),
