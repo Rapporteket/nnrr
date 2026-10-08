@@ -9,9 +9,11 @@
 #'
 #' @export
 #'
-nnrrBeregnGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra = "2000-01-01", datoTil = "2050-01-01", reshID,
-                                       minald = 0, maxald = 120, erMann = 99, sammenlign = 1,
-                                       enhetsUtvalg = 0, gr_var = "SykehusNavn") {
+nnrrBeregnGjsnPrePostGrVar <- function(
+    RegData, valgtVar, datoFra = "2000-01-01",
+    datoTil = "2050-01-01", reshID,
+    minald = 0, maxald = 120, erMann = 99, sammenlign = 1,
+    enhetsUtvalg = 0, gr_var = "SykehusNavn") {
   RegData$Gr_var <- RegData[, gr_var]
 
   # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
@@ -20,10 +22,12 @@ nnrrBeregnGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra = "2000-01-01"
   }
 
   # Definerer pre -og postvariabler, fjerner registreringer som mangler én eller begge
-  PrePostVar <- switch(valgtVar,
+  PrePostVar <- switch(
+    valgtVar,
     ODI_PrePost = c("OdiScore", "OdiScore_post", "OdiScore_post2"),
     NDI_PrePost = c("NdiScore", "NdiScore_post", "NdiScore_post2"),
-    EQ5D_PrePost = c("Eq5dScore", "Eq5dScore_post", "Eq5dScore_post"), # NB, finn ut av
+    EQ5D_PrePost = c("Score_EQ5DL", "Score_EQ5DL_post",
+                     "Score_EQ5DL_post2"),
     PainExperiencesNoActivity = c(
       "PainExperiencesNoActivity",
       "PainExperiencesNoActivity_post",
@@ -33,7 +37,8 @@ nnrrBeregnGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra = "2000-01-01"
       "PainExperiencesActivity",
       "PainExperiencesActivity_post",
       "PainExperiencesActivity_post2"
-    )
+    ),
+    HSCL10Score = c("HSCL10Score", "HSCL10Score", "HSCL10Score")
   )
 
   RegData$VarPre <- RegData[, PrePostVar[1]]
@@ -47,23 +52,27 @@ nnrrBeregnGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra = "2000-01-01"
   }
   if (sammenlign == 2) {
     RegData <- RegData[which(!is.na(RegData$VarPre) &
-      !is.na(RegData$VarPost) &
-      !is.na(RegData$VarPost2)), ]
+                               !is.na(RegData$VarPost) &
+                               !is.na(RegData$VarPost2)), ]
   }
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra, datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann
+    RegData = RegData,
+    datoFra = datoFra,
+    datoTil = datoTil,
+    minald = minald,
+    maxald = maxald,
+    erMann = erMann
   )
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
 
   PrePost <- aggregate(RegData[, c("VarPre", "VarPost", "VarPost2")[1:(sammenlign + 1)]],
-    by = list(RegData$Gr_var), mean, na.rm = TRUE
+                       by = list(RegData$Gr_var), mean, na.rm = TRUE
   )
   PrePostSD <- aggregate(RegData[, c("VarPre", "VarPost", "VarPost2")[1:(sammenlign + 1)]],
-    by = list(RegData$Gr_var), sd, na.rm = TRUE
+                         by = list(RegData$Gr_var), sd, na.rm = TRUE
   )
   # Ngr <- tapply(RegData[, c('VarPre')], RegData$Gr_var, function(x){length(x[!is.na(x)])})
   Ngr <- aggregate(RegData[, c("VarPre")], by = list(RegData$Gr_var), length)
@@ -88,11 +97,12 @@ nnrrBeregnGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra = "2000-01-01"
   grtxt <- c(names(Ngr)[1:(length(Ngr) - 1)], "Totalt")
 
   tittel <- switch(valgtVar,
-    ODI_PrePost = "ODI-score",
-    NDI_PrePost = "NDI-score",
-    EQ5D_PrePost = "EQ5D-Score",
-    PainExperiencesNoActivity = "Smerte i hvile",
-    PainExperiencesActivity = "Smerte i aktivitet"
+                   ODI_PrePost = "ODI-score",
+                   NDI_PrePost = "NDI-score",
+                   EQ5D_PrePost = "EQ5D-Score",
+                   PainExperiencesNoActivity = "Smerte i hvile",
+                   PainExperiencesActivity = "Smerte i aktivitet",
+                   HSCL10Score = "Psykisk symptomtrykk"
   )
 
   plotparams <- list(

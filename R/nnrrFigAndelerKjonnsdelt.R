@@ -35,8 +35,13 @@ nnrrFigAntallKjonnsdelt <- function(RegData, valgtVar, datoFra = "2014-01-01", d
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra, datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann
+    RegData = RegData,
+    reshID = reshID,
+    datoFra = datoFra,
+    datoTil = datoTil,
+    minald = minald,
+    maxald = maxald,
+    erMann = erMann
   )
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt

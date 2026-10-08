@@ -6,6 +6,8 @@
 \usage{
 nnrrUtvalg(
   RegData,
+  reshID = NA,
+  enhetsUtvalg = NA,
   datoFra = "2000-01-01",
   datoTil = "2100-01-01",
   minald = 0,
@@ -20,11 +22,16 @@ nnrrUtvalg(
   tolk = 99,
   iArbeid = 99,
   valgtShus = "",
+  Treatment_IndividualMonoDiciplinary = "",
+  Treatment_InvidualInterdisciplinary = "",
+  Treatment_GroupInterdisciplinary2018 = "",
   fargepalett = "BlaaRapp"
 )
 }
 \arguments{
 \item{RegData}{- ei dataramme med alle nødvendige variable fra registeret}
+
+\item{reshID}{- avdelingsid for egen avdeling, standard: 0-hele landet}
 
 \item{datoFra}{<- '2014-01-01'    # min og max dato i utvalget vises alltid i figuren.}
 

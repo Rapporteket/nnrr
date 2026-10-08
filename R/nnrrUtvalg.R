@@ -9,6 +9,8 @@
 #' @export
 #'
 nnrrUtvalg <- function(RegData,
+                       reshID = NA,
+                       enhetsUtvalg = NA,
                        datoFra = "2000-01-01",
                        datoTil = "2100-01-01",
                        minald = 0,
@@ -23,9 +25,41 @@ nnrrUtvalg <- function(RegData,
                        tolk = 99,
                        iArbeid = 99,
                        valgtShus = "",
+                       Treatment_IndividualMonoDiciplinary = "",
+                       Treatment_InvidualInterdisciplinary = "",
+                       Treatment_GroupInterdisciplinary2018 = "",
                        fargepalett = "BlaaRapp") {
   # Definerer intersect-operator
   "%i%" <- intersect
+
+  shtxt <- "Ingen valg"
+
+  if (!is.na(enhetsUtvalg)) {
+
+    if (valgtShus[1] != "") {
+      valgtShus <- as.numeric(valgtShus)
+      if (length(valgtShus)==1) {reshID<-valgtShus[1]}
+    }
+
+    # Sykehustekst avhengig av bruker og brukervalg
+    if (enhetsUtvalg == 0) {
+      shtxt <- "Hele landet"
+    } else {
+      shtxt <- as.character(RegData$SykehusNavn[
+        match(reshID, RegData$UnitId)])
+    }
+
+    if (enhetsUtvalg!=0 & length(valgtShus)>1) {
+      RegData$UnitId[RegData$UnitId %in% valgtShus] <- 99
+      shtxt <- 'Ditt utvalg'
+      reshID <- 99
+    }
+
+    # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
+    if (enhetsUtvalg == 2) {
+      RegData <- RegData[which(RegData$UnitId == reshID), ]
+    }
+  }
 
   RegData$Dato <- RegData[, datovar]
   datotxt <- switch(datovar,
@@ -53,6 +87,27 @@ nnrrUtvalg <- function(RegData,
   } else {
     indAlle
   }
+  ind_mono_individ <- if (Treatment_IndividualMonoDiciplinary[1] != "") {
+    which(RegData$Treatment_IndividualMonoDiciplinary %in%
+            Treatment_IndividualMonoDiciplinary)
+  } else {
+    indAlle
+  }
+
+  ind_tverrfaglig_individ <- if (Treatment_InvidualInterdisciplinary[1] != "") {
+    which(RegData$Treatment_InvidualInterdisciplinary %in%
+            Treatment_InvidualInterdisciplinary)
+  } else {
+    indAlle
+  }
+
+  ind_tverrfaglig_gruppe <- if (Treatment_GroupInterdisciplinary2018[1] != "") {
+    which(RegData$Treatment_GroupInterdisciplinary2018 %in%
+            Treatment_GroupInterdisciplinary2018)
+  } else {
+    indAlle
+  }
+
   indHSCL <- if (minHSCL > 1 | maxHSCL < 4) {
     which(RegData$HSCL10.Score >= minHSCL & RegData$HSCL10.Score <= maxHSCL)
   } else {
@@ -86,7 +141,8 @@ nnrrUtvalg <- function(RegData,
 
 
   indMed <- indAld %i% indDato %i% indKj %i% indTverr %i% indHSCL %i%
-    indMedikament %i% indSmerte %i% indTolk %i% indEmployed
+    indMedikament %i% indSmerte %i% indTolk %i% indEmployed %i%
+    ind_mono_individ %i% ind_tverrfaglig_individ %i% ind_tverrfaglig_gruppe
   RegData <- RegData[indMed, ]
 
   utvalgTxt <- c(
@@ -139,14 +195,38 @@ nnrrUtvalg <- function(RegData,
         c("Nei", "Ja")[iArbeid + 1]
       )
     },
+    if (Treatment_GroupInterdisciplinary2018[1] != "") {
+      paste0("Tverrfaglig behandling i gruppe: ",
+             paste(c("Nei", "1-3 ganger",
+                     "4-6 ganger", "7-10 ganger",
+                     ">10 ganger")[
+                       sort(Treatment_GroupInterdisciplinary2018 + 1)],
+                   collapse = ", "))
+    },
+    if (Treatment_IndividualMonoDiciplinary[1] != "") {
+      paste0("Individuell monofaglig behandling: ",
+             paste(c("Nei", "1-3 ganger",
+                     "4-10 ganger", ">10 ganger")[
+                       sort(Treatment_IndividualMonoDiciplinary + 1)],
+                   collapse = ", "))
+    },
+    if (Treatment_InvidualInterdisciplinary[1] != "") {
+      paste0("Individuell tverrfaglig behandling: ",
+             paste(c("Nei", "1-3 ganger",
+                     "4-10 ganger", ">10 ganger")[
+                       sort(Treatment_InvidualInterdisciplinary + 1)],
+                   collapse = ", "))
+    },
     if (length(valgtShus)>1) {
       paste0('Valgte RESH: ', paste(as.character(valgtShus),
                                     collapse=', '))
     }
+
   )
 
 
   UtData <- list(RegData = RegData, utvalgTxt = utvalgTxt,
-                 fargepalett = fargepalett)
+                 fargepalett = fargepalett,
+                 shtxt = shtxt, reshID = reshID)
   return(invisible(UtData))
 }

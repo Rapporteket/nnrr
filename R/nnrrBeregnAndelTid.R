@@ -15,51 +15,54 @@
 #'
 #' @export
 #'
-nnrrBeregnAndelTid <- function(RegData,
-                               valgtVar = "tverrfaglig_behandlet",
-                               datoFra = "2014-01-01",
-                               datoTil = "2050-12-31",
-                               enhetsUtvalg = 1,
-                               datovar = "Besoksdato",
-                               minald = 0,
-                               maxald = 130,
-                               erMann = 99,
-                               outfile = "",
-                               reshID,
-                               tidsenhet = "Kvartal",
-                               maal = NA,
-                               maalnivaatxt = NA,
-                               tverrfaglig = 99,
-                               minHSCL = 1,
-                               maxHSCL = 4,
-                               medikamenter = NULL,
-                               smerte = NULL,
-                               tolk = 99,
-                               iArbeid = 99) {
+nnrrBeregnAndelTid <- function(
+    RegData,
+    valgtVar = "tverrfaglig_behandlet",
+    datoFra = "2014-01-01",
+    datoTil = "2050-12-31",
+    enhetsUtvalg = 1,
+    datovar = "Besoksdato",
+    minald = 0,
+    maxald = 130,
+    erMann = 99,
+    outfile = "",
+    reshID,
+    tidsenhet = "Kvartal",
+    maal = NA,
+    maalnivaatxt = NA,
+    tverrfaglig = 99,
+    minHSCL = 1,
+    maxHSCL = 4,
+    medikamenter = NULL,
+    smerte = NULL,
+    tolk = 99,
+    iArbeid = 99,
+    valgtShus = "",
+    ...) {
   datotxt <- switch(datovar,
-    Besoksdato = "intervensjon",
-    dato_oppfolg = "6-mnd oppfølging",
-    dato_oppfolg2 = "12-mnd oppfølging"
+                    Besoksdato = "intervensjon",
+                    dato_oppfolg = "6-mnd oppfølging",
+                    dato_oppfolg2 = "12-mnd oppfølging"
   )
   xaksetxt <- switch(tidsenhet,
-    Aar = paste0("År for ", datotxt),
-    Mnd = paste0("År og måned for ", datotxt),
-    Kvartal = paste0("År og kvartal for ", datotxt),
-    Halvaar = paste0("År og halvår for ", datotxt)
+                     Aar = paste0("År for ", datotxt),
+                     Mnd = paste0("År og måned for ", datotxt),
+                     Kvartal = paste0("År og kvartal for ", datotxt),
+                     Halvaar = paste0("År og halvår for ", datotxt)
   )
   xaksetxt2 <- switch(tidsenhet,
-    Aar = "År for oppfølging",
-    Mnd = "År og måned for oppfølging",
-    Kvartal = "År og kvartal for oppfølging",
-    Halvaar = "År og halvår for oppfølging"
+                      Aar = "År for oppfølging",
+                      Mnd = "År og måned for oppfølging",
+                      Kvartal = "År og kvartal for oppfølging",
+                      Halvaar = "År og halvår for oppfølging"
   )
 
-  # Sykehustekst avhengig av bruker og brukervalg
-  if (enhetsUtvalg == 0) {
-    shtxt <- "Hele landet"
-  } else {
-    shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
-  }
+  # # Sykehustekst avhengig av bruker og brukervalg
+  # if (enhetsUtvalg == 0) {
+  #   shtxt <- "Hele landet"
+  # } else {
+  #   shtxt <- as.character(RegData$SykehusNavn[match(reshID, RegData$UnitId)])
+  # }
 
   ## Preparer variabler for fremstilling i figur
   PlotParams <- nnrrPrepVar(RegData = RegData, valgtVar = valgtVar)
@@ -68,15 +71,22 @@ nnrrBeregnAndelTid <- function(RegData,
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra,
+    RegData = RegData,
+    reshID = reshID,
+    enhetsUtvalg = enhetsUtvalg,
+    valgtShus = valgtShus,
+    datoFra = datoFra,
     datoTil = datoTil, minald = minald,
     maxald = maxald, erMann = erMann, datovar = datovar,
     tverrfaglig = tverrfaglig, minHSCL = minHSCL,
     maxHSCL = maxHSCL, medikamenter = medikamenter,
-    smerte = smerte, tolk = tolk, iArbeid = iArbeid
+    smerte = smerte, tolk = tolk, iArbeid = iArbeid,
+    ...
   )
+  reshID <- NNRRUtvalg$reshID
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
+  shtxt <- NNRRUtvalg$shtxt
 
   RegData$Dato <- RegData[, datovar]
   RegData$Aar <- as.numeric(format(RegData$Dato, "%Y"))
@@ -84,7 +94,8 @@ nnrrBeregnAndelTid <- function(RegData,
   RegData$Kvartal <- floor((RegData$Mnd - 1) / 3) + 1
   RegData$Halvaar <- floor((RegData$Mnd - 1) / 6) + 1
 
-  RegData$TidsEnhet <- switch(tidsenhet,
+  RegData$TidsEnhet <- switch(
+    tidsenhet,
     Aar = RegData$Aar - min(RegData$Aar) + 1,
     Mnd = RegData$Mnd - min(RegData$Mnd[RegData$Aar == min(RegData$Aar)]) + 1 +
       (RegData$Aar - min(RegData$Aar)) * 12,
@@ -94,7 +105,8 @@ nnrrBeregnAndelTid <- function(RegData,
       (RegData$Aar - min(RegData$Aar)) * 2
   )
 
-  Tidtxt <- switch(tidsenhet,
+  Tidtxt <- switch(
+    tidsenhet,
     Mnd = paste(
       substr(RegData$Aar[match(
         1:max(RegData$TidsEnhet),
@@ -122,7 +134,7 @@ nnrrBeregnAndelTid <- function(RegData,
         RegData$TidsEnhet
       )], 3, 4),
       sprintf("%01.0f", RegData$Halvaar
-      [match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]),
+              [match(1:max(RegData$TidsEnhet), RegData$TidsEnhet)]),
       sep = "-"
     ),
     Aar = as.character(RegData$Aar[match(
@@ -131,7 +143,8 @@ nnrrBeregnAndelTid <- function(RegData,
     )])
   )
 
-  RegData$TidsEnhet <- factor(RegData$TidsEnhet, levels = 1:max(RegData$TidsEnhet))
+  RegData$TidsEnhet <- factor(
+    RegData$TidsEnhet, levels = 1:max(RegData$TidsEnhet))
 
   # Hvis man ikke skal sammenligne, får man ut resultat for eget sykehus
   if (enhetsUtvalg == 2) {

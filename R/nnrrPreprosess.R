@@ -120,26 +120,30 @@ nnrrPreprosess <- function(RegData) {
   RegData$FABQScore2 <- as.numeric(sapply(as.character(RegData$FABQScore2), gsub, pattern = ",", replacement = "."))
   # RegData$Eq5dScore_post2 <- as.numeric(sapply(as.character(RegData$Eq5dScore_post2), gsub, pattern = ",", replacement= "."))
 
-  RegData$SykehusNavn <- NA
-  RegData$SykehusNavn[RegData$UnitId == 102959] <- "Haukeland"
-  RegData$SykehusNavn[RegData$UnitId == 104293] <- "St. Olavs"
-  RegData$SykehusNavn[RegData$UnitId == 109834] <- "OUS"
-  RegData$SykehusNavn[RegData$UnitId == 601032] <- "UNN-Tromsø"
-  RegData$SykehusNavn[RegData$UnitId == 700735] <- "UNN-Harstad"
-  RegData$SykehusNavn[RegData$UnitId == 102169] <- "Sandnessjøen"
-  RegData$SykehusNavn[RegData$UnitId == 114174] <- "Kristiansand"
-  RegData$SykehusNavn[RegData$UnitId == 4211588] <- "Stavanger"
-  RegData$SykehusNavn[RegData$UnitId == 4212982] <- "Ålesund"
-  RegData$SykehusNavn[RegData$UnitId == 105821] <- "Levanger"
-  RegData$SykehusNavn[RegData$UnitId == 103736] <- "Drammen"
-  RegData$SykehusNavn[RegData$UnitId == 700138] <- "Stavern"
-  RegData$SykehusNavn[RegData$UnitId == 700701] <- "NLSH"
-  RegData$SykehusNavn[RegData$UnitId == 4216667] <- "SI-Ottestad"
-  RegData$SykehusNavn[RegData$UnitId == 701433] <- "Stord"
-  RegData$SykehusNavn[RegData$UnitId == 101831] <- "Kirkenes"
+  # RegData$SykehusNavn <- NA
+  # RegData$SykehusNavn[RegData$UnitId == 102959] <- "Haukeland"
+  # RegData$SykehusNavn[RegData$UnitId == 104293] <- "St. Olavs"
+  # RegData$SykehusNavn[RegData$UnitId == 109834] <- "OUS"
+  # RegData$SykehusNavn[RegData$UnitId == 601032] <- "UNN-Tromsø"
+  # RegData$SykehusNavn[RegData$UnitId == 700735] <- "UNN-Harstad"
+  # RegData$SykehusNavn[RegData$UnitId == 102169] <- "Sandnessjøen"
+  # RegData$SykehusNavn[RegData$UnitId == 114174] <- "Kristiansand"
+  # RegData$SykehusNavn[RegData$UnitId == 4211588] <- "Stavanger"
+  # RegData$SykehusNavn[RegData$UnitId == 4212982] <- "Ålesund"
+  # RegData$SykehusNavn[RegData$UnitId == 105821] <- "Levanger"
+  # RegData$SykehusNavn[RegData$UnitId == 103736] <- "Drammen"
+  # RegData$SykehusNavn[RegData$UnitId == 700138] <- "Stavern"
+  # RegData$SykehusNavn[RegData$UnitId == 700701] <- "NLSH"
+  # RegData$SykehusNavn[RegData$UnitId == 4216667] <- "SI-Ottestad"
+  # RegData$SykehusNavn[RegData$UnitId == 701433] <- "Stord"
+  # RegData$SykehusNavn[RegData$UnitId == 101831] <- "Kirkenes"
+  # RegData$SykehusNavn[RegData$UnitId == 420497] <- "Østfold"
 
-  names(RegData)[which(names(RegData) == "Eq5dHealthLevel")] <- "EQ5D.VAS"
-  names(RegData)[which(names(RegData) == "Eq5dHealthLevel_post")] <- "EQ5D.VAS_post"
+  RegData <- RegData |>
+    dplyr::rename(SykehusNavn = ExtraData)
+
+  # names(RegData)[which(names(RegData) == "Eq5dHealthLevel")] <- "EQ5D.VAS"
+  # names(RegData)[which(names(RegData) == "Eq5dHealthLevel_post")] <- "EQ5D.VAS_post"
 
   RegData$FamilyStatus[RegData$FamilyStatus == 0] <- 99
   RegData$FamilyStatus <- factor(RegData$FamilyStatus,

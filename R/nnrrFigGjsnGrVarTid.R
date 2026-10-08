@@ -30,8 +30,12 @@ nnrrFigGjsnGrVarTid <- function(RegData, valgtVar = "PatientAge", tittel = "", d
 
   ## Gjør utvalg basert på brukervalg (nnrrUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra, datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann
+    RegData = RegData,
+    datoFra = datoFra,
+    datoTil = datoTil,
+    minald = minald,
+    maxald = maxald,
+    erMann = erMann
   )
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
