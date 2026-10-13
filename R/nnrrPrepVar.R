@@ -190,7 +190,9 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     RegData$Variabel <- 0
     RegData$Variabel[RegData$regstatus_post == 1] <- 1
     grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+    RegData$VariabelGr <- factor(RegData$Variabel,
+                                 levels = 0:1,
+                                 labels = grtxt)
   }
 
   if (valgtVar == "Oppfolging_utfylt_12mnd") {
@@ -199,7 +201,9 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     RegData$Variabel <- 0
     RegData$Variabel[RegData$regstatus_post2 == 1] <- 1
     grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+    RegData$VariabelGr <- factor(RegData$Variabel,
+                                 levels = 0:1,
+                                 labels = grtxt)
   }
 
   if (valgtVar == "opplevd_nytte_beh_6mnd") {
@@ -311,23 +315,30 @@ nnrrPrepVar <- function(RegData, valgtVar) {
   ####################################
 
 
-  if (valgtVar == "odi_klinisk_viktig") {
-    tittel <- "Funksjonsbedring"
-    RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
-    RegData$Variabel <- 0
-    RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post) >= 10] <- 1
-    grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
-  }
+  # if (valgtVar == "odi_klinisk_viktig") {
+  #   tittel <- "Funksjonsbedring"
+  #   RegData <- RegData[!is.na(RegData$OdiScore) &
+  #                        !is.na(RegData$OdiScore_post), ]
+  #   RegData$Variabel <- 0
+  #   RegData$Variabel[(RegData$OdiScore -
+  #                       RegData$OdiScore_post) >= 10] <- 1
+  #   grtxt <- c("Nei", "Ja")
+  #   RegData$VariabelGr <- factor(RegData$Variabel,
+  #                                levels = 0:1,
+  #                                labels = grtxt)
+  # }
 
   if (valgtVar == "odi_klinisk_viktig_6mnd") {
     tittel <- "Funksjonsbedring"
-    RegData <- RegData[!is.na(RegData$OdiScore) & !is.na(RegData$OdiScore_post), ]
+    RegData <- RegData[!is.na(RegData$OdiScore) &
+                         !is.na(RegData$OdiScore_post), ]
     RegData$Variabel <- 0
-    RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post) >= 10] <- 1
-    # RegData$Variabel[(RegData$OdiScore - RegData$OdiScore_post)/RegData$OdiScore >= .3] <- 1
+    RegData$Variabel[(RegData$OdiScore -
+                        RegData$OdiScore_post) >= 10] <- 1
     grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+    RegData$VariabelGr <- factor(RegData$Variabel,
+                                 levels = 0:1,
+                                 labels = grtxt)
   }
 
   if (valgtVar == "odi_klinisk_viktig_12mnd") {
@@ -358,25 +369,27 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
 
+  # if (valgtVar == "bedring_smerte_hvile_6mnd_gml") {
+  #   tittel <- "Klinisk bedring av smerte i hvile"
+  #   RegData <- RegData %>%
+  #     dplyr::filter(
+  #       regstatus_pre == 1 & regstatus_post == 1 &
+  #         !is.na(PainExperiencesNoActivity) &
+  #         !is.na(PainExperiencesNoActivity_post) &
+  #         PainExperiencesNoActivity != 0
+  #     )
+  #   RegData$pstEndringSmerteHvile <-
+  #     (RegData$PainExperiencesNoActivity -
+  #       RegData$PainExperiencesNoActivity_post) /
+  #       RegData$PainExperiencesNoActivity * 100
+  #   RegData$Variabel <- 0
+  #   RegData$Variabel[RegData$pstEndringSmerteHvile >= 30] <- 1
+  #   grtxt <- c("Nei", "Ja")
+  #   RegData$VariabelGr <- factor(RegData$Variabel,
+  #                                levels = 0:1,
+  #                                labels = grtxt)
+  # }
   if (valgtVar == "bedring_smerte_hvile_6mnd") {
-    tittel <- "Klinisk bedring av smerte i hvile"
-    RegData <- RegData %>%
-      dplyr::filter(
-        regstatus_pre == 1 & regstatus_post == 1 &
-          !is.na(PainExperiencesNoActivity) &
-          !is.na(PainExperiencesNoActivity_post) &
-          PainExperiencesNoActivity != 0
-      )
-    RegData$pstEndringSmerteHvile <-
-      (RegData$PainExperiencesNoActivity -
-        RegData$PainExperiencesNoActivity_post) /
-        RegData$PainExperiencesNoActivity * 100
-    RegData$Variabel <- 0
-    RegData$Variabel[RegData$pstEndringSmerteHvile >= 30] <- 1
-    grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
-  }
-  if (valgtVar == "bedring_smerte_hvile_6mnd_v2") {
     tittel <- "Klinisk bedring av smerte i hvile"
     RegData <- RegData %>%
       dplyr::filter(
@@ -390,29 +403,33 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     RegData$Variabel <- 0
     RegData$Variabel[RegData$EndringSmerteHvile >= 2] <- 1
     grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+    RegData$VariabelGr <- factor(RegData$Variabel,
+                                 levels = 0:1,
+                                 labels = grtxt)
   }
+
+  # if (valgtVar == "bedring_smerte_hvile_12mnd_gml") {
+  #   tittel <- "Klinisk bedring av smerte i hvile"
+  #   RegData <- RegData %>%
+  #     dplyr::filter(
+  #       regstatus_pre == 1 & regstatus_post2 == 1 &
+  #         !is.na(PainExperiencesNoActivity) &
+  #         !is.na(PainExperiencesNoActivity_post2) &
+  #         PainExperiencesNoActivity != 0
+  #     )
+  #   RegData$pstEndringSmerteHvile <-
+  #     (RegData$PainExperiencesNoActivity -
+  #       RegData$PainExperiencesNoActivity_post2) /
+  #       RegData$PainExperiencesNoActivity * 100
+  #   RegData$Variabel <- 0
+  #   RegData$Variabel[RegData$pstEndringSmerteHvile >= 30] <- 1
+  #   grtxt <- c("Nei", "Ja")
+  #   RegData$VariabelGr <- factor(RegData$Variabel,
+  #                                levels = 0:1,
+  #                                labels = grtxt)
+  # }
 
   if (valgtVar == "bedring_smerte_hvile_12mnd") {
-    tittel <- "Klinisk bedring av smerte i hvile"
-    RegData <- RegData %>%
-      dplyr::filter(
-        regstatus_pre == 1 & regstatus_post2 == 1 &
-          !is.na(PainExperiencesNoActivity) &
-          !is.na(PainExperiencesNoActivity_post2) &
-          PainExperiencesNoActivity != 0
-      )
-    RegData$pstEndringSmerteHvile <-
-      (RegData$PainExperiencesNoActivity -
-        RegData$PainExperiencesNoActivity_post2) /
-        RegData$PainExperiencesNoActivity * 100
-    RegData$Variabel <- 0
-    RegData$Variabel[RegData$pstEndringSmerteHvile >= 30] <- 1
-    grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
-  }
-
-  if (valgtVar == "bedring_smerte_hvile_12mnd_v2") {
     tittel <- "Klinisk bedring av smerte i hvile"
     RegData <- RegData %>%
       dplyr::filter(
@@ -426,28 +443,30 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     RegData$Variabel <- 0
     RegData$Variabel[RegData$EndringSmerteHvile >= 2] <- 1
     grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+    RegData$VariabelGr <- factor(RegData$Variabel,
+                                 levels = 0:1,
+                                 labels = grtxt)
   }
+
+  # if (valgtVar == "bedring_smerte_aktiv_6mnd_gml") {
+  #   tittel <- "Klinisk bedring av smerte i aktivitet"
+  #   RegData <- RegData %>%
+  #     dplyr::filter(
+  #       regstatus_pre == 1 & regstatus_post == 1 &
+  #         !is.na(PainExperiencesActivity) &
+  #         !is.na(PainExperiencesActivity_post) &
+  #         PainExperiencesActivity != 0
+  #     )
+  #   RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
+  #     RegData$PainExperiencesActivity_post) /
+  #     RegData$PainExperiencesActivity * 100
+  #   RegData$Variabel <- 0
+  #   RegData$Variabel[RegData$pstEndringSmerteAktiv >= 30] <- 1
+  #   grtxt <- c("Nei", "Ja")
+  #   RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  # }
 
   if (valgtVar == "bedring_smerte_aktiv_6mnd") {
-    tittel <- "Klinisk bedring av smerte i aktivitet"
-    RegData <- RegData %>%
-      dplyr::filter(
-        regstatus_pre == 1 & regstatus_post == 1 &
-          !is.na(PainExperiencesActivity) &
-          !is.na(PainExperiencesActivity_post) &
-          PainExperiencesActivity != 0
-      )
-    RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
-      RegData$PainExperiencesActivity_post) /
-      RegData$PainExperiencesActivity * 100
-    RegData$Variabel <- 0
-    RegData$Variabel[RegData$pstEndringSmerteAktiv >= 30] <- 1
-    grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
-  }
-
-  if (valgtVar == "bedring_smerte_aktiv_6mnd_v2") {
     tittel <- "Klinisk bedring av smerte i aktivitet"
     RegData <- RegData %>%
       dplyr::filter(
@@ -464,25 +483,25 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
   }
 
-  if (valgtVar == "bedring_smerte_aktiv_12mnd") {
-    tittel <- "Klinisk bedring av smerte i aktivitet"
-    RegData <- RegData %>%
-      dplyr::filter(
-        regstatus_pre == 1 & regstatus_post2 == 1 &
-          !is.na(PainExperiencesActivity) &
-          !is.na(PainExperiencesActivity_post2) &
-          PainExperiencesActivity != 0
-      )
-    RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
-      RegData$PainExperiencesActivity_post2) /
-      RegData$PainExperiencesActivity * 100
-    RegData$Variabel <- 0
-    RegData$Variabel[RegData$pstEndringSmerteAktiv >= 30] <- 1
-    grtxt <- c("Nei", "Ja")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
-  }
+  # if (valgtVar == "bedring_smerte_aktiv_12mnd_gml") {
+  #   tittel <- "Klinisk bedring av smerte i aktivitet"
+  #   RegData <- RegData %>%
+  #     dplyr::filter(
+  #       regstatus_pre == 1 & regstatus_post2 == 1 &
+  #         !is.na(PainExperiencesActivity) &
+  #         !is.na(PainExperiencesActivity_post2) &
+  #         PainExperiencesActivity != 0
+  #     )
+  #   RegData$pstEndringSmerteAktiv <- (RegData$PainExperiencesActivity -
+  #     RegData$PainExperiencesActivity_post2) /
+  #     RegData$PainExperiencesActivity * 100
+  #   RegData$Variabel <- 0
+  #   RegData$Variabel[RegData$pstEndringSmerteAktiv >= 30] <- 1
+  #   grtxt <- c("Nei", "Ja")
+  #   RegData$VariabelGr <- factor(RegData$Variabel, levels = 0:1, labels = grtxt)
+  # }
 
-  if (valgtVar == "bedring_smerte_aktiv_12mnd_v2") {
+  if (valgtVar == "bedring_smerte_aktiv_12mnd") {
     tittel <- "Klinisk bedring av smerte i aktivitet"
     RegData <- RegData %>%
       dplyr::filter(
@@ -921,13 +940,19 @@ nnrrPrepVar <- function(RegData, valgtVar) {
   }
 
   if (valgtVar == "Eq5dSatisfactionTreatment") {
-    RegData$Variabel <- RegData[, valgtVar]
+    RegData$Variabel <- RegData[, "Eq5dSatisfactionTreatment_Old"]
     RegData <- RegData[which(!is.na(RegData$Variabel)), ]
-    tittel <- c("Behandlingstilfredshet. Hvor fornøyd er du", "med behandlingen du har fått for de", "aktuelle plagene inntil i dag?")
-    subtxt <- "Hvor fornøyd er du med behandlingen du har fått for de aktuelle plagene inntil i dag?"
+    tittel <- c("Behandlingstilfredshet. Hvor fornøyd er du",
+                "med behandlingen du har fått for de",
+                "aktuelle plagene inntil i dag?")
+    subtxt <- "Hvor fornøyd er du med behandlingen du har fått
+    for de aktuelle plagene inntil i dag?"
     gr <- c(1:5, 0)
-    grtxt <- c("Fornøyd", "Litt fornøyd", "Hverken fornøyd \neller misfornøyd", "Litt misfornøyd", "Misfornøyd", "Ikke svart")
-    RegData$VariabelGr <- factor(RegData$Variabel, levels = gr, labels = grtxt)
+    grtxt <- c("Fornøyd", "Litt fornøyd",
+               "Hverken fornøyd \neller misfornøyd",
+               "Litt misfornøyd", "Misfornøyd", "Ikke svart")
+    RegData$VariabelGr <- factor(RegData$Variabel,
+                                 levels = gr, labels = grtxt)
     retn <- "H"
   }
 

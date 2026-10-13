@@ -37,14 +37,23 @@ fordelingsfig_UI <- function(id) {
           "Tverrfaglig behandlet" = "tverrfaglig_behandlet",
           "Individuell oppfølging" = "individuell_oppfolging",
           "FABQ11" = "fabq11",
-          "Utfylt oppfølging" = "Oppfolging_utfylt",
-          "Opplevd nytte av behandling" = "opplevd_nytte_beh",
-          "Funksjonsbedring" = "odi_klinisk_viktig",
-          "Funksjonsbedring v2" = "odi_klinisk_viktig_v2",
-          "Klinisk bedring av smerte i hvile" = "bedring_smerte_hvile",
-          "Klinisk bedring av smerte i aktivitet" = "bedring_smerte_aktiv",
-          "Misfornøyd med behandling" = "misfornoyd",
-          "Fornøyd med behandling" = "fornoyd",
+          "Utfylt 6 mnd-oppfølging" = "Oppfolging_utfylt_6mnd",
+          "Utfylt 12 mnd-oppfølging" = "Oppfolging_utfylt_12mnd",
+          "Opplevd nytte av behandling (6mnd)" = "opplevd_nytte_beh_6mnd",
+          "Opplevd nytte av behandling (12mnd)" = "opplevd_nytte_beh_12mnd",
+          "Funksjonsbedring etter 6mnd" = "odi_klinisk_viktig_6mnd",
+          "Funksjonsbedring etter 12 mnd" = "odi_klinisk_viktig_12mnd",
+          "Klinisk bedring av smerte i hvile (6mnd)" =
+            "bedring_smerte_hvile_6mnd",
+          "Klinisk bedring av smerte i hvile (12mnd)" =
+            "bedring_smerte_hvile_12mnd",
+          "Klinisk bedring av smerte i aktivitet (6mnd)" =
+            "bedring_smerte_aktiv_6mnd",
+          "Klinisk bedring av smerte i aktivitet (12mnd)" =
+            "bedring_smerte_aktiv_12mnd",
+          # "Misfornøyd med behandling" = "misfornoyd",
+          "Fornøyd med behandling (6mnd)" = "fornoyd_6mnd",
+          "Fornøyd med behandling (12mnd)" = "fornoyd_12mnd",
           "Hopkins symptom checklist" = "HSCL10.Score",
           "Smertevarighet > 2 år" = "smerter_2aar"
         )
@@ -167,7 +176,8 @@ fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session) {
         shinyjs::reset("id_fordeling_panel")
       })
 
-      sykehus <- RegData$UnitId[match(sort(unique(RegData$SykehusNavn)), RegData$SykehusNavn)]
+      sykehus <- RegData$UnitId[match(sort(unique(RegData$SykehusNavn)),
+                                      RegData$SykehusNavn)]
       names(sykehus) <- sort(unique(RegData$SykehusNavn))
 
       output$sykehus_ui <- shiny::renderUI({
