@@ -35,6 +35,7 @@ nnrrPrepVar <- function(RegData, valgtVar) {
   if (valgtVar == "Treatment_TreatmentInSpecialistServices") {
     tittel <- "Behandlet i spesialisthelsetjenesten"
     RegData$Variabel <- RegData[, valgtVar]
+    RegData <- RegData[!is.na(RegData$Variabel), ]
     # RegData$Variabel <- RegData$Treatment_TreatmentInSpecialistServices
     grtxt <- c("Nei", "Ja")
     RegData$VariabelGr <- factor(RegData$Variabel,
