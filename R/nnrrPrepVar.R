@@ -24,7 +24,7 @@ nnrrPrepVar <- function(RegData, valgtVar) {
 
 
   if (valgtVar == "Treatment_GroupInterdisciplinary2018_dikotom") {
-    tittel <- "-	Behandling i gruppe"
+    tittel <- "Behandling i gruppe"
     RegData$Variabel <- ifelse(
       RegData$Treatment_GroupInterdisciplinary2018 == 0, 0, 1)
     grtxt <- c("Nei", "Ja")
