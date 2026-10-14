@@ -163,7 +163,8 @@ nnrrPrepVar <- function(RegData, valgtVar) {
           Treatment_IndividualMonoDiciplinary != 0 |
             Treatment_InvidualInterdisciplinary != 0, 1, 0),
         VariabelGr = factor(Variabel, levels = 0:1, labels = grtxt)
-        )
+      ) |>
+      dplyr::filter(!is.na(Variabel))
   }
 
   if (valgtVar == "fabq11") {
