@@ -27,6 +27,7 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     tittel <- "Behandling i gruppe"
     RegData$Variabel <- ifelse(
       RegData$Treatment_GroupInterdisciplinary2018 == 0, 0, 1)
+    RegData <- RegData[!is.na(RegData$Variabel), ]
     grtxt <- c("Nei", "Ja")
     RegData$VariabelGr <- factor(RegData$Variabel,
                                  levels = 0:1, labels = grtxt)
