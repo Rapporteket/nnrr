@@ -54,7 +54,7 @@ fordelingsfig_UI <- function(id) {
           # "Misfornøyd med behandling" = "misfornoyd",
           "Fornøyd med behandling (6mnd)" = "fornoyd_6mnd",
           "Fornøyd med behandling (12mnd)" = "fornoyd_12mnd",
-          "Hopkins symptom checklist" = "HSCL10.Score",
+          "Hopkins symptom checklist" = "HSCL10Score",
           "Smertevarighet > 2 år" = "smerter_2aar"
         )
       ),

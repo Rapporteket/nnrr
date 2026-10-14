@@ -158,13 +158,13 @@ print(xtable::xtable(tabell2, digits=0, align=c('l','l', rep('r', ncol(tabell2)-
 
 <<'Tab:eq5d_mm', results='asis', echo=FALSE>>=
 Gj.snitt <- apply(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
-                             "OdiScore", "NdiScore", "HSCL10.Score")], 2, mean, na.rm=T)
+                             "OdiScore", "NdiScore", "HSCL10Score")], 2, mean, na.rm=T)
 Median <- apply(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
-                           "OdiScore", "NdiScore", "HSCL10.Score")], 2, median, na.rm=T)
+                           "OdiScore", "NdiScore", "HSCL10Score")], 2, median, na.rm=T)
 Std.avvik <- apply(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
-                              "OdiScore", "NdiScore", "HSCL10.Score")], 2, sd, na.rm=T)
+                              "OdiScore", "NdiScore", "HSCL10Score")], 2, sd, na.rm=T)
 N <- apply(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
-                      "OdiScore", "NdiScore", "HSCL10.Score")], 2, function(x){length(which(!is.na(x)))})
+                      "OdiScore", "NdiScore", "HSCL10Score")], 2, function(x){length(which(!is.na(x)))})
 
 tabell3 <- cbind(Gj.snitt, Median, Std.avvik, N)
 rownames(tabell3) <- c('EQ5D-score', 'EQ5D-VAS', 'FABQ fysisk aktivitet', 'FABQ arbeid', 'ODI', 'NDI', 'HSCL-10')
@@ -175,16 +175,16 @@ print(xtable::xtable(tabell3, digits=c(1,1,1,1,0), align=c('l','l', rep('r', nco
 
 <<'Tab:PrShus', results='asis', echo=FALSE>>=
 Gj.snitt <- aggregate(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
-                                 "OdiScore", "NdiScore", "HSCL10.Score")], by=list(RegData$SykehusNavn), mean, na.rm=T)
+                                 "OdiScore", "NdiScore", "HSCL10Score")], by=list(RegData$SykehusNavn), mean, na.rm=T)
 Gj.snitt[,2:dim(Gj.snitt)[2]] <- round(Gj.snitt[,2:dim(Gj.snitt)[2]], 1)
 Median <- aggregate(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
-                               "OdiScore", "NdiScore", "HSCL10.Score")], by=list(RegData$SykehusNavn), median, na.rm=T)
+                               "OdiScore", "NdiScore", "HSCL10Score")], by=list(RegData$SykehusNavn), median, na.rm=T)
 Median[,2:dim(Gj.snitt)[2]] <- round(Median[,2:dim(Gj.snitt)[2]], 1)
 Std.avvik <- aggregate(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
-                                  "OdiScore", "NdiScore", "HSCL10.Score")], by=list(RegData$SykehusNavn), sd, na.rm=T)
+                                  "OdiScore", "NdiScore", "HSCL10Score")], by=list(RegData$SykehusNavn), sd, na.rm=T)
 Std.avvik[,2:dim(Gj.snitt)[2]] <- round(Std.avvik[,2:dim(Gj.snitt)[2]], 1)
 N <- aggregate(RegData[,c("Eq5dScore", "EQ5D.VAS", "FABQ.Score1", "FABQ.Score2",
-                          "OdiScore", "NdiScore", "HSCL10.Score")], by=list(RegData$SykehusNavn), function(x){length(which(!is.na(x)))})
+                          "OdiScore", "NdiScore", "HSCL10Score")], by=list(RegData$SykehusNavn), function(x){length(which(!is.na(x)))})
 
 eq5d_score <- rbind(cbind(Gj.snitt[,1:2], Median[,2], Std.avvik[,2], N[,2]), c('Totalt', round(tabell3[1,],1)))
 colnames(eq5d_score) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
@@ -198,8 +198,8 @@ OdiScore <- rbind(cbind(Gj.snitt[,c(1,6)], Median[,6], Std.avvik[,6], N[,6]), c(
 colnames(OdiScore) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
 NdiScore <- rbind(cbind(Gj.snitt[,c(1,7)], Median[,7], Std.avvik[,7], N[,7]), c('Totalt', round(tabell3[6,],1)))
 colnames(NdiScore) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
-HSCL10.Score <- rbind(cbind(Gj.snitt[,c(1,8)], Median[,8], Std.avvik[,8], N[,8]), c('Totalt', round(tabell3[7,],1)))
-colnames(HSCL10.Score) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
+HSCL10Score <- rbind(cbind(Gj.snitt[,c(1,8)], Median[,8], Std.avvik[,8], N[,8]), c('Totalt', round(tabell3[7,],1)))
+colnames(HSCL10Score) <- c('Sykehus', 'Gj.snitt', 'Median', 'Std.avvik', 'N')
 
 
 print(xtable::xtable(eq5d_score, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(eq5d_score)-1)),
@@ -214,7 +214,7 @@ print(xtable::xtable(OdiScore, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', 
                      caption = 'ODI score'), include.rownames=FALSE)
 print(xtable::xtable(NdiScore, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(NdiScore)-1)),
                      caption = 'NDI score'), include.rownames=FALSE)
-print(xtable::xtable(HSCL10.Score, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(HSCL10.Score)-1)),
+print(xtable::xtable(HSCL10Score, digits=c(1,1,1,1,1,0), align=c('l','l', rep('r', ncol(HSCL10Score)-1)),
                      caption = 'HSCL-10'), include.rownames=FALSE)
 @
 
@@ -234,7 +234,7 @@ FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=d
                maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
                preprosess=preprosess, hentData=hentData)
 
-valgtVar <- 'HSCL10.Score'
+valgtVar <- 'HSCL10Score'
 outfile='HSCL10Score.pdf'
 
 FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,

@@ -109,7 +109,7 @@ nnrrUtvalg <- function(RegData,
   }
 
   indHSCL <- if (minHSCL > 1 | maxHSCL < 4) {
-    which(RegData$HSCL10.Score >= minHSCL & RegData$HSCL10.Score <= maxHSCL)
+    which(RegData$HSCL10Score >= minHSCL & RegData$HSCL10Score <= maxHSCL)
   } else {
     indAlle
   }

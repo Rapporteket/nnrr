@@ -1172,7 +1172,7 @@ write.csv2(RegData, 'I:/nnrr/utforskdata.csv', row.names = F)
 RegData <- RegData[ , c("Besoksdato", "PatientAge", "PatientGender", "EducationLevel",
                         "DiagnosticNumber1", "DiagnosticNumber1Name", "DiagnosticNumber2", "DiagnosticNumber2Name",
                         "DiagnosticNumber3", "DiagnosticNumber3Name", "PainExperiencesActivity", "PainExperiencesNoActivity",
-                        "HSCL10.Score")]
+                        "HSCL10Score")]
 
 write.csv2(RegData, 'I:/nnrr/utlevering17032020.csv', row.names = F)
 

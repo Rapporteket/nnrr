@@ -43,10 +43,10 @@ tidsvisning_UI <- function(id) {
             "bedring_smerte_aktiv_6mnd",
           "Klinisk bedring av smerte i aktivitet 12 mnd" =
             "bedring_smerte_aktiv_12mnd",
-          # "Forhøyet psykisk symptomtrykk (HSCL-10)" = "HSCL10.Score",
+          # "Forhøyet psykisk symptomtrykk (HSCL-10)" = "HSCL10Score",
           "Smertevarighet > 2 år" = "smerter_2aar",
           "Lav tro på RTW (FABQ11)" = "fabq11",
-          "Mestringsoritentert samtale" =
+          "Mestringsorientert samtale" =
             "mestringsorientert_samtale",
           "Kartlagt funksjonsevne relatert til arbeid og utdannelse" =
             "kartlagt_funksjon",
@@ -242,7 +242,7 @@ tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
                bedring_smerte_aktiv_12mnd = "dato_oppfolg2",
                fornoyd_6mnd = "dato_oppfolg",
                fornoyd_12mnd = "dato_oppfolg2",
-               # HSCL10.Score = "Besoksdato",
+               # HSCL10Score = "Besoksdato",
                smerter_2aar = "Besoksdato"
         )
       })

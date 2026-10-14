@@ -583,7 +583,7 @@ nnrrPrepVar <- function(RegData, valgtVar) {
     subtxt <- "Score"
   }
 
-  if (valgtVar == "HSCL10.Score") {
+  if (valgtVar == "HSCL10Score") {
     RegData$Variabel <- RegData[, valgtVar]
     RegData <- RegData[which(!is.na(RegData$Variabel)), ]
     tittel <- "Hopkins symptom checklist"

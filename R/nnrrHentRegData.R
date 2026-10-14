@@ -11,7 +11,16 @@ nnrrHentRegData <- function(datoFra = "2017-01-01",
                             datoTil = "2099-01-01") {
   shiny::withProgress(message = "Loading data", value = 0, {
 
+    dbList <- NULL
     dbList <- rapbase::rapOpenDbConnection("data", "mysql")
+
+    on.exit({
+      if (!is.null(dbList) &&
+          !is.null(dbList$con) &&
+          DBI::dbIsValid(dbList$con)) {
+        rapbase::rapCloseDbConnection(dbList$con)
+      }
+    }, add = TRUE)
 
     shiny::incProgress(0.1, detail = "Laster behandlerskjema")
     legeskjema <- DBI::dbGetQuery(
@@ -67,8 +76,8 @@ nnrrHentRegData <- function(datoFra = "2017-01-01",
       statement = "SELECT * FROM accessunits"
     )
 
-    rapbase::rapCloseDbConnection(dbList$con)
-    dbList <- NULL
+    # rapbase::rapCloseDbConnection(dbList$con)
+    # dbList <- NULL
 
     shiny::incProgress(0.5, detail = "Behandler data")
 

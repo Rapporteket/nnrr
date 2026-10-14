@@ -21,7 +21,7 @@ logoWidget <- tags$script(shiny::HTML(logoCode))
 
 RegData <- nnrr::nnrrHentRegData()
 
-brvalg_fordeling <- c("tverrfaglig_behandlet", "PatientAge", "FABQ.Score1", "FABQ.Score2", "HSCL10.Score", "PainDurationNow",
+brvalg_fordeling <- c("tverrfaglig_behandlet", "PatientAge", "FABQ.Score1", "FABQ.Score2", "HSCL10Score", "PainDurationNow",
                       "AarsakSmerte_PasRap", "beh_kommunalt", "beh_spesialist", "pasrapp_beh_klinikk", "Eq5dSatisfactionTreatment")
 names(brvalg_fordeling) <- c("Tverrfaglig behandling", "Alder ved konsultasjon", "FABQ fysisk aktivitet", "FABQ arbeid",
                              "Hopkins symptom checklist", "Varighet av nåværende smerter", "Årsak til smerte, pasientrapportert",
