@@ -50,7 +50,7 @@ tidsvisning_UI <- function(id) {
             "mestringsorientert_samtale",
           "Kartlagt funksjonsevne relatert til arbeid og utdannelse" =
             "kartlagt_funksjon",
-          "Individuell rådgivning vedrørende livstil og/eller medikamenter" =
+          "Individuell rådgivning vedrørende livsstil og/eller medikamenter" =
             "ind_raad_livsstil",
           "Opplevd nytte av behandling 6 mnd" = "opplevd_nytte_beh_6mnd",
           "Opplevd nytte av behandling 12 mnd" = "opplevd_nytte_beh_12mnd",
