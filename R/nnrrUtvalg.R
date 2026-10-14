@@ -145,6 +145,7 @@ nnrrUtvalg <- function(RegData,
     ind_mono_individ %i% ind_tverrfaglig_individ %i% ind_tverrfaglig_gruppe
   RegData <- RegData[indMed, ]
 
+  if (nrow(RegData) != 0) {
   utvalgTxt <- c(
     paste0(
       datotxt,
@@ -223,6 +224,9 @@ nnrrUtvalg <- function(RegData,
     }
 
   )
+  } else {
+    utvalgTxt <- ""
+  }
 
 
   UtData <- list(RegData = RegData, utvalgTxt = utvalgTxt,
