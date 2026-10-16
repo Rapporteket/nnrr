@@ -189,21 +189,21 @@ write.csv2(samlet[29:39,], "C:/GIT/nnrr/doc/tab5_tidligere_op.csv", row.names = 
 
 <<'Tab 2', results='asis', echo=FALSE>>=
 
-tab2 <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQ.Score1",
+tab2 <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10Score", "FABQ.Score1",
                     "FABQ.Score2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>% group_by (SykehusNavn) %>%
   summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
             Gj.snitt.ndi = mean(NdiScore, na.rm = T),
-            Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+            Gj.snitt.hscl10 = mean(HSCL10Score, na.rm = T),
             Gj.snitt.fabq.fysisk = mean(FABQ.Score1, na.rm = T),
             Gj.snitt.fabq.arbeid = mean(FABQ.Score2, na.rm = T),
             Gj.snitt.eq5d = mean(Eq5dScore, na.rm = T),
             Gj.snitt.eq5d.vas = mean(EQ5D.VAS, na.rm = T))
 
-tot <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQ.Score1",
+tot <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10Score", "FABQ.Score1",
                    "FABQ.Score2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>%
   summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
             Gj.snitt.ndi = mean(NdiScore, na.rm = T),
-            Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+            Gj.snitt.hscl10 = mean(HSCL10Score, na.rm = T),
             Gj.snitt.fabq.fysisk = mean(FABQ.Score1, na.rm = T),
             Gj.snitt.fabq.arbeid = mean(FABQ.Score2, na.rm = T),
             Gj.snitt.eq5d = mean(Eq5dScore, na.rm = T),
@@ -1028,11 +1028,11 @@ write.csv2(aux2, "C:/GIT/nnrr/doc/tab30_pasientrapp_beh_ellers.csv", row.names =
 
 <<'hscl utdypet', results='asis', echo=FALSE>>=
 
-tabell_hscl <- RegData %>% group_by(Aar, SykehusNavn) %>% summarise('Gj.snitt' = mean(HSCL10.Score, na.rm = T),
-                                                                    'Std.avvik' = sd (HSCL10.Score, na.rm = T),
-                                                                    'AntallHoy' = sum(HSCL10.Score>=1.85, na.rm = T),
-                                                                    'Ikke utfylt' = sum(is.na(HSCL10.Score)),
-                                                                    'HSCL=0' = sum(HSCL10.Score==0, na.rm = T),
+tabell_hscl <- RegData %>% group_by(Aar, SykehusNavn) %>% summarise('Gj.snitt' = mean(HSCL10Score, na.rm = T),
+                                                                    'Std.avvik' = sd (HSCL10Score, na.rm = T),
+                                                                    'AntallHoy' = sum(HSCL10Score>=1.85, na.rm = T),
+                                                                    'Ikke utfylt' = sum(is.na(HSCL10Score)),
+                                                                    'HSCL=0' = sum(HSCL10Score==0, na.rm = T),
                                                                     N = n())
 tabell_hscl$AndelHoy <- tabell_hscl$AntallHoy/(tabell_hscl$N - tabell_hscl$`Ikke utfylt`)*100
 tabell_hscl$Aar[-match(unique(tabell_hscl$Aar), tabell_hscl$Aar)] <- NA
@@ -1070,9 +1070,9 @@ if (!is.na(annetformat)) {
 
 
 Indikator <- RegDataAll[RegDataAll$Aar <= rap_aar,]
-Indikator <- Indikator[!is.na(Indikator$HSCL10.Score), ]
+Indikator <- Indikator[!is.na(Indikator$HSCL10Score), ]
 Indikator$Teller <- 0
-Indikator$Teller[Indikator$HSCL10.Score>=1.85] <- 1
+Indikator$Teller[Indikator$HSCL10Score>=1.85] <- 1
 
 indikator <- Indikator[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")

@@ -561,7 +561,7 @@ nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
 
 
 
-valgtVar <- "bedring_smerte_hvile_6mnd_v2"
+valgtVar <- "bedring_smerte_hvile_6mnd"
 plotdata1 <- nnrr::nnrrBeregnAndelTid(
   RegData, valgtVar=valgtVar,
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,

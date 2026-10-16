@@ -197,7 +197,7 @@ FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=d
                maxald=maxald, erMann=erMann, outfile=outfile, reshID=reshID, enhetsUtvalg=enhetsUtvalg,
                preprosess=preprosess, hentData=hentData)
 
-valgtVar <- 'HSCL10.Score'
+valgtVar <- 'HSCL10Score'
 outfile='HSCL10Score.pdf'
 
 FigData <- nnrrFigAndeler(RegData, valgtVar=valgtVar, datoFra=datoFra, datoTil=datoTil, minald=minald,

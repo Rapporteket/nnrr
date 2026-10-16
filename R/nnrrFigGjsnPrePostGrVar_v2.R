@@ -70,9 +70,12 @@ nnrrFigGjsnPrePostGrVar_v2 <- function(
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra,
-    datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann
+    RegData = RegData,
+    datoFra = datoFra,
+    datoTil = datoTil,
+    minald = minald,
+    maxald = maxald,
+    erMann = erMann
   )
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt

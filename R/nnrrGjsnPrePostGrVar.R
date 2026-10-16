@@ -37,8 +37,12 @@ nnrrGjsnPrePostGrVar <- function(RegData, valgtVar, datoFra = "2012-04-01", dato
 
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   nnrrUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra, datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann
+    RegData = RegData,
+    datoFra = datoFra,
+    datoTil = datoTil,
+    minald = minald,
+    maxald = maxald,
+    erMann = erMann
   )
   RegData <- nnrrUtvalg$RegData
   utvalgTxt <- nnrrUtvalg$utvalgTxt

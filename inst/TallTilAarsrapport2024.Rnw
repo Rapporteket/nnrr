@@ -249,15 +249,15 @@ if (!is.na(annetformat)) {
 
 <<'Tab 2', results='asis', echo=FALSE>>=
 tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore",
-                    "NdiScore", "HSCL10.Score", "FABQScore1", "FABQScore2",
+                    "NdiScore", "HSCL10Score", "FABQScore1", "FABQScore2",
                     "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
   dplyr::filter(Aar == rap_aar) %>%
   dplyr::summarise(Gj.snitt.odi = sum(OdiScore, na.rm = T),
                    N.odi = sum(!is.na(OdiScore)),
                    Gj.snitt.ndi = sum(NdiScore, na.rm = T),
                    N.ndi = sum(!is.na(NdiScore)),
-                   Gj.snitt.hscl10 = sum(HSCL10.Score, na.rm = T),
-                   N.hscl10 = sum(!is.na(HSCL10.Score)),
+                   Gj.snitt.hscl10 = sum(HSCL10Score, na.rm = T),
+                   N.hscl10 = sum(!is.na(HSCL10Score)),
                    Gj.snitt.fabq.fysisk = sum(FABQScore1, na.rm = T),
                    N.FABQScore1 = sum(!is.na(FABQScore1)),
                    Gj.snitt.fabq.arbeid = sum(FABQScore2, na.rm = T),
@@ -278,7 +278,7 @@ tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore",
          Gj.snitt.eq5d.vas = Gj.snitt.eq5d.vas/N.eq5d.vas)
 
 
-# tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
+# tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10Score", "FABQScore1",
 #                     "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
 #   dplyr::filter(Aar == rap_aar) %>%
 #   dplyr::group_by (SykehusNavn) %>%
@@ -286,8 +286,8 @@ tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore",
 #                    N.odi = sum(!is.na(OdiScore)),
 #                    Gj.snitt.ndi = mean(NdiScore, na.rm = T),
 #                    N.ndi = sum(!is.na(NdiScore)),
-#                    Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
-#                    N.hscl10 = sum(!is.na(HSCL10.Score)),
+#                    Gj.snitt.hscl10 = mean(HSCL10Score, na.rm = T),
+#                    N.hscl10 = sum(!is.na(HSCL10Score)),
 #                    Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
 #                    N.FABQScore1 = sum(!is.na(FABQScore1)),
 #                    Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
@@ -297,15 +297,15 @@ tab2 <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore",
 #                    Gj.snitt.eq5d.vas = mean(Eq5d_L_spm6, na.rm = T),
 #                    N.eq5d.vas = sum(!is.na(Eq5d_L_spm6)))
 #
-# tot <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10.Score", "FABQScore1",
+# tot <- RegData[, c("SykehusNavn", "Score_EQ5DL", "Eq5d_L_spm6", "OdiScore", "NdiScore", "HSCL10Score", "FABQScore1",
 #                    "FABQScore2", "PainExperiencesNoActivity", "PainExperiencesActivity", "Aar")] %>%
 #   dplyr::filter(Aar == rap_aar) %>%
 #   dplyr::summarise(Gj.snitt.odi = mean(OdiScore, na.rm = T),
 #                    N.odi = sum(!is.na(OdiScore)),
 #                    Gj.snitt.ndi = mean(NdiScore, na.rm = T),
 #                    N.ndi = sum(!is.na(NdiScore)),
-#                    Gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
-#                    N.hscl10 = sum(!is.na(HSCL10.Score)),
+#                    Gj.snitt.hscl10 = mean(HSCL10Score, na.rm = T),
+#                    N.hscl10 = sum(!is.na(HSCL10Score)),
 #                    Gj.snitt.fabq.fysisk = mean(FABQScore1, na.rm = T),
 #                    N.FABQScore1 = sum(!is.na(FABQScore1)),
 #                    Gj.snitt.fabq.arbeid = mean(FABQScore2, na.rm = T),
@@ -1696,10 +1696,10 @@ write.csv2(aux2, paste0(tabfolder, "tab_pasientrapp_beh_ellers.csv"), row.names 
 <<'hscl utdypet', results='asis', echo=FALSE>>=
 
 # tabell_hscl <- RegData %>% group_by(Aar, SykehusNavn) %>%
-#   summarise('Gj.snitt' = mean(HSCL10.Score, na.rm = T),
-#             'Std.avvik' = sd (HSCL10.Score, na.rm = T),
-#             'AntallHoy' = sum(HSCL10.Score>=1.85, na.rm = T),
-#             'Ikke utfylt' = sum(is.na(HSCL10.Score)),
+#   summarise('Gj.snitt' = mean(HSCL10Score, na.rm = T),
+#             'Std.avvik' = sd (HSCL10Score, na.rm = T),
+#             'AntallHoy' = sum(HSCL10Score>=1.85, na.rm = T),
+#             'Ikke utfylt' = sum(is.na(HSCL10Score)),
 #             N = n())
 # tabell_hscl$AndelHoy <- tabell_hscl$AntallHoy/(tabell_hscl$N - tabell_hscl$`Ikke utfylt`)*100
 # tabell_hscl$Aar[-match(unique(tabell_hscl$Aar), tabell_hscl$Aar)] <- NA
@@ -1710,11 +1710,11 @@ write.csv2(aux2, paste0(tabfolder, "tab_pasientrapp_beh_ellers.csv"), row.names 
 
 # V2
 tabell_hscl <- RegData %>%
-  summarise(sum.hcsl = sum(HSCL10.Score, na.rm = T),
-            ant.hcslverdi = sum(!is.na(HSCL10.Score)),
-            sq.dev = sum((HSCL10.Score - sum.hcsl/ant.hcslverdi)^2, na.rm = T),
-            AntallHoy = sum(HSCL10.Score>=1.85, na.rm = T),
-            'Ikke utfylt' = sum(is.na(HSCL10.Score)),
+  summarise(sum.hcsl = sum(HSCL10Score, na.rm = T),
+            ant.hcslverdi = sum(!is.na(HSCL10Score)),
+            sq.dev = sum((HSCL10Score - sum.hcsl/ant.hcslverdi)^2, na.rm = T),
+            AntallHoy = sum(HSCL10Score>=1.85, na.rm = T),
+            'Ikke utfylt' = sum(is.na(HSCL10Score)),
             N = n(),
             tmp = AntallHoy/ant.hcslverdi*100,
             .by = SykehusNavn) %>%
@@ -1762,9 +1762,9 @@ if (!is.na(annetformat)) {
 
 
 Indikator <- RegDataAll[RegDataAll$Aar <= rap_aar,]
-Indikator <- Indikator[!is.na(Indikator$HSCL10.Score), ]
+Indikator <- Indikator[!is.na(Indikator$HSCL10Score), ]
 Indikator$Teller <- 0
-Indikator$Teller[Indikator$HSCL10.Score>=1.85] <- 1
+Indikator$Teller[Indikator$HSCL10Score>=1.85] <- 1
 
 indikator <- Indikator[, c("UnitId", "Aar", "Teller", "SykehusNavn")]
 names(indikator) <- c('ReshId', 'Aar', 'Teller', "SykehusNavn")

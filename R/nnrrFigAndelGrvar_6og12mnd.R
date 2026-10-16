@@ -45,8 +45,13 @@ nnrrFigAndelGrvar_6og12mnd <- function(
   PlotParams1$RegData <- NA
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra, datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann, datovar = "dato_oppfolg"
+    RegData = RegData,
+    datoFra = datoFra,
+    datoTil = datoTil,
+    minald = minald,
+    maxald = maxald,
+    erMann = erMann,
+    datovar = "dato_oppfolg"
   )
   RegData <- NNRRUtvalg$RegData
   utvalgTxt <- NNRRUtvalg$utvalgTxt
@@ -87,8 +92,13 @@ nnrrFigAndelGrvar_6og12mnd <- function(
   PlotParams2$RegData <- NA
   ## Gjør utvalg basert på brukervalg (LibUtvalg)
   NNRRUtvalg <- nnrrUtvalg(
-    RegData = RegData, datoFra = datoFra, datoTil = datoTil, minald = minald,
-    maxald = maxald, erMann = erMann, datovar = "dato_oppfolg2"
+    RegData = RegData,
+    datoFra = datoFra,
+    datoTil = datoTil,
+    minald = minald,
+    maxald = maxald,
+    erMann = erMann,
+    datovar = "dato_oppfolg2"
   )
   RegData <- NNRRUtvalg$RegData
 

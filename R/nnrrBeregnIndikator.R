@@ -25,7 +25,7 @@ nnrrBeregnIndikator <- function(RegData, ind_id) {
       103736, 700138
     )
   )
-  terskel <- 30
+  terskel <- 10
   minstekrav <- NA
   maal <- NA
   skriftStr <- 1.3

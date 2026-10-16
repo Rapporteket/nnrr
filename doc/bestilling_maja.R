@@ -15,7 +15,7 @@ aux <- aux[!is.na(aux$OdiScore) & !is.na(aux$OdiScore_post), ]
 aux$odidiff_klin_viktig <- 0
 aux$odidiff_klin_viktig[(aux$OdiScore - aux$OdiScore_post)/aux$OdiScore >= .3] <- 1
 
-aux <- aux %>% mutate(Gr = ifelse(HSCL10.Score >= 1.85, "StrLik", "Mindre")) %>%
+aux <- aux %>% mutate(Gr = ifelse(HSCL10Score >= 1.85, "StrLik", "Mindre")) %>%
   dplyr::filter(!is.na(Gr))
 
 Tabell1 <- aux %>% filter(Aar <= rap_aar & Aar > rap_aar-3) %>%
@@ -163,9 +163,9 @@ tabell <- baseline %>%
     antall.ikkehoyereutdannet = sum(UtdanningHoy == 0, na.rm = T),
     antall.single = sum(FamilyStatus == 'Enslig'),
     antall.ikkesingle = sum(!(FamilyStatus %in% c('Enslig', 'Ikke svart'))),
-    gj.sn.hscl10 = mean(HSCL10.Score, na.rm = T),
-    sd.hscl10 = sd(HSCL10.Score, na.rm = T),
-    n.hscl10 = sum(!is.na(HSCL10.Score)),
+    gj.sn.hscl10 = mean(HSCL10Score, na.rm = T),
+    sd.hscl10 = sd(HSCL10Score, na.rm = T),
+    n.hscl10 = sum(!is.na(HSCL10Score)),
     gj.sn.fabq = mean(FABQScore1, na.rm = T),
     sd.fabq = sd(FABQScore1, na.rm = T),
     gj.sn.odi = mean(OdiScore, na.rm = T),
@@ -186,7 +186,7 @@ tabell <- baseline %>%
     andel.kvinner = sum(ErMann == 0)/antall*100,
     andel.hoyereutdannet = sum(UtdanningHoy == 1, na.rm = T)/sum(!is.na(UtdanningHoy))*100,
     andel.single = sum(Single == 1, na.rm = T)/sum(!is.na(Single))*100,
-    gj.sn.hscl10 = mean(HSCL10.Score, na.rm = T),
+    gj.sn.hscl10 = mean(HSCL10Score, na.rm = T),
     gj.sn.fabq = mean(FABQScore1, na.rm = T),
     gj.sn.odi = mean(OdiScore, na.rm = T),
     gj.sn.eq5d = mean(Score_EQ5DL, na.rm = T),
@@ -197,7 +197,7 @@ tabell <- baseline %>%
 
 
 studydata_num <- baseline %>%
-  select(Gr, PatientAge, HSCL10.Score, FABQScore1, OdiScore, Score_EQ5DL,
+  select(Gr, PatientAge, HSCL10Score, FABQScore1, OdiScore, Score_EQ5DL,
          PainExperiencesNoActivity, PainExperiencesActivity)
 
 studydata_kat <- baseline %>%
@@ -292,7 +292,7 @@ baseline %>%
 # aux$odidiff_klin_viktig <- 0
 # aux$odidiff_klin_viktig[(aux$OdiScore - aux$OdiScore_post)/aux$OdiScore >= .3] <- 1
 #
-# aux <- aux %>% mutate(Gr = ifelse(HSCL10.Score >= 1.85, "StrLik", "Mindre")) %>%
+# aux <- aux %>% mutate(Gr = ifelse(HSCL10Score >= 1.85, "StrLik", "Mindre")) %>%
 #   dplyr::filter(!is.na(Gr))
 #
 # Tabell1 <- aux %>% filter(Aar <= rap_aar & Aar > rap_aar-3) %>%

@@ -131,25 +131,25 @@ print(xtable::xtable(samlet, align=c('l', 'l', rep('r', ncol(samlet)-1)),
 
 <<'Tab 2', results='asis', echo=FALSE>>=
 
-tab2 <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQ.Score1",
+tab2 <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10Score", "FABQ.Score1",
                     "FABQ.Score2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>% group_by (SykehusNavn) %>%
   summarise(smerteintensitet.hvile = mean(PainExperiencesNoActivity, na.rm = T),
             smerteintensitet.aktiv = mean(PainExperiencesActivity, na.rm = T),
             gj.snitt.odi = mean(OdiScore, na.rm = T),
             gj.snitt.ndi = mean(NdiScore, na.rm = T),
-            gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+            gj.snitt.hscl10 = mean(HSCL10Score, na.rm = T),
             gj.snitt.fabq.fysisk = mean(FABQ.Score1, na.rm = T),
             gj.snitt.fabq.arbeid = mean(FABQ.Score2, na.rm = T),
             gj.snitt.eq5d = mean(Eq5dScore, na.rm = T),
             gj.snitt.eq5d.vas = mean(EQ5D.VAS, na.rm = T))
 
-tot <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10.Score", "FABQ.Score1",
+tot <- RegData[, c("SykehusNavn", "Eq5dScore", "EQ5D.VAS", "OdiScore", "NdiScore", "HSCL10Score", "FABQ.Score1",
                     "FABQ.Score2", "PainExperiencesNoActivity", "PainExperiencesActivity")] %>%
   summarise(smerteintensitet.hvile = mean(PainExperiencesNoActivity, na.rm = T),
             smerteintensitet.aktiv = mean(PainExperiencesActivity, na.rm = T),
             gj.snitt.odi = mean(OdiScore, na.rm = T),
             gj.snitt.ndi = mean(NdiScore, na.rm = T),
-            gj.snitt.hscl10 = mean(HSCL10.Score, na.rm = T),
+            gj.snitt.hscl10 = mean(HSCL10Score, na.rm = T),
             gj.snitt.fabq.fysisk = mean(FABQ.Score1, na.rm = T),
             gj.snitt.fabq.arbeid = mean(FABQ.Score2, na.rm = T),
             gj.snitt.eq5d = mean(Eq5dScore, na.rm = T),
