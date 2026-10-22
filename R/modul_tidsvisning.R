@@ -197,7 +197,7 @@ tidsvisning_UI <- function(id) {
 #'
 #' @export
 #'
-tidsvisningServer <- function(id, reshID, RegData, userRole, hvd_session) {
+tidsvisningServer <- function(id, reshID, RegData, userRole) {
   moduleServer(
     id,
     function(input, output, session) {

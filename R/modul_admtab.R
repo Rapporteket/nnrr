@@ -95,8 +95,7 @@ admtab_ui <- function(id) {
 #'
 #' @export
 #'
-admtab_server <- function(id, RegData, userRole,
-                          hvd_session) {
+admtab_server <- function(id, RegData, userRole) {
   moduleServer(
     id,
     function(input, output, session) {

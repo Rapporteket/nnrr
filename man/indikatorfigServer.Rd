@@ -4,7 +4,7 @@
 \alias{indikatorfigServer}
 \title{Server-modul for indikatorfigurer i NNRR sin shiny-app på Rapporteket}
 \usage{
-indikatorfigServer(id, RegData, userRole, hvd_session)
+indikatorfigServer(id, RegData, userRole)
 }
 \description{
 Kun til bruk i Shiny

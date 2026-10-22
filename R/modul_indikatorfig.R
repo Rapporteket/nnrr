@@ -83,7 +83,7 @@ indikatorfig_UI <- function(id) {
 #'
 #' @export
 #'
-indikatorfigServer <- function(id, RegData, userRole, hvd_session) {
+indikatorfigServer <- function(id, RegData, userRole) {
   moduleServer(
     id,
     function(input, output, session) {

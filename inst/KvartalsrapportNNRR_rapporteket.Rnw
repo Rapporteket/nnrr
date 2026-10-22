@@ -567,7 +567,7 @@ plotdata1 <- nnrr::nnrrBeregnAndelTid(
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
   minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
   tidsenhet="Kvartal", datovar = "dato_oppfolg")
-valgtVar <- "bedring_smerte_hvile_12mnd_v2"
+valgtVar <- "bedring_smerte_hvile_12mnd"
 plotdata2 <- nnrr::nnrrBeregnAndelTid(
   RegData, valgtVar=valgtVar,
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
@@ -581,13 +581,13 @@ nnrr::nnrrTidsplot_6og12mnd(plotdata1 = plotdata1,
                             inkl_konf = 0)
 
 
-valgtVar <- "bedring_smerte_aktiv_6mnd_v2"
+valgtVar <- "bedring_smerte_aktiv_6mnd"
 plotdata1 <- nnrr::nnrrBeregnAndelTid(
   RegData, valgtVar=valgtVar,
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,
   minald=0, maxald=130, erMann=99, outfile=outfile, reshID=reshID,
   tidsenhet="Kvartal", datovar = "dato_oppfolg")
-valgtVar <- "bedring_smerte_aktiv_12mnd_v2"
+valgtVar <- "bedring_smerte_aktiv_12mnd"
 plotdata2 <- nnrr::nnrrBeregnAndelTid(
   RegData, valgtVar=valgtVar,
   datoFra=datoFra, datoTil=datoTil, enhetsUtvalg=1,

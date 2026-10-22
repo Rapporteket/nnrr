@@ -99,7 +99,7 @@ sykehusvisning_UI <- function(id) {
 #'
 #' @export
 #'
-sykehusvisningServer <- function(id, RegData, userRole, hvd_session) {
+sykehusvisningServer <- function(id, RegData, userRole) {
   moduleServer(
     id,
     function(input, output, session) {

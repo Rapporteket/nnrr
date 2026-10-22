@@ -154,43 +154,35 @@ appServer <- function(input, output, session) {
 
   nnrr::fordelingsfigServer("fordelingsfig_id",
                             reshID = user$org,
-                            RegData = RegData, userRole = user$role,
-                            hvd_session = session
+                            RegData = RegData, userRole = user$role
   )
 
   nnrr::sykehusvisningServer("sykehusvisning_id",
-                             RegData = RegData, userRole = user$role,
-                             hvd_session = session
+                             RegData = RegData, userRole = user$role
   )
 
   nnrr::tidsvisningServer("tidsvisning_id",
                           reshID = user$org,
-                          RegData = RegData, userRole = user$role,
-                          hvd_session = session
+                          RegData = RegData, userRole = user$role
   )
 
   nnrr::indikatorfigServer("indikatorfig_id",
-                           RegData = RegData, userRole = user$role,
-                           hvd_session = session
+                           RegData = RegData, userRole = user$role
   )
 
   nnrr::datadump_Server("datadump_id",
-                        #reshID = user$org,
                         user = user,
-                        RegData = RegData, #userRole = user$role,
-                        hvd_session = session
+                        RegData = RegData
   )
 
   nnrr::samledok_server("samledok",
                         reshID = user$org,
-                        RegData = RegData, userRole = user$role,
-                        hvd_session = session
+                        RegData = RegData, userRole = user$role
   )
 
   nnrr::admtab_server("admtabell",
                       RegData = RegData,
-                      userRole = user$role,
-                      hvd_session = session
+                      userRole = user$role
   )
 
 

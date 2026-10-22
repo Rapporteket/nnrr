@@ -168,7 +168,7 @@ fordelingsfig_UI <- function(id) {
 #'
 #' @export
 #'
-fordelingsfigServer <- function(id, reshID, RegData, userRole, hvd_session) {
+fordelingsfigServer <- function(id, reshID, RegData, userRole) {
   moduleServer(
     id,
     function(input, output, session) {

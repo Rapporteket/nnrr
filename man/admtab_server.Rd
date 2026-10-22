@@ -5,7 +5,7 @@
 \title{Serverdel av modul for Administrative tabeller-fane i
 NNRR sin shiny-app på Rapporteket}
 \usage{
-admtab_server(id, RegData, userRole, hvd_session)
+admtab_server(id, RegData, userRole)
 }
 \value{
 Modulfunksjoner til Administrative tabeller

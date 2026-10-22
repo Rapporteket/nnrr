@@ -56,8 +56,7 @@ datadump_UI <- function(id) {
 #'
 #' @export
 #'
-datadump_Server <- function(id, RegData,
-                            hvd_session, user) {
+datadump_Server <- function(id, RegData, user) {
   moduleServer(
     id,
     function(input, output, session) {
