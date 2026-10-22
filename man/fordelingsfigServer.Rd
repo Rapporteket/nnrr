@@ -4,7 +4,7 @@
 \alias{fordelingsfigServer}
 \title{Server-modul for fordelingsfigurer i NNRR sin shiny-app på Rapporteket}
 \usage{
-fordelingsfigServer(id, reshID, RegData, userRole, hvd_session)
+fordelingsfigServer(id, reshID, RegData, userRole)
 }
 \description{
 Kun til bruk i Shiny

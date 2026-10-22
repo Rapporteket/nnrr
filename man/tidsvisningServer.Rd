@@ -4,7 +4,7 @@
 \alias{tidsvisningServer}
 \title{Server-modul for tidsvisninger i NNRR sin shiny-app på Rapporteket}
 \usage{
-tidsvisningServer(id, reshID, RegData, userRole, hvd_session)
+tidsvisningServer(id, reshID, RegData, userRole)
 }
 \description{
 Kun til bruk i Shiny

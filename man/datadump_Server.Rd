@@ -4,7 +4,7 @@
 \alias{datadump_Server}
 \title{Modul for serverdel av datadump i NNRR sin shiny-app på Rapporteket}
 \usage{
-datadump_Server(id, RegData, hvd_session, user)
+datadump_Server(id, RegData, user)
 }
 \description{
 Kun til bruk i Shiny

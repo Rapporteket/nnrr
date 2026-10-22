@@ -3,6 +3,16 @@ library(nnrr)
 library(dplyr)
 library(ggplot2)
 
+##### Hianor 20.10.2026 ##########################
+
+kobling_nnrr <- data.table::fread(
+  "C:/Users/kth200/regdata/nnrr/utleveringer/data_2026-10-20_1326.csv",
+  select = c("_PasientFnr", "PasientGUID"),
+  colClasses = "character",
+  sep = ";"
+) |> dplyr::distinct()
+
+
 ### Bestilling poster Maja 22.01.2026 #########
 figfolder <- "C:/Users/kth200/regdata/nnrr/utleveringer/"
 

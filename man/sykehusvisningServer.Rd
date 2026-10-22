@@ -4,7 +4,7 @@
 \alias{sykehusvisningServer}
 \title{Server-modul for sykehusvise figurer i NNRR sin shiny-app på Rapporteket}
 \usage{
-sykehusvisningServer(id, RegData, userRole, hvd_session)
+sykehusvisningServer(id, RegData, userRole)
 }
 \description{
 Kun til bruk i Shiny

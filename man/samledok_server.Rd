@@ -4,7 +4,7 @@
 \alias{samledok_server}
 \title{Server-modul for Samledokumenter-fane i NNRR sin shiny-app på Rapporteket}
 \usage{
-samledok_server(id, reshID, RegData, userRole, hvd_session)
+samledok_server(id, reshID, RegData, userRole)
 }
 \value{
 Modulfunksjoner til Samledokumenter
