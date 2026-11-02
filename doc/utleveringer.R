@@ -5,12 +5,128 @@ library(ggplot2)
 
 ##### Hianor 20.10.2026 ##########################
 
-kobling_nnrr <- data.table::fread(
-  "C:/Users/kth200/regdata/nnrr/utleveringer/data_2026-10-20_1326.csv",
-  select = c("_PasientFnr", "PasientGUID"),
-  colClasses = "character",
-  sep = ";"
-) |> dplyr::distinct()
+kobling_nnrr <- readxl::read_xlsx(
+  "C:/Users/kth200/regdata/nnrr/utleveringer/hianor/data_2026-10-27_1245.xlsx",
+) |> dplyr::select("_PasientFnr", "PasientGUID") |>
+  dplyr::distinct()
+
+
+pasliste_hianor <- readxl::read_xlsx(
+  "C:/Users/kth200/regdata/nnrr/utleveringer/hianor/Pseudonym_Personnummer_Dato_til_NNRR.xlsx"
+)
+
+kobl_fnr_pguid <- merge(kobling_nnrr,
+                        pasliste_hianor,
+                        by.x = "_PasientFnr",
+                        by.y = "u_account")
+
+# setdiff(pasliste_hianor$u_account, kobling_nnrr$`_PasientFnr`)
+registryName <- "data"
+dbType <- "mysql"
+datoFra <- "2023-01-16"
+datoTil <- "2025-10-15"
+
+legeskjema <- rapbase::loadRegData(
+  registryName,
+  paste0(
+    "SELECT * FROM behandlerskjema_1 WHERE
+      S1b_DateOfCompletion >= \'",
+    datoFra, "\' AND S1b_DateOfCompletion <= \'",
+    datoTil, "\' "
+  )
+) |>
+  dplyr::distinct(SkjemaGUID, .keep_all = TRUE) |>
+  dplyr::filter(PasientGUID %in% kobl_fnr_pguid$PasientGUID) |>
+  dplyr::filter(PatientAge >= 18) |>
+  merge(kobl_fnr_pguid |> dplyr::select(PasientGUID, pseudonym),
+        by = "PasientGUID")
+
+pasientsvar_pre <- rapbase::loadRegData(
+  registryName,
+  paste0(
+    "SELECT * FROM pasientskjema_foer_behandling_2 WHERE
+      S1b_DateOfCompletion >= \'",
+    datoFra, "\' AND S1b_DateOfCompletion <= \'",
+    datoTil, "\' "
+  )
+) |>
+  dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE) |>
+  dplyr::filter(PasientGUID %in% kobl_fnr_pguid$PasientGUID) |>
+  merge(kobl_fnr_pguid |> dplyr::select(PasientGUID, pseudonym),
+        by = "PasientGUID")
+
+pasientsvar_post <- rapbase::loadRegData(
+  registryName,
+  paste0(
+    "SELECT * FROM pasientskjema_6_maaneder_etter_behandling_3 WHERE
+      S1b_DateOfCompletion >= \'",
+    datoFra, "\' AND S1b_DateOfCompletion <= \'",
+    datoTil, "\' "
+  )
+) |>
+  dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE) |>
+  dplyr::filter(PasientGUID %in% kobl_fnr_pguid$PasientGUID) |>
+  merge(kobl_fnr_pguid |> dplyr::select(PasientGUID, pseudonym),
+        by = "PasientGUID")
+
+pasientsvar_post2 <- rapbase::loadRegData(
+  registryName,
+  paste0(
+    "SELECT * FROM pasientskjema_12_maaneder_etter_behandling_8 WHERE
+      S1b_DateOfCompletion >= \'",
+    datoFra, "\' AND S1b_DateOfCompletion <= \'",
+    datoTil, "\' "
+  )
+) |>
+  dplyr::distinct(HovedskjemaGUID, .keep_all = TRUE) |>
+  dplyr::filter(PasientGUID %in% kobl_fnr_pguid$PasientGUID) |>
+  merge(kobl_fnr_pguid |> dplyr::select(PasientGUID, pseudonym),
+        by = "PasientGUID")
+
+pasientsvar_pre <- pasientsvar_pre[
+  pasientsvar_pre$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+legeskjema <- legeskjema[
+  legeskjema$SkjemaGUID %in% pasientsvar_pre$HovedskjemaGUID, ]
+pasientsvar_post <- pasientsvar_post[
+  pasientsvar_post$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+pasientsvar_post2 <- pasientsvar_post2[
+  pasientsvar_post2$HovedskjemaGUID %in% legeskjema$SkjemaGUID, ]
+
+ikkemed <- c("BackSurgery", "NeckSurgery", "PelvisSurgery", "Radiological_None", "RadiologicalUS_CT", "RadiologicalUS_MR",
+             "RadiologicalUS_Radikulgraphy", "RadiologicalUS_Discography", "RadiologicalUS_LS_C_Columna",
+             "RadiologicalUS_FlexionExtention", "RadiologicalF_Normal", "RadiologicalF_DiscHernitation",
+             "RadiologicalF_CentralSpinalCord", "RadiologicalF_RecesStenosis", "RadiologicalF_Spondylolisthesis2018",
+             "RadiologicalF_Spondylolisthesis", "RadiologicalF_Scoliosis", "RadiologicalF_Scoliosis_Subcategory",
+             "RadiologicalF_Modicchanges", "RadiologicalF_Modicchanges1", "RadiologicalF_Modicchanges2",
+             "RadiologicalF_Modicchanges3", "RadiologicalF_ModicchangesUnspecified", "RadiologicalF_Other",
+             "OtherSupplementaryDiagnostic_DiagnosticInjection", "OtherSupplementaryDiagnostic_Radikulgraphy",
+             "RadiologicalUS_DiagnosticBlock", "OtherSupplementaryDiagnostic_Emg", "OtherSupplementaryDiagnostic_Nevrografi")
+legeskjema <- legeskjema[, -which(names(legeskjema) %in% ikkemed)]
+
+readr::write_csv2(
+  pasientsvar_pre,
+  paste0(
+    "C:/Users/kth200/regdata/nnrr/utleveringer/hianor/pasientsvar_pre_",
+    Sys.Date(), ".csv")
+)
+readr::write_csv2(
+  legeskjema,
+  paste0(
+    "C:/Users/kth200/regdata/nnrr/utleveringer/hianor/legeskjema_",
+    Sys.Date(), ".csv")
+)
+readr::write_csv2(
+  pasientsvar_post,
+  paste0(
+    "C:/Users/kth200/regdata/nnrr/utleveringer/hianor/pasientsvar_post6mnd_",
+    Sys.Date(), ".csv")
+)
+readr::write_csv2(
+  pasientsvar_post2,
+  paste0(
+    "C:/Users/kth200/regdata/nnrr/utleveringer/hianor/pasientsvar_post12mnd_",
+    Sys.Date(), ".csv")
+)
 
 
 ### Bestilling poster Maja 22.01.2026 #########
@@ -82,7 +198,7 @@ Tab_6mnd <- RegData |>
          !is.na(NdiScore),
          !is.na(RegData$OdiScore),
          !is.na(RegData$OdiScore_post)) |>
-mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post >= 10, 1, 0)) |>
+  mutate(klinisk_forbedring = ifelse(OdiScore-OdiScore_post >= 10, 1, 0)) |>
   summarise(
     bedring = sum(klinisk_forbedring),
     N = n(),
@@ -141,7 +257,7 @@ Tab_6mnd <- RegData |>
   filter(aar_oppfolg %in% 2023:2025,
          !is.na(NdiScore),
          !is.na(RegData$NdiScore_post)) |>
-mutate(klinisk_forbedring = ifelse(NdiScore-NdiScore_post >= 10, 1, 0)) |>
+  mutate(klinisk_forbedring = ifelse(NdiScore-NdiScore_post >= 10, 1, 0)) |>
   summarise(
     bedring = sum(klinisk_forbedring),
     N = n(),
@@ -241,9 +357,9 @@ if (outfile != "") {dev.off()}
 aar <- sort(unique(tab_oppf$aar))
 ggplot(tab_oppf,
        aes(x = andel, y = oppf, shape = aar, color = aar)) +
-geom_bar(data = tab_oppf,
-         aes(x = andel, y = oppf),
-         stat = "identity", fill = "steelblue", alpha = 1, width = 4 / 5) +
+  geom_bar(data = tab_oppf,
+           aes(x = andel, y = oppf),
+           stat = "identity", fill = "steelblue", alpha = 1, width = 4 / 5) +
   geom_point(size = 3) +
   scale_shape_manual(values = setNames(
     c(rev(c(19, 1, 17, 6, 15, 0)[1:(length(aar)-1)]), NA), aar)) +
